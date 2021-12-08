@@ -1,36 +1,25 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
-    "jsx": "react-jsx",
-    "emitDecoratorMetadata": true,
-    "module": "esnext",
-    "allowJs": true,
+    "target": "es2021",
+    "module": "commonjs",
+    "lib": ["dom", "esnext"],
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "newLine": "lf",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "useUnknownInCatchVariables": true,
-    "alwaysStrict": true,
+    "pretty": true,
+    "sourceMap": true,
+    "baseUrl": "./src",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
     "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true
+    "allowJs": true,
+    "outDir": "release/app/dist"
   },
-  "include": [
-    "src"
-  ]
+  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }
