@@ -34,7 +34,7 @@ if (
       'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
     )
   );
-  execSync('npm run postinstall');
+  execSync('pnpm run postinstall');
 }
 
 export default merge(baseConfig, {
@@ -163,7 +163,7 @@ export default merge(baseConfig, {
     },
     onBeforeSetupMiddleware() {
       console.log('Starting Main Process...');
-      spawn('npm', ['run', 'start:main'], {
+      spawn('pnpm', ['run', 'start:main'], {
         shell: true,
         env: process.env,
         stdio: 'inherit',
