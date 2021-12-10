@@ -1,13 +1,18 @@
+import { Paper } from '@mui/material'
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom'
-import icon from '../../assets/icon.svg'
 import './App.css'
+import Sidebar from './components/sidebar/sidebar'
 
 const Hello = () => {
   return (
-    <div>
-      <h1>Title</h1>
-      <p>Hello world!</p>
-    </div>
+    <Paper sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Paper
+        elevation={3}
+        sx={{ display: 'flex', width: '280px', height: '100%' }}
+      >
+        <Sidebar />
+      </Paper>
+    </Paper>
   )
 }
 
