@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import UUID from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { ClusterInfo } from './clusterInfo'
 import regions from './mockRegions.json'
 import { Vendor } from './vendor'
@@ -35,7 +35,7 @@ function randAccount() {
 }
 
 function randAccountUUID() {
-  return UUID.v4()
+  return uuidv4()
 }
 
 const accountTable = {
