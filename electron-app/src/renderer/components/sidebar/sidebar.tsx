@@ -10,12 +10,13 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import EditIcon from '@mui/icons-material/Edit'
 import InfoIcon from '@mui/icons-material/Info'
 import SettingsIcon from '@mui/icons-material/Settings'
+import { Link } from 'react-router-dom'
 
 export default function Sidebar() {
   return (
     <List>
       <ListItem>
-        <ListItemButton>
+        <ListItemButton component={Link} to="/cluster-management">
           <ListItemIcon>
             <ManageSearchIcon />
           </ListItemIcon>
