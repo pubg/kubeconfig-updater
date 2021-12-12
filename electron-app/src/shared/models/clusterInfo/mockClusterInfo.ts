@@ -1,5 +1,5 @@
-import crypto, { randomUUID } from 'crypto'
 import _ from 'lodash'
+import UUID from 'uuid'
 import { ClusterInfo } from './clusterInfo'
 import regions from './mockRegions.json'
 import { Vendor } from './vendor'
@@ -21,23 +21,28 @@ function randStage(): string {
 }
 
 function hash() {
-  return crypto.randomBytes(3).toString('hex')
+  const template = '0123456789abcdef'
+  const values: string[] = []
+  for (let i = 0; i < 6; i += 1) {
+    values.push(template[_.random(0, template.length)])
+  }
+
+  return values.join()
+}
+
+function randAccount() {
+  return _.random(10 ** 11, 10 ** 12).toString()
+}
+
+function randAccountUUID() {
+  return UUID.v4()
 }
 
 const accountTable = {
-  AWS: [
-    crypto.randomInt(10 ** 11, 10 ** 12).toString(),
-    crypto.randomInt(10 ** 11, 10 ** 12).toString(),
-  ],
-  Tencent: [
-    crypto.randomInt(10 ** 11, 10 ** 12).toString(),
-    crypto.randomInt(10 ** 11, 10 ** 12).toString(),
-  ],
-  Google: [
-    crypto.randomInt(10 ** 11, 10 ** 12).toString(),
-    crypto.randomInt(10 ** 11, 10 ** 12).toString(),
-  ],
-  Azure: [randomUUID(), randomUUID()],
+  AWS: [randAccount(), randAccount()],
+  Tencent: [randAccount(), randAccount()],
+  Google: [randAccount(), randAccount()],
+  Azure: [randAccountUUID(), randAccountUUID()],
 }
 
 function account(vendor: Vendor): string {
