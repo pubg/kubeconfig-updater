@@ -14,6 +14,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import Enumerable from 'linq'
+import _ from 'lodash'
 import { useCallback, useState } from 'react'
 import {
   ClusterInfo,
@@ -27,6 +29,41 @@ const items = generateMockClusterInfos(64)
 
 export default function ClusterManagement() {
   const [showRegistered, setShowRegistered] = useState(false)
+
+  const [listItems, setListItems] = useState(items)
+
+  // FIXME: sorting works but only one time, this is incorrect implementation (for mock-ups)
+  // and need to be fixed when doing proper implementation
+  const onColumnClick = (
+    e?: React.MouseEvent<HTMLElement>,
+    column?: IColumn
+  ): void => {
+    const sortKey = column?.fieldName
+    if (!sortKey) {
+      return
+    }
+
+    let descending = false
+
+    if (column.isSorted) {
+      descending = !descending
+    }
+
+    const sortedItemsLINQ = Enumerable.from(listItems).orderBy(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (item) => (item as any)[sortKey]
+    )
+
+    if (descending) {
+      sortedItemsLINQ.reverse()
+    }
+
+    const sortedItems = sortedItemsLINQ.toArray()
+
+    setListItems(sortedItems)
+
+    column.isSorted = true
+  }
 
   const colorFormatForStatus = (status: Status) => {
     switch (status) {
@@ -190,8 +227,9 @@ export default function ClusterManagement() {
           }}
         >
           <DetailsList
-            items={items.filter(itemFilter)}
+            items={listItems.filter(itemFilter)}
             columns={columns}
+            onColumnHeaderClick={onColumnClick}
             // layoutMode={DetailsListLayoutMode.justified}
             // onRenderItemColumn={renderItemColumn}
           />
