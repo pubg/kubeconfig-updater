@@ -8,10 +8,25 @@ import Home from './pages/home/home'
 export default function App() {
   return (
     <Router>
-      <Paper sx={{ height: '100vh', display: 'flex', flexDirection: 'row' }}>
+      <Paper
+        sx={{
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'stretch',
+          alignItems: 'stretch',
+        }}
+      >
         <Paper
           elevation={3}
-          sx={{ display: 'flex', width: '280px', height: '100%' }}
+          sx={{
+            display: 'flex',
+            width: '320px',
+            height: '100%',
+            flexShrink: 0,
+            flexGrow: 0,
+          }}
         >
           <Sidebar />
         </Paper>
