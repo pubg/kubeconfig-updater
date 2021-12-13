@@ -27,7 +27,7 @@ function hash() {
     values.push(template[_.random(0, template.length)])
   }
 
-  return values.join()
+  return values.join('')
 }
 
 function randAccount() {
