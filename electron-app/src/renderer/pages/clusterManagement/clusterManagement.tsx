@@ -13,6 +13,7 @@ import {
   Switch,
   TextField,
 } from '@mui/material'
+import { useState } from 'react'
 import { generateMockClusterInfos } from '../../../shared/models/clusterInfo/mockClusterInfo'
 
 const mockTags = ['stage', 'vendor', 'region']
@@ -20,6 +21,8 @@ const mockTags = ['stage', 'vendor', 'region']
 const items = generateMockClusterInfos(64)
 
 export default function ClusterManagement() {
+  const [showRegistered, setShowRegistered] = useState(false)
+
   return (
     /** background */
     <Paper sx={{ width: '100%', height: '100%' }}>
@@ -40,7 +43,14 @@ export default function ClusterManagement() {
                 label="filter by name"
                 variant="outlined"
               />
-              <FormControlLabel control={<Switch />} label="Show Registered" />
+              <FormControlLabel
+                control={
+                  <Switch
+                    onChange={(e) => setShowRegistered(e.target.checked)}
+                  />
+                }
+                label="Show Registered"
+              />
               <Autocomplete
                 multiple
                 options={mockTags}
@@ -72,7 +82,9 @@ export default function ClusterManagement() {
         {/* list container */}
         <Box overflow="scroll" width="100%" height="100%">
           <DetailsList
-            items={items}
+            items={items.filter(
+              (item) => !item.registered || (showRegistered && item.registered)
+            )}
             layoutMode={DetailsListLayoutMode.justified}
           />
         </Box>

@@ -75,6 +75,7 @@ export function generateMockClusterInfos(len: number): ClusterInfo[] {
       }-${hash()}`,
       vendor: region.infraVendor as Vendor,
       account: account(region.infraVendor),
+      registered: Math.random() >= 0.5,
     })
   }
 
