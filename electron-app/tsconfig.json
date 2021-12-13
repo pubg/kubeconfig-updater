@@ -5,6 +5,8 @@
     "lib": ["dom", "esnext"],
     "declaration": true,
     "declarationMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "jsx": "react-jsx",
     "strict": true,
     "pretty": true,
