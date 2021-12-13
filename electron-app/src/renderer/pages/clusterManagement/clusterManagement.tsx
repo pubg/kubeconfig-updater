@@ -8,6 +8,8 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
+  Menu,
+  MenuItem,
   Paper,
   Stack,
   Switch,
@@ -16,7 +18,7 @@ import {
 } from '@mui/material'
 import Enumerable from 'linq'
 import _ from 'lodash'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   ClusterInfo,
   Status,
@@ -88,6 +90,11 @@ export default function ClusterManagement() {
     return showRegistered || (!showRegistered && item.status !== 'Registered')
   }
 
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+  const onMenuClick = () => {
+    setMenuAnchor(null)
+  }
+
   const columns: IColumn[] = [
     {
       key: 'clusterName',
@@ -95,6 +102,9 @@ export default function ClusterManagement() {
       fieldName: 'clusterName',
       minWidth: 0,
       isResizable: true,
+      onRender: (item: ClusterInfo) => {
+        return <Typography variant="body1">{item.clusterName}</Typography>
+      },
     },
     {
       key: 'vendor',
@@ -102,6 +112,9 @@ export default function ClusterManagement() {
       fieldName: 'vendor',
       minWidth: 0,
       isResizable: true,
+      onRender: (item: ClusterInfo) => {
+        return <Typography variant="body1">{item.vendor}</Typography>
+      },
     },
     {
       key: 'account',
@@ -109,6 +122,9 @@ export default function ClusterManagement() {
       fieldName: 'account',
       minWidth: 256,
       isResizable: true,
+      onRender: (item: ClusterInfo) => {
+        return <Typography variant="body1">{item.account}</Typography>
+      },
     },
     {
       key: 'status',
@@ -117,7 +133,7 @@ export default function ClusterManagement() {
       isResizable: true,
       onRender: (item: ClusterInfo) => {
         return (
-          <Typography color={colorFormatForStatus(item.status)}>
+          <Typography variant="body1" color={colorFormatForStatus(item.status)}>
             {item.status}
           </Typography>
         )
@@ -130,7 +146,12 @@ export default function ClusterManagement() {
       isResizable: true,
       onRender: (item: ClusterInfo) => {
         return (
-          <IconButton color="primary">
+          <IconButton
+            color="primary"
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              setMenuAnchor(e.currentTarget)
+            }}
+          >
             <MoreVertOutlined />
           </IconButton>
         )
@@ -233,6 +254,11 @@ export default function ClusterManagement() {
             // layoutMode={DetailsListLayoutMode.justified}
             // onRenderItemColumn={renderItemColumn}
           />
+          <Menu open={!!menuAnchor} anchorEl={menuAnchor}>
+            <MenuItem onClick={onMenuClick}>Register</MenuItem>
+            <MenuItem onClick={onMenuClick}>Unregister</MenuItem>
+            <MenuItem onClick={onMenuClick}>Inspect</MenuItem>
+          </Menu>
         </Box>
 
         {/* bottom sidebar container */}
