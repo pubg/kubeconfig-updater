@@ -61,6 +61,7 @@ specifiers:
   husky: ^7.0.0
   identity-obj-proxy: ^3.0.0
   jest: ^27.3.1
+  linq: ^4.0.0
   lint-staged: ^11.2.6
   lodash: ^4.17.21
   mini-css-extract-plugin: ^2.4.3
@@ -100,6 +101,7 @@ dependencies:
   electron-log: 4.4.1
   electron-updater: 4.6.1
   history: 4.10.1
+  linq: 4.0.0
   lodash: 4.17.21
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
@@ -7058,6 +7060,10 @@ packages:
 
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
+
+  /linq/4.0.0:
+    resolution: {integrity: sha512-oO6Or6ndtSWBrTpy876umEgUxDIrV7Vu/1L2CGNGchp7FOtCxoMBNtCaVxtkkZm6iJlv/KGjmvlj8C5fZI9Snw==}
+    dev: false
 
   /lint-staged/11.2.6:
     resolution: {integrity: sha512-Vti55pUnpvPE0J9936lKl0ngVeTdSZpEdTNhASbkaWX7J5R9OEifo1INBGQuGW4zmy6OG+TcWPJ3m5yuy5Q8Tg==}
