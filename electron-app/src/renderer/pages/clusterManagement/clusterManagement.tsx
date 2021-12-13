@@ -5,7 +5,7 @@ import {
   Box,
   Button,
   Checkbox,
-  Container,
+  Container as Box,
   FormControlLabel,
   FormGroup,
   Paper,
@@ -27,12 +27,9 @@ export default function ClusterManagement() {
     /** background */
     <Paper sx={{ width: '100%', height: '100%' }}>
       {/* actual container */}
-      <Container
-        maxWidth="xl"
-        sx={{ width: '100%', height: '100%', marginTop: '32px' }}
-      >
+      <Box sx={{ width: '100%', height: '100%', marginTop: '32px' }}>
         {/* Header Menu Container */}
-        <Box sx={{ display: 'flex', marginBottom: '16px' }}>
+        <Box sx={{ display: 'flex', margin: '32px' }}>
           {/*  */}
           <Box />
           <Stack direction="row" width="100%" justifyContent="space-between">
@@ -88,7 +85,7 @@ export default function ClusterManagement() {
             layoutMode={DetailsListLayoutMode.justified}
           />
         </Box>
-      </Container>
+      </Box>
     </Paper>
   )
 }
