@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import { ClusterInfo } from './clusterInfo'
+import { ClusterInfo, Status } from './clusterInfo'
 import regions from './mockRegions.json'
 import { Vendor } from './vendor'
 
@@ -62,6 +62,13 @@ function account(vendor: Vendor): string {
   }
 }
 
+const status: Status[] = [
+  'Registered',
+  'Unauthorized',
+  'Unknown',
+  'Unregistered',
+]
+
 export function generateMockClusterInfos(len: number): ClusterInfo[] {
   const clusterInfos: ClusterInfo[] = []
 
@@ -75,7 +82,8 @@ export function generateMockClusterInfos(len: number): ClusterInfo[] {
       }-${hash()}`,
       vendor: region.infraVendor as Vendor,
       account: account(region.infraVendor),
-      registered: Math.random() >= 0.5,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      status: _.sample(status)!,
     })
   }
 
