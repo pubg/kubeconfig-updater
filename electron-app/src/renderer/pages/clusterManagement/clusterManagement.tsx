@@ -19,11 +19,9 @@ import {
 import Enumerable from 'linq'
 import _ from 'lodash'
 import React, { useCallback, useState } from 'react'
-import {
-  ClusterInfo,
-  Status,
-} from '../../../shared/models/clusterInfo/clusterInfo'
-import { generateMockClusterInfos } from '../../../shared/models/clusterInfo/mockClusterInfo'
+import { ClusterInfo, Status } from '../../models/clusterInfo/clusterInfo'
+import { generateMockClusterInfos } from '../../models/clusterInfo/mockClusterInfo'
+import ClusterInfoListContainer from '../../containers/clusterInfoList'
 import FilterBarContainer from '../../containers/filterBar'
 
 const mockTags = ['stage', 'vendor', 'region']
@@ -193,28 +191,7 @@ export default function ClusterManagement() {
           <FilterBarContainer />
         </Paper>
 
-        {/* list container */}
-        <Box
-          sx={{
-            height: '100%',
-            overflow: 'hidden',
-            overflowY: 'scroll',
-            marginTop: '4px',
-          }}
-        >
-          <DetailsList
-            items={listItems.filter(itemFilter)}
-            columns={columns}
-            onColumnHeaderClick={onColumnClick}
-            // layoutMode={DetailsListLayoutMode.justified}
-            // onRenderItemColumn={renderItemColumn}
-          />
-          <Menu open={!!menuAnchor} anchorEl={menuAnchor}>
-            <MenuItem onClick={onMenuClick}>Register</MenuItem>
-            <MenuItem onClick={onMenuClick}>Unregister</MenuItem>
-            <MenuItem onClick={onMenuClick}>Inspect</MenuItem>
-          </Menu>
-        </Box>
+        <ClusterInfoListContainer />
 
         {/* bottom sidebar container */}
         <Box
