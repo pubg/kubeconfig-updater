@@ -1,5 +1,11 @@
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
+import {
+  AggregatedClusterMetadata,
+  ClusterInformationStatus,
+  ClusterMetadata,
+  MetadataResolverType,
+} from '../../protos/kubeconfig_service_pb'
 import { ClusterInfo, Status } from './clusterInfo'
 import regions from './mockRegions.json'
 import { Vendor } from './vendor'
@@ -38,6 +44,21 @@ function randAccountUUID() {
   return uuidv4()
 }
 
+function randDataResolversList() {
+  const values = [
+    MetadataResolverType.CRED_RESOLVER,
+    MetadataResolverType.FOX,
+    MetadataResolverType.KUBECONFIG,
+    MetadataResolverType.META_RESOLVER_NOT_SETTED,
+  ].filter(() => Math.random() > 0.5)
+
+  if (values.length === 0) {
+    values.push(MetadataResolverType.KUBECONFIG)
+  }
+
+  return values
+}
+
 const accountTable = {
   AWS: [randAccount(), randAccount()],
   Tencent: [randAccount(), randAccount()],
@@ -62,6 +83,22 @@ function account(vendor: Vendor): string {
   }
 }
 
+function randMetadata(): ClusterMetadata.AsObject {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const region = _.sample(mockRegions)!
+
+  return {
+    clustername: `${randStage()}-${region.fullName}-${
+      region.infraVendor
+    }-${hash()}`,
+    clustertagsMap: [
+      ['vendor', region.infraVendor],
+      ['account', account(region.infraVendor)],
+    ],
+    credresolverid: '',
+  }
+}
+
 const status: Status[] = [
   'Registered',
   'Unauthorized',
@@ -69,22 +106,21 @@ const status: Status[] = [
   'Unregistered',
 ]
 
-export function generateMockClusterInfos(len: number): ClusterInfo[] {
-  const clusterInfos: ClusterInfo[] = []
+export function generateMockClusterInfo(): AggregatedClusterMetadata.AsObject {
+  return {
+    dataresolversList: randDataResolversList(),
+    status: _.sample(ClusterInformationStatus) as ClusterInformationStatus,
+    metadata: randMetadata(),
+  }
+}
+
+export function generateMockClusterInfos(
+  len: number
+): AggregatedClusterMetadata.AsObject[] {
+  const clusterInfos: AggregatedClusterMetadata.AsObject[] = []
 
   for (let i = 0; i < len; i += 1) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const region = _.sample(mockRegions)!
-
-    clusterInfos.push({
-      clusterName: `${randStage()}-${region.fullName}-${
-        region.infraVendor
-      }-${hash()}`,
-      vendor: region.infraVendor as Vendor,
-      account: account(region.infraVendor),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      status: _.sample(status)!,
-    })
+    clusterInfos.push(generateMockClusterInfo())
   }
 
   return clusterInfos
