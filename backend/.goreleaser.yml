@@ -1,0 +1,37 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: kubeconfig-updater
+    main: main.go
+    binary: kubeconfig-updater
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X 'github.krafton.com/xtrm/kubeconfig-updater/cmd.Version=v{{.Version}}'
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - id: kubeconfig-updater-archive
+    name_template: |-
+      kubeconfig_updater_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+    builds:
+      - kubeconfig-updater
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+github_urls:
+  api: https://github.krafton.com/api/v3/
+  upload: https://github.krafton.com/api/uploads/
+  download: https://github.krafton.com/
+  skip_tls_verify: false
