@@ -20,15 +20,15 @@ interface ClusterManagementFilterBarProps {
   groupTags: string[]
 }
 
-export default function ClusterManagementFilterBar({
+export default function FilterBar({
   groupTags,
   onNameFilterChanged,
   onShowRegisterToggled,
   onReloadClick,
 }: ClusterManagementFilterBarProps) {
   return (
-    <Stack>
-      <FormGroup>
+    <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
+      <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
         <TextField
           size="small"
           label="filter..."

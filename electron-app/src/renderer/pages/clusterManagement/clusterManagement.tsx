@@ -24,6 +24,7 @@ import {
   Status,
 } from '../../../shared/models/clusterInfo/clusterInfo'
 import { generateMockClusterInfos } from '../../../shared/models/clusterInfo/mockClusterInfo'
+import FilterBarContainer from '../../containers/filterBar'
 
 const mockTags = ['stage', 'vendor', 'region']
 
@@ -189,53 +190,7 @@ export default function ClusterManagement() {
             borderBottom: '2px solid gray',
           }}
         >
-          <Stack
-            direction="row"
-            width="100%"
-            justifyContent="space-between"
-            margin="32px 32px 32px 32px"
-          >
-            <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
-              <TextField
-                size="small"
-                id="outlined-basic"
-                label="filter by name"
-                variant="outlined"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    onChange={(e) => setShowRegistered(e.target.checked)}
-                  />
-                }
-                label="Show Registered"
-              />
-              <Autocomplete
-                multiple
-                options={mockTags}
-                disableCloseOnSelect
-                getOptionLabel={(opt) => opt}
-                style={{ width: '256px' }}
-                size="small"
-                renderInput={(params) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <TextField {...params} label="Group with Tag" />
-                )}
-                renderOption={(props, option, { selected }) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <li {...props}>
-                    <Checkbox checked={selected} />
-                    {option}
-                  </li>
-                )}
-              />
-            </FormGroup>
-            <Stack direction="row">
-              <Button variant="outlined" startIcon={<Refresh />}>
-                Reload
-              </Button>
-            </Stack>
-          </Stack>
+          <FilterBarContainer />
         </Paper>
 
         {/* list container */}
