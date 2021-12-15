@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos";
+option go_package = "github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos";
 
 package kubeconfig;
 
