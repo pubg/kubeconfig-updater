@@ -3,7 +3,7 @@ package eks_helper
 import (
 	"fmt"
 	"github.com/tidwall/gjson"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/internal/common"
 )
 
 func GetAccountIdOfProfileFromAWS(profileName string) (string, error) {

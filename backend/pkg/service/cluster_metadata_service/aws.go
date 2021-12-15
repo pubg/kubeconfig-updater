@@ -5,8 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
 func NewAwsResolver(credCfg *protos.CredResolverConfig) (*AwsResolver, error) {

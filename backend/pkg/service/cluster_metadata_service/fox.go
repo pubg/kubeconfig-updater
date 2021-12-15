@@ -8,9 +8,9 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.krafton.com/xtrm/fox/client"
 	"github.krafton.com/xtrm/fox/source/pkg/document"
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/api/types"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/fox"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
+	"github.com/pubg/kubeconfig-updater/backend/internal/fox"
 )
 
 func NewFoxResolver() (*FoxResolver, error) {

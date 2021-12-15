@@ -10,8 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/application"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
 )
 
 func ListCredResolvers() []*protos.CredResolverConfig {

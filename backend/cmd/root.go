@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.krafton.com/xtrm/kubeconfig-updater/cmd/register"
-	"github.krafton.com/xtrm/kubeconfig-updater/cmd/server"
-	"github.krafton.com/xtrm/kubeconfig-updater/cmd/shared"
+	"github.com/pubg/kubeconfig-updater/backend/cmd/register"
+	"github.com/pubg/kubeconfig-updater/backend/cmd/server"
+	"github.com/pubg/kubeconfig-updater/backend/cmd/shared"
 )
 
 var Version = "dev-build"

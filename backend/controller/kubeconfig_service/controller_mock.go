@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

@@ -1,6 +1,6 @@
 package cluster_metadata_service
 
-import "github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
+import "github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 
 type aggregatedResolver struct {
 

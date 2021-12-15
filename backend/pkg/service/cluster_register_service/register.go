@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/aks_helper"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/api/types"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/eks_helper"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/tke_helper"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/service/cluster_metadata_service"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/internal/aks_helper"
+	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
+	"github.com/pubg/kubeconfig-updater/backend/internal/eks_helper"
+	"github.com/pubg/kubeconfig-updater/backend/internal/tke_helper"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
 func RegisterCluster(ctx context.Context, clusterName string, credConf *protos.CredResolverConfig) error {

@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"github.krafton.com/xtrm/kubeconfig-updater/cmd"
+	"github.com/pubg/kubeconfig-updater/backend/cmd"
 )
 
 func main() {

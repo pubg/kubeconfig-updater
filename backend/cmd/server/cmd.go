@@ -9,9 +9,9 @@ import (
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/spf13/cobra"
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service"
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/application"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

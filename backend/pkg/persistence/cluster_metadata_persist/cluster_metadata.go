@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/schollz/jsonstore"
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 )
 
 type ClusterMetadataStorage struct {

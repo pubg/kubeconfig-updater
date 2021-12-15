@@ -1,4 +1,4 @@
-module github.krafton.com/xtrm/kubeconfig-updater
+module github.com/pubg/kubeconfig-updater/backend
 
 go 1.17
 

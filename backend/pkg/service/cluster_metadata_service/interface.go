@@ -3,8 +3,8 @@ package cluster_metadata_service
 import (
 	"fmt"
 
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/application"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
 )
 
 type ClusterMetadataResolver interface {

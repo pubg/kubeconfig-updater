@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/service/cluster_metadata_service"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/service/cluster_register_service"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
 type kubeconfigService struct {

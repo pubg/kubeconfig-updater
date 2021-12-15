@@ -3,9 +3,9 @@ package application
 import (
 	"log"
 
-	"github.krafton.com/xtrm/kubeconfig-updater/controller/kubeconfig_service/protos"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/persistence/cluster_metadata_persist"
-	"github.krafton.com/xtrm/kubeconfig-updater/pkg/persistence/cred_resolver_config_persist"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
 )
 
 var app *ServerApplication

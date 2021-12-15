@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
-	"github.krafton.com/xtrm/kubeconfig-updater/cmd/shared"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/aks_helper"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/eks_helper"
-	"github.krafton.com/xtrm/kubeconfig-updater/internal/tke_helper"
+	"github.com/pubg/kubeconfig-updater/backend/cmd/shared"
+	"github.com/pubg/kubeconfig-updater/backend/internal/aks_helper"
+	"github.com/pubg/kubeconfig-updater/backend/internal/eks_helper"
+	"github.com/pubg/kubeconfig-updater/backend/internal/tke_helper"
 )
 
 func Cmd() *cobra.Command {
