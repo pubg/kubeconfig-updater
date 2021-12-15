@@ -1,3 +1,6 @@
+// required by tsyringe
+import 'reflect-metadata'
+
 import { ThemeProvider } from '@mui/material'
 import { render } from 'react-dom'
 import { createTheme } from '@mui/material/styles'
