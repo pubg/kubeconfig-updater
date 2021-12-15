@@ -19,6 +19,7 @@ import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
+import BackendManager from "./core/backend";
 
 export default class AppUpdater {
   constructor() {
@@ -138,3 +139,7 @@ app
     })
   })
   .catch(console.log)
+
+console.log('Try Backend Process Start')
+new BackendManager('/usr/local/bin/go run main.go server', '../backend').start()
+console.log('Backend Process Started')

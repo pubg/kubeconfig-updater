@@ -122,3 +122,9 @@ func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.Commo
 		Message: fmt.Sprintf("sync success"),
 	}, nil
 }
+
+func (s *kubeconfigService) Ping(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+	return &protos.CommonRes{
+		Message: fmt.Sprintf("pong"),
+	}, nil
+}

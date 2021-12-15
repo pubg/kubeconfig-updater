@@ -1,2 +1,3 @@
 /* eslint-disable import/prefer-default-export */
-export const CoreExecPath = Symbol('kubeconfig-updater-execPath')
+export const CoreExecCmd = Symbol('kubeconfig-updater-cmd')
+export const CoreExecCwd = Symbol('kubeconfig-updater-cwd')
