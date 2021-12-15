@@ -1,5 +1,8 @@
 # Kubeconfig-Updater
 
+# Application Architecture
+![Screenshot](./docs/arch.png)
+
 ## Backend
 
 ### AS API Server
