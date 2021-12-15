@@ -112,6 +112,11 @@ func (s *ServerApplication) InitApplication(option *ServerApplicationOption) err
 		if err != nil {
 			return err
 		}
+
+		err = s.CredResolverConfigStorage.SaveStorage()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

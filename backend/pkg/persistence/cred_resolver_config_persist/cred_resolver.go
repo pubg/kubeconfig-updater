@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/schollz/jsonstore"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/schollz/jsonstore"
 )
 
 type CredResolverConfigStorage struct {
@@ -59,7 +59,11 @@ func (c *CredResolverConfigStorage) GetConfig(credResolverId string) (*protos.Cr
 }
 
 func (c *CredResolverConfigStorage) SetConfig(cfg *protos.CredResolverConfig) error {
-	err := c.keyStore.Set(cfg.AccountId, cfg)
+	return c.keyStore.Set(cfg.AccountId, cfg)
+}
+
+func (c *CredResolverConfigStorage) SetAndSaveConfig(cfg *protos.CredResolverConfig) error {
+	err := c.SetConfig(cfg)
 	if err != nil {
 		return err
 	}

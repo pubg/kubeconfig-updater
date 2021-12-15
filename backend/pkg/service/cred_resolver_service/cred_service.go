@@ -9,9 +9,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
 func ListCredResolvers() []*protos.CredResolverConfig {
@@ -36,7 +36,7 @@ func SetCredResolver(cfg *protos.CredResolverConfig) error {
 		return fmt.Errorf("credResolverConfig should not be null")
 	}
 
-	return application.GetInstance().CredResolverConfigStorage.SetConfig(cfg)
+	return application.GetInstance().CredResolverConfigStorage.SetAndSaveConfig(cfg)
 }
 
 func DeleteCredResolver(credResolverId string) error {
