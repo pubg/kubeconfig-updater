@@ -1,0 +1,11 @@
+# Integration with Issue Tracker
+#
+# (note that '\' need to be escaped).
+
+[issuetracker "Krafton JIRA Rule"]
+  regex = "XTRM-(\\d+)"
+  url = "https://jira.krafton.com/browse/XTRM-$1"
+
+[issuetracker "Krafton GitHub Enterprise Rule"]
+  regex = "#(\\d+)"
+  url = "https://github.com/pubg/kubeconfig-updater/issues/$1"

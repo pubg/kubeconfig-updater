@@ -1,0 +1,8 @@
+[bugtraq "jira"]
+	url = https://jira.krafton.com/browse/%BUGID%
+	logregex = (XTRM-\\d+)
+
+[bugtraq "github"]
+	url = https://github.com/pubg/kubeconfig-=updater/pull/%BUGID%
+	loglinkregex = "#\\d+"
+	logregex = \\d+
