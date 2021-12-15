@@ -179,32 +179,32 @@ export namespace ClusterMetadata {
   }
 }
 
-export class ClusterInformation extends jspb.Message {
+export class AggregatedClusterMetadata extends jspb.Message {
   getMetadata(): ClusterMetadata | undefined;
-  setMetadata(value?: ClusterMetadata): ClusterInformation;
+  setMetadata(value?: ClusterMetadata): AggregatedClusterMetadata;
   hasMetadata(): boolean;
-  clearMetadata(): ClusterInformation;
+  clearMetadata(): AggregatedClusterMetadata;
 
-  getDataresolvertypeList(): Array<MetadataResolverType>;
-  setDataresolvertypeList(value: Array<MetadataResolverType>): ClusterInformation;
-  clearDataresolvertypeList(): ClusterInformation;
-  addDataresolvertype(value: MetadataResolverType, index?: number): ClusterInformation;
+  getDataresolversList(): Array<MetadataResolverType>;
+  setDataresolversList(value: Array<MetadataResolverType>): AggregatedClusterMetadata;
+  clearDataresolversList(): AggregatedClusterMetadata;
+  addDataresolvers(value: MetadataResolverType, index?: number): AggregatedClusterMetadata;
 
   getStatus(): ClusterInformationStatus;
-  setStatus(value: ClusterInformationStatus): ClusterInformation;
+  setStatus(value: ClusterInformationStatus): AggregatedClusterMetadata;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): ClusterInformation.AsObject;
-  static toObject(includeInstance: boolean, msg: ClusterInformation): ClusterInformation.AsObject;
-  static serializeBinaryToWriter(message: ClusterInformation, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): ClusterInformation;
-  static deserializeBinaryFromReader(message: ClusterInformation, reader: jspb.BinaryReader): ClusterInformation;
+  toObject(includeInstance?: boolean): AggregatedClusterMetadata.AsObject;
+  static toObject(includeInstance: boolean, msg: AggregatedClusterMetadata): AggregatedClusterMetadata.AsObject;
+  static serializeBinaryToWriter(message: AggregatedClusterMetadata, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AggregatedClusterMetadata;
+  static deserializeBinaryFromReader(message: AggregatedClusterMetadata, reader: jspb.BinaryReader): AggregatedClusterMetadata;
 }
 
-export namespace ClusterInformation {
+export namespace AggregatedClusterMetadata {
   export type AsObject = {
     metadata?: ClusterMetadata.AsObject,
-    dataresolvertypeList: Array<MetadataResolverType>,
+    dataresolversList: Array<MetadataResolverType>,
     status: ClusterInformationStatus,
   }
 }
@@ -215,10 +215,10 @@ export class GetAvailableClustersRes extends jspb.Message {
   hasCommonres(): boolean;
   clearCommonres(): GetAvailableClustersRes;
 
-  getClustersList(): Array<ClusterInformation>;
-  setClustersList(value: Array<ClusterInformation>): GetAvailableClustersRes;
+  getClustersList(): Array<AggregatedClusterMetadata>;
+  setClustersList(value: Array<AggregatedClusterMetadata>): GetAvailableClustersRes;
   clearClustersList(): GetAvailableClustersRes;
-  addClusters(value?: ClusterInformation, index?: number): ClusterInformation;
+  addClusters(value?: AggregatedClusterMetadata, index?: number): AggregatedClusterMetadata;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetAvailableClustersRes.AsObject;
@@ -231,7 +231,7 @@ export class GetAvailableClustersRes extends jspb.Message {
 export namespace GetAvailableClustersRes {
   export type AsObject = {
     commonres?: protos_common_pb.CommonRes.AsObject,
-    clustersList: Array<ClusterInformation.AsObject>,
+    clustersList: Array<AggregatedClusterMetadata.AsObject>,
   }
 }
 

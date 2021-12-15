@@ -380,5 +380,48 @@ export class KubeconfigClient {
     this.methodInfoRegisterCluster);
   }
 
+  methodInfoSyncAvailableClusters = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/SyncAvailableClusters',
+    grpcWeb.MethodType.UNARY,
+    protos_common_pb.CommonReq,
+    protos_common_pb.CommonRes,
+    (request: protos_common_pb.CommonReq) => {
+      return request.serializeBinary();
+    },
+    protos_common_pb.CommonRes.deserializeBinary
+  );
+
+  syncAvailableClusters(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
+
+  syncAvailableClusters(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
+
+  syncAvailableClusters(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Kubeconfig/SyncAvailableClusters',
+        request,
+        metadata || {},
+        this.methodInfoSyncAvailableClusters,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Kubeconfig/SyncAvailableClusters',
+    request,
+    metadata || {},
+    this.methodInfoSyncAvailableClusters);
+  }
+
 }
 
