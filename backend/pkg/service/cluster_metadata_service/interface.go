@@ -2,14 +2,18 @@ package cluster_metadata_service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
 type ClusterMetadataResolver interface {
 	ListClusters() ([]*protos.ClusterMetadata, error)
 	GetResolverType() protos.MetadataResolverType
+	GetResolverDescription() string
 }
 
 func ListClusterMetadatas() []*protos.AggregatedClusterMetadata {
@@ -21,18 +25,21 @@ func GetClusterMetadata(clusterName string) (*protos.AggregatedClusterMetadata, 
 }
 
 func SyncAvailableClusters() error {
-	resolvers, err := listMetadataResolvers()
+	resolvers, err := ListMetadataResolvers()
 	if err != nil {
 		return err
 	}
+	for _, resolver := range resolvers {
+		fmt.Printf("Resolver Status: %s\n", resolver.GetResolverDescription())
+	}
 
 	aggrMetaMap := map[string]*protos.AggregatedClusterMetadata{}
-
 	for _, resolver := range resolvers {
 		metadatas, err := resolver.ListClusters()
 		if err != nil {
-			fmt.Printf("List cluster metadata occurred error, resolver type:%s, err:%+v\n", resolver.GetResolverType().String(), err)
+			fmt.Printf("List cluster metadata occurred error, resolver type:%s, err:%s\n", resolver.GetResolverType().String(), err.Error())
 		}
+		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters\n", resolver.GetResolverDescription(), len(metadatas))
 		for _, metadata := range metadatas {
 			if aggrMeta, exists := aggrMetaMap[metadata.ClusterName]; exists {
 				aggrMeta.Metadata = mergeMetadata(aggrMeta.Metadata, metadata)
@@ -59,7 +66,6 @@ func SyncAvailableClusters() error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -87,12 +93,35 @@ func mergeMetadata(a *protos.ClusterMetadata, b *protos.ClusterMetadata) *protos
 	return merged
 }
 
-func listMetadataResolvers() ([]ClusterMetadataResolver, error) {
-	//application.GetInstance().CredResolverConfigStorage.ListConfigs()
+func ListMetadataResolvers() ([]ClusterMetadataResolver, error) {
+	var metaResolvers []ClusterMetadataResolver
 	fox, err := NewFoxResolver()
 	if err != nil {
 		return nil, err
 	}
+	metaResolvers = append(metaResolvers, fox)
 
-	return []ClusterMetadataResolver{fox}, nil
+	credResolvers := cred_resolver_service.ListCredResolvers()
+	for _, cr := range credResolvers {
+		if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_AWS) {
+			awsResolver, err := NewAwsResolver(cr, cr.AccountId)
+			if err != nil {
+				return nil, err
+			}
+			metaResolvers = append(metaResolvers, awsResolver)
+		} else if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_Azure) {
+			authorizer, err := NewAzureResolver(cr, cr.AccountId)
+			if err != nil {
+				return nil, err
+			}
+			metaResolvers = append(metaResolvers, authorizer)
+		} else if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_Tencent) {
+			tcResolver, err := NewTencentResolver(cr, cr.AccountId)
+			if err != nil {
+				return nil, err
+			}
+			metaResolvers = append(metaResolvers, tcResolver)
+		}
+	}
+	return metaResolvers, nil
 }

@@ -112,7 +112,9 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 }
 
 func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+	fmt.Printf("Start SyncAvailableClusters\n")
 	err := cluster_metadata_service.SyncAvailableClusters()
+	fmt.Printf("Success SyncAvailableClusters\n")
 	if err != nil {
 		return nil, err
 	}

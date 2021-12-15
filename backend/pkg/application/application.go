@@ -106,7 +106,19 @@ func (s *ServerApplication) InitApplication(option *ServerApplicationOption) err
 			InfraVendor:        "Tencent",
 			AccountAlias:       "xtrm-playground",
 			Kind:               protos.CredentialResolverKind_PROFILE,
-			ResolverAttributes: map[string]string{"profile": "newstate"},
+			ResolverAttributes: map[string]string{"profile": "dev"},
+			Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
+		})
+		if err != nil {
+			return err
+		}
+
+		err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
+			AccountId:          "f073f292-7255-416f-adaf-34b476e050be",
+			InfraVendor:        "Azure",
+			AccountAlias:       "xtrm-newstate",
+			Kind:               protos.CredentialResolverKind_DEFAULT,
+			ResolverAttributes: map[string]string{},
 			Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
 		})
 		if err != nil {
