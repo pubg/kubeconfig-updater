@@ -1,7 +1,8 @@
 import React from 'react'
-import { action, computed, observable } from 'mobx'
-import { singleton } from 'tsyringe'
-import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
+import { action, computed, flow, observable } from 'mobx'
+import { container, singleton } from 'tsyringe'
+import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
+import GetAvailableClusters from '../../services/getAvailableClusters'
 
 export const ClusterMetadataStoreContext =
   React.createContext<ClusterMetadataStore | null>(null)
@@ -33,6 +34,9 @@ export class ClusterMetadataStore {
   items: MetadataItem[] = []
 
   @observable
+  state: 'fetching' | 'ready' = 'ready'
+
+  @observable
   private _filter: Filter | null = null
 
   @computed
@@ -51,4 +55,27 @@ export class ClusterMetadataStore {
     // TODO: group 에 사용되는 태그를 보여줌
     return []
   }
+
+  fetchMetadata = flow(function* (this: ClusterMetadataStore) {
+    console.log('fetching cluster metadata...')
+    this.state = 'fetching'
+
+    const fetch = async () => {
+      const req = container.resolve(GetAvailableClusters)
+      const res = await req.request()
+
+      return res.getClustersList()
+    }
+
+    try {
+      const clusterList: AggregatedClusterMetadata[] = yield fetch()
+      this.items = clusterList.map((metadata) => ({
+        data: metadata.toObject(),
+      })) as MetadataItem[]
+    } catch (e) {
+      console.error(e)
+    }
+
+    this.state = 'ready'
+  })
 }

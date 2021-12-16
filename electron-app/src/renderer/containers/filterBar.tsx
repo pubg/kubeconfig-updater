@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import FilterBar from '../components/filterBar'
 import { ClusterInformationStatus } from '../protos/kubeconfig_service_pb'
-import { Filter, MetadataItem, useStore } from '../stores/clusterMetadataStore'
+import { Filter, MetadataItem, useStore } from '../pages/clusterManagement/clusterMetadataStore'
 
 function predicateBuilder(
   name: string,

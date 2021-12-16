@@ -1,5 +1,5 @@
 import ClusterInfoList from '../components/clusterInfoList'
-import { useStore } from '../stores/clusterMetadataStore'
+import { useStore } from '../pages/clusterManagement/clusterMetadataStore'
 
 export default function ClusterInfoListContainer() {
   const store = useStore()

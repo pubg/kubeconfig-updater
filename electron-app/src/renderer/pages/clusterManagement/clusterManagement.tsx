@@ -27,7 +27,7 @@ import FilterBarContainer from '../../containers/filterBar'
 import {
   ClusterMetadataStore,
   ClusterMetadataStoreContext,
-} from '../../stores/clusterMetadataStore'
+} from './clusterMetadataStore'
 
 const mockTags = ['stage', 'vendor', 'region']
 

@@ -1,6 +1,6 @@
 import { DetailsList, IDetailsListProps } from '@fluentui/react'
 import { Box } from '@mui/material'
-import { MetadataItem } from '../stores/clusterMetadataStore'
+import { MetadataItem } from '../pages/clusterManagement/clusterMetadataStore'
 
 interface ClusterInfoListProps {
   clusterInformations: MetadataItem[]
