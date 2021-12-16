@@ -27,6 +27,7 @@ type KubeconfigClient interface {
 	GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error)
 	RegisterCluster(ctx context.Context, in *RegisterClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
 	SyncAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 }
 
 type kubeconfigClient struct {
@@ -118,6 +119,15 @@ func (c *kubeconfigClient) SyncAvailableClusters(ctx context.Context, in *Common
 	return out, nil
 }
 
+func (c *kubeconfigClient) Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/Ping", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KubeconfigServer is the server API for Kubeconfig service.
 // All implementations must embed UnimplementedKubeconfigServer
 // for forward compatibility
@@ -131,6 +141,7 @@ type KubeconfigServer interface {
 	GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error)
 	RegisterCluster(context.Context, *RegisterClusterReq) (*CommonRes, error)
 	SyncAvailableClusters(context.Context, *CommonReq) (*CommonRes, error)
+	Ping(context.Context, *CommonReq) (*CommonRes, error)
 	mustEmbedUnimplementedKubeconfigServer()
 }
 
@@ -164,6 +175,9 @@ func (UnimplementedKubeconfigServer) RegisterCluster(context.Context, *RegisterC
 }
 func (UnimplementedKubeconfigServer) SyncAvailableClusters(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncAvailableClusters not implemented")
+}
+func (UnimplementedKubeconfigServer) Ping(context.Context, *CommonReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
 func (UnimplementedKubeconfigServer) mustEmbedUnimplementedKubeconfigServer() {}
 
@@ -340,6 +354,24 @@ func _Kubeconfig_SyncAvailableClusters_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Kubeconfig_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KubeconfigServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Kubeconfig/Ping",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KubeconfigServer).Ping(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Kubeconfig_ServiceDesc is the grpc.ServiceDesc for Kubeconfig service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -382,6 +414,10 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SyncAvailableClusters",
 			Handler:    _Kubeconfig_SyncAvailableClusters_Handler,
+		},
+		{
+			MethodName: "Ping",
+			Handler:    _Kubeconfig_Ping_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

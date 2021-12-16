@@ -3,14 +3,20 @@ module github.com/pubg/kubeconfig-updater/backend
 go 1.17
 
 require (
+	github.com/Azure/azure-sdk-for-go v60.1.0+incompatible
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.1-0.20211215012433-e065f79cc2a6
+	github.com/Azure/go-autorest/autorest v0.11.23
+	github.com/Azure/go-autorest/autorest/azure/auth v0.5.3
 	github.com/aws/aws-sdk-go-v2 v1.11.2
 	github.com/aws/aws-sdk-go-v2/config v1.6.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.25.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.15.1
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/schollz/jsonstore v1.1.0
 	github.com/spf13/cobra v1.2.1
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.228
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.313
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.228
 	github.com/tidwall/gjson v1.9.1
 	github.krafton.com/xtrm/fox v1.1.1
@@ -22,6 +28,14 @@ require (
 )
 
 require (
+	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.9.14 // indirect
+	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2 // indirect
+	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
+	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
+	github.com/Azure/go-autorest/autorest/validation v0.3.0 // indirect
+	github.com/Azure/go-autorest/logger v0.2.1 // indirect
+	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.3.2 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.4.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.2 // indirect
@@ -34,6 +48,8 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
+	github.com/dimchansky/utfbom v1.1.0 // indirect
+	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.7.4 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
@@ -51,6 +67,7 @@ require (
 	github.com/klauspost/compress v1.11.7 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/rs/cors v1.7.0 // indirect

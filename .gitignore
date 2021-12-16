@@ -404,3 +404,4 @@ fabric.properties
 # Local History for Visual Studio Code
 .history/
 
+electron-app/release/app/bin

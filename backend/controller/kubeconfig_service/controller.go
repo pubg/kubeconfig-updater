@@ -112,11 +112,19 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 }
 
 func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+	fmt.Printf("Start SyncAvailableClusters\n")
 	err := cluster_metadata_service.SyncAvailableClusters()
+	fmt.Printf("Success SyncAvailableClusters\n")
 	if err != nil {
 		return nil, err
 	}
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("sync success"),
+	}, nil
+}
+
+func (s *kubeconfigService) Ping(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+	return &protos.CommonRes{
+		Message: fmt.Sprintf("pong"),
 	}, nil
 }

@@ -7,11 +7,13 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
 func ListCredResolvers() []*protos.CredResolverConfig {
@@ -36,7 +38,7 @@ func SetCredResolver(cfg *protos.CredResolverConfig) error {
 		return fmt.Errorf("credResolverConfig should not be null")
 	}
 
-	return application.GetInstance().CredResolverConfigStorage.SetConfig(cfg)
+	return application.GetInstance().CredResolverConfigStorage.SetAndSaveConfig(cfg)
 }
 
 func DeleteCredResolver(credResolverId string) error {
@@ -73,9 +75,19 @@ func GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (
 }
 
 // Azure Cli는 멀티어카운트를 지원하지 않는다
-func GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (string, error) {
-	return "", nil
-}
+func GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (autorest.Authorizer, error) {
+	switch credConf.GetKind() {
+	case protos.CredentialResolverKind_DEFAULT:
+		return auth.NewAuthorizerFromCLI()
+	case protos.CredentialResolverKind_ENV:
+		return auth.NewAuthorizerFromEnvironment()
+	case protos.CredentialResolverKind_IMDS:
+		return auth.NewMSIConfig().Authorizer()
+	case protos.CredentialResolverKind_PROFILE:
+		return nil, fmt.Errorf("credentialType=PROFILE is not support for azure credResolver")
+	default:
+		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
+	}}
 
 func GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
 	switch credConf.GetKind() {
