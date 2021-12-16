@@ -2,6 +2,7 @@
 import 'reflect-metadata'
 
 import { ThemeProvider } from '@mui/material'
+import { initializeIcons } from '@fluentui/react/lib/Icons'
 import { render } from 'react-dom'
 import { createTheme } from '@mui/material/styles'
 import App from './App'
@@ -11,6 +12,8 @@ const theme = createTheme({
     // mode: 'dark',
   },
 })
+
+initializeIcons()
 
 render(
   <ThemeProvider theme={theme}>
