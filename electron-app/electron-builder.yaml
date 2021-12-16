@@ -1,0 +1,61 @@
+productName: kubeconfig-updater
+appId: com.pubg.newstate.kubeconfig-updater
+asar: true
+asarUnpack: '**\*.{node,dll}'
+files:
+  - dist
+  - node_modules
+  - package.json
+extraFiles:
+  - from: release/app/bin/kubeconfig-updater-backend-${os}-${arch}
+    to: kubeconfig-updater-backend
+  - from: release/app/bin/kubeconfig-updater-backend-${os}-${arch}.exe
+    to: kubeconfig-updater-backend.exe
+afterSign: .erb/scripts/notarize.js
+mac:
+  target:
+    - target: default
+      arch:
+        - arm64
+#        - x64
+  type: distribution
+  hardenedRuntime: true
+  entitlements: assets/entitlements.mac.plist
+  entitlementsInherit: assets/entitlements.mac.plist
+  gatekeeperAssess: false
+dmg:
+  contents:
+    - x: 130
+      'y': 220
+    - x: 410
+      'y': 220
+      type: link
+      path: /Applications
+win:
+  target:
+    - target: nsis
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  publisherName: PUBG-XTRM
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - arm64
+        - x64
+  category: Development
+directories:
+  app: release/app
+  buildResources: assets
+  output: release/build
+extraResources:
+  - ./assets/**
+publish:
+  provider: github
+  owner: pubg
+  repo: kubeconfig-updater

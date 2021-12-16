@@ -2,6 +2,10 @@
   "name": "kubeconfig-updater",
   "description": "management application for kubernetes cluster access.",
   "main": "./dist/main/main.js",
+  "author": {
+    "name": "PUBG"
+  },
+  "version": "0.0.1",
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",

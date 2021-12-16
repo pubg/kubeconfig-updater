@@ -3,6 +3,7 @@ module github.com/pubg/kubeconfig-updater/backend
 go 1.17
 
 require (
+	github.com/Azure/azure-sdk-for-go v60.1.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.1-0.20211215012433-e065f79cc2a6
 	github.com/Azure/go-autorest/autorest v0.11.23
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.3
@@ -27,7 +28,6 @@ require (
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go v60.1.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.14 // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2 // indirect

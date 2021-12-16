@@ -14,14 +14,14 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
+import { container } from 'tsyringe'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
-import BackendManager from "./core/backend";
-import {CoreExecCmd, CoreExecCwd} from "./core/symbols";
-import {container} from "tsyringe";
+import BackendManager from './backend/backend'
+import { CoreExecCmd, CoreExecCwd } from './backend/symbols'
 
 export default class AppUpdater {
   constructor() {
@@ -52,12 +52,36 @@ if (isProduction) {
   sourceMapSupport.install()
 }
 
-if (isDevelopment) {
-  container.register(CoreExecCmd, { useValue: 'go run main.go server' })
-  container.register(CoreExecCwd, { useValue: '../backend' })
+console.log(`[Debug] isPacked: ${app.isPackaged}`)
+console.log(`[Debug] getAppPath: ${app.getAppPath()}`)
+console.log(`[Debug] getPath('exe'): ${app.getPath('exe')}`)
+
+if (app.isPackaged) {
+  const parsedPath = path.parse(app.getPath('exe'))
+  if (process.platform === 'darwin') {
+    container.register(CoreExecCwd, {
+      useValue: path.join(parsedPath.dir, '../'),
+    })
+  } else {
+    container.register(CoreExecCwd, {
+      useValue: path.join(parsedPath.dir, './'),
+    })
+  }
+
+  if (process.platform === 'win32') {
+    container.register(CoreExecCmd, {
+      useValue: 'kubeconfig-updater-backend.exe',
+    })
+  } else {
+    container.register(CoreExecCmd, {
+      useValue: './kubeconfig-updater-backend',
+    })
+  }
 } else {
+  container.register(CoreExecCwd, {
+    useValue: path.join(process.cwd(), '../backend'),
+  })
   container.register(CoreExecCmd, { useValue: 'go run main.go server' })
-  container.register(CoreExecCwd, { useValue: '../backend' })
 }
 
 const installExtensions = async () => {

@@ -4,7 +4,7 @@ before:
 builds:
   - id: kubeconfig-updater
     main: main.go
-    binary: kubeconfig-updater
+    binary: kubeconfig-updater-backend
     env:
       - CGO_ENABLED=0
     ldflags:
@@ -16,22 +16,3 @@ builds:
     goarch:
       - amd64
       - arm64
-archives:
-  - id: kubeconfig-updater-archive
-    name_template: |-
-      kubeconfig_updater_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
-    builds:
-      - kubeconfig-updater
-    format_overrides:
-      - goos: windows
-        format: zip
-    files:
-      - LICENSE
-checksum:
-  name_template: "checksums.txt"
-  algorithm: sha256
-github_urls:
-  api: https://github.krafton.com/api/v3/
-  upload: https://github.krafton.com/api/uploads/
-  download: https://github.krafton.com/
-  skip_tls_verify: false
