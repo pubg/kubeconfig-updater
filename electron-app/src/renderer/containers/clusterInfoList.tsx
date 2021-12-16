@@ -1,6 +1,13 @@
 import ClusterInfoList from '../components/clusterInfoList'
+import { useStore } from '../stores/clusterMetadataStore'
 
 export default function ClusterInfoListContainer() {
-  const nil = () => {}
-  return <ClusterInfoList clusterInformations={[]} onHeaderNameClicked={nil} />
+  const store = useStore()
+
+  return (
+    <ClusterInfoList
+      clusterInformations={store.items}
+      onHeaderNameClicked={() => {}}
+    />
+  )
 }

@@ -37,6 +37,10 @@ export default function ClusterManagement() {
   const [showRegistered, setShowRegistered] = useState(false)
 
   const [listItems, setListItems] = useState(items)
+  const clusterMetadataStore = container.resolve(ClusterMetadataStore)
+
+  // TODO: improve this
+  clusterMetadataStore.items = listItems.map((item) => ({ data: item as any }))
 
   // FIXME: sorting works but only one time, this is incorrect implementation (for mock-ups)
   // and need to be fixed when doing proper implementation
@@ -88,10 +92,6 @@ export default function ClusterManagement() {
       default:
         throw new Error()
     }
-  }
-
-  const itemFilter = (item: ClusterInfo) => {
-    return showRegistered || (!showRegistered && item.status !== 'Registered')
   }
 
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
@@ -172,51 +172,51 @@ export default function ClusterManagement() {
 
   return (
     /** background */
-    <Paper sx={{ width: '100%', height: '100%' }}>
-      {/* actual container */}
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'stretch',
-        }}
-      >
-        {/* Header Menu Container */}
-        <Paper
-          elevation={0}
+    <ClusterMetadataStoreContext.Provider
+      value={container.resolve(ClusterMetadataStore)}
+    >
+      <Paper sx={{ width: '100%', height: '100%' }}>
+        {/* actual container */}
+        <Box
           sx={{
             width: '100%',
-            height: '128px',
+            height: '100%',
             display: 'flex',
-            borderBottom: '2px solid gray',
+            flexDirection: 'column',
+            justifyContent: 'stretch',
           }}
         >
-          <ClusterMetadataStoreContext.Provider
-            value={container.resolve(ClusterMetadataStore)}
+          {/* Header Menu Container */}
+          <Paper
+            elevation={0}
+            sx={{
+              width: '100%',
+              height: '128px',
+              display: 'flex',
+              borderBottom: '2px solid gray',
+            }}
           >
             <FilterBarContainer />
-          </ClusterMetadataStoreContext.Provider>
-        </Paper>
+          </Paper>
 
-        <ClusterInfoListContainer />
+          <ClusterInfoListContainer />
 
-        {/* bottom sidebar container */}
-        <Box
-          width="100%"
-          height="64px"
-          display="flex"
-          alignItems="center"
-          margin="8px"
-          paddingLeft="16px"
-        >
-          <Stack direction="row" width="100%" alignItems="center" gap="16px">
-            <Button variant="outlined">Register ALL</Button>
-            <Typography>0 Clusters Selected.</Typography>
-          </Stack>
+          {/* bottom sidebar container */}
+          <Box
+            width="100%"
+            height="64px"
+            display="flex"
+            alignItems="center"
+            margin="8px"
+            paddingLeft="16px"
+          >
+            <Stack direction="row" width="100%" alignItems="center" gap="16px">
+              <Button variant="outlined">Register ALL</Button>
+              <Typography>0 Clusters Selected.</Typography>
+            </Stack>
+          </Box>
         </Box>
-      </Box>
-    </Paper>
+      </Paper>
+    </ClusterMetadataStoreContext.Provider>
   )
 }

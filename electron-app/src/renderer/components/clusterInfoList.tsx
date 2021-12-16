@@ -1,9 +1,9 @@
 import { DetailsList, IDetailsListProps } from '@fluentui/react'
 import { Box } from '@mui/material'
-import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
+import { MetadataItem } from '../stores/clusterMetadataStore'
 
 interface ClusterInfoListProps {
-  clusterInformations: AggregatedClusterMetadata.AsObject[]
+  clusterInformations: MetadataItem[]
   onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick']
 }
 
@@ -14,7 +14,9 @@ export default function ClusterInfoList({
   return (
     <Box height="100%">
       <DetailsList
-        items={clusterInformations}
+        items={clusterInformations.map((item) => ({
+          name: item.data.metadata.clustername,
+        }))}
         onColumnHeaderClick={onHeaderNameClicked}
       />
       {/* <Menu></Menu> */}
