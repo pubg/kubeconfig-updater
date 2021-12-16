@@ -20,6 +20,8 @@ import log from 'electron-log'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 import BackendManager from "./core/backend";
+import {CoreExecCmd, CoreExecCwd} from "./core/symbols";
+import {container} from "tsyringe";
 
 export default class AppUpdater {
   constructor() {
@@ -37,16 +39,25 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'))
 })
 
-if (process.env.NODE_ENV === 'production') {
+const isDevelopment =
+  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+const isProduction = process.env.NODE_ENV === 'production'
+
+if (isDevelopment) {
+  require('electron-debug')()
+}
+
+if (isProduction) {
   const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install()
 }
 
-const isDevelopment =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-
 if (isDevelopment) {
-  require('electron-debug')()
+  container.register(CoreExecCmd, { useValue: 'go run main.go server' })
+  container.register(CoreExecCwd, { useValue: '../backend' })
+} else {
+  container.register(CoreExecCmd, { useValue: 'go run main.go server' })
+  container.register(CoreExecCwd, { useValue: '../backend' })
 }
 
 const installExtensions = async () => {
@@ -140,6 +151,5 @@ app
   })
   .catch(console.log)
 
-console.log('Try Backend Process Start')
-new BackendManager('/usr/local/bin/go run main.go server', '../backend').start()
-console.log('Backend Process Started')
+const manager = container.resolve(BackendManager)
+manager.start()

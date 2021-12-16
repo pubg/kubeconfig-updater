@@ -28,8 +28,8 @@ export default class BackendManager {
   start() {
     const cmd = `${this.cmd} server --port=${this.grpcPort} --web-port=${this.grpbWebPort}`
     const absoluteCwd = path.join(process.cwd(), this.cwd)
-    console.log(`CMD ${cmd}`)
-    console.log(`CWD ${absoluteCwd}`)
+    console.log(`[BackendManager] CMD ${cmd}`)
+    console.log(`[BackendManager] CWD ${absoluteCwd}`)
     this.process = exec(cmd, { cwd: absoluteCwd }, (err, stdout, stderr) => {
       if (err) {
         console.error(err)
@@ -52,6 +52,7 @@ export default class BackendManager {
     this.status = "exited"
     if (this.process) {
       this.process.kill()
+      this.process = null
     }
   }
 }
