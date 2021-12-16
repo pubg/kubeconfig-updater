@@ -19,10 +19,15 @@ import {
 import Enumerable from 'linq'
 import _ from 'lodash'
 import React, { useCallback, useState } from 'react'
+import { container } from 'tsyringe'
 import { ClusterInfo, Status } from '../../models/clusterInfo/clusterInfo'
 import { generateMockClusterInfos } from '../../models/clusterInfo/mockClusterInfo'
 import ClusterInfoListContainer from '../../containers/clusterInfoList'
 import FilterBarContainer from '../../containers/filterBar'
+import {
+  ClusterMetadataStore,
+  ClusterMetadataStoreContext,
+} from '../../stores/clusterMetadataStore'
 
 const mockTags = ['stage', 'vendor', 'region']
 
@@ -188,7 +193,11 @@ export default function ClusterManagement() {
             borderBottom: '2px solid gray',
           }}
         >
-          <FilterBarContainer />
+          <ClusterMetadataStoreContext.Provider
+            value={container.resolve(ClusterMetadataStore)}
+          >
+            <FilterBarContainer />
+          </ClusterMetadataStoreContext.Provider>
         </Paper>
 
         <ClusterInfoListContainer />

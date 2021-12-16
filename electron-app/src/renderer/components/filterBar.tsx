@@ -18,16 +18,23 @@ interface ClusterManagementFilterBarProps {
   onReloadClick: ButtonProps['onClick']
   onShowRegisterToggled: SwitchProps['onChange']
   groupTags: string[]
+  onGroupTagsChanged: SwitchProps['onChange']
 }
 
 export default function FilterBar({
-  groupTags,
   onNameFilterChanged,
   onShowRegisterToggled,
+  groupTags,
+  onGroupTagsChanged,
   onReloadClick,
 }: ClusterManagementFilterBarProps) {
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      width="100%"
+    >
       <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
         <TextField
           size="small"
@@ -49,7 +56,7 @@ export default function FilterBar({
           renderOption={(props, option, { selected }) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
             <li {...props}>
-              <Checkbox checked={selected} />
+              <Checkbox checked={selected} onChange={onGroupTagsChanged} />
               {option}
             </li>
           )}
