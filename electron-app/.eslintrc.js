@@ -12,6 +12,7 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
     'no-case-declarations': 'error',
+    'no-underscore-dangle': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
