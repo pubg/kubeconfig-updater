@@ -47,7 +47,7 @@ linux:
   target:
     - target: AppImage
       arch:
-        - arm64
+#        - arm64
         - x64
   category: Development
 directories:
