@@ -1,6 +1,10 @@
 build-backend:
 	cd ../backend && goreleaser build --rm-dist --snapshot
 
+build-frontend:
+	npm run clean:dist
+	npm run build
+
 copy-backend-to-package:
 	mkdir -p release/app/bin
 	cp ../backend/dist/kubeconfig-updater_darwin_amd64/kubeconfig-updater-backend release/app/bin/kubeconfig-updater-backend-mac-x64
@@ -13,9 +17,7 @@ copy-backend-to-package:
 package-only:
 	npm run package:only
 
-package-all: build-backend copy-backend-to-package
-	npm run clean:dist
-	npm run build
+package-all: build-backend copy-backend-to-package build-frontend
 	npm run package:only:allplatform
 
 publish:
