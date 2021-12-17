@@ -15,6 +15,7 @@ module.exports = {
     'no-case-declarations': 'error',
     'no-underscore-dangle': 'off',
     'prettier/prettier': 'warn',
+    'no-restricted-syntax': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,
