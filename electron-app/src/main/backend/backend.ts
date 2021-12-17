@@ -40,14 +40,14 @@ export default class BackendManager {
       console.log(stderr)
     })
 
-    this.process.stdout?.on('data', (data) => {
-      data.split(os.EOL).forEach((line) => {
+    this.process.stdout?.on('data', (data: string) => {
+      data.split('\n').forEach((line) => {
         console.log(`[BackendManager] StdOut: ${line}`)
       })
     })
 
-    this.process.stderr?.on('data', (data) => {
-      data.split(os.EOL).forEach((line) => {
+    this.process.stderr?.on('data', (data: string) => {
+      data.split('\n').forEach((line) => {
         console.log(`[BackendManager] StdErr: ${line}`)
       })
     })
