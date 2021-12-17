@@ -56,3 +56,4 @@ directories:
   output: release/build
 extraResources:
   - ./assets/**
+extends: null
