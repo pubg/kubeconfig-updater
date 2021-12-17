@@ -19,8 +19,8 @@ jobs:
           go-version: 1.17
       - run: |
           set -eux
-          echo "machine github.krafton.com login xtrm-cicd-bot password ${{ secrets.MY_GITHUB_TOKEN }}" >> ~/.netrc
-        name: Login ECR and GHES
+          echo "machine github.krafton.com login xtrm-cicd-bot password ${{ secrets.GHES_GITHUB_TOKEN }}" >> ~/.netrc
+        name: Login  GHES
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
