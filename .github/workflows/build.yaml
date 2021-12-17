@@ -50,3 +50,26 @@ jobs:
             electron-app/release/**
           if-no-files-found: error
           retention-days: 1
+
+  package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        include:
+          - os: ubuntu-latest
+            artifactName: linux
+          - os: windows-latest
+            artifactName: windows
+          - os: macos-latest
+            artifactName: macos
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+      - run: |
+          ls -ahl
+          ls -ahl backend
+          ls -ahl electron-app
