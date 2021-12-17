@@ -1,45 +1,35 @@
-import { DetailsList, IColumn } from '@fluentui/react'
-import { MoreVertOutlined, Refresh } from '@mui/icons-material'
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  IconButton,
-  Menu,
-  MenuItem,
-  Paper,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { MoreVertOutlined } from '@mui/icons-material'
+import { Box, IconButton, Paper, Skeleton, Typography } from '@mui/material'
 import Enumerable from 'linq'
-import _ from 'lodash'
-import React, { useCallback, useState } from 'react'
-import {
-  ClusterInfo,
-  Status,
-} from '../../../shared/models/clusterInfo/clusterInfo'
-import { generateMockClusterInfos } from '../../../shared/models/clusterInfo/mockClusterInfo'
-
-const mockTags = ['stage', 'vendor', 'region']
+import React, { useCallback, useEffect, useState } from 'react'
+import { container } from 'tsyringe'
+import { IColumn } from '@fluentui/react'
+import { observer } from 'mobx-react-lite'
+import { ClusterInfo, Status } from '../../models/clusterInfo/clusterInfo'
+import { generateMockClusterInfos } from '../../models/clusterInfo/mockClusterInfo'
+import { ClusterMetadataStore, ClusterMetadataStoreContext } from './clusterMetadataStore'
+import TopBar from './topBar'
+import BottomBar from './bottomBar'
+import ClusterInfoList from './clusterInfoList'
+import { KubeconfigClient } from '../../protos/Kubeconfig_serviceServiceClientPb'
 
 const items = generateMockClusterInfos(64)
 
-export default function ClusterManagement() {
-  const [showRegistered, setShowRegistered] = useState(false)
-
+export default observer(function ClusterManagement() {
   const [listItems, setListItems] = useState(items)
+  const clusterMetadataStore = container.resolve(ClusterMetadataStore)
+
+  // TODO: remove this temp client variable
+
+  // TODO: improve this
+  useEffect(() => {
+    clusterMetadataStore.fetchMetadata()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // FIXME: sorting works but only one time, this is incorrect implementation (for mock-ups)
   // and need to be fixed when doing proper implementation
-  const onColumnClick = (
-    e?: React.MouseEvent<HTMLElement>,
-    column?: IColumn
-  ): void => {
+  const onColumnClick = (e?: React.MouseEvent<HTMLElement>, column?: IColumn): void => {
     const sortKey = column?.fieldName
     if (!sortKey) {
       return
@@ -84,10 +74,6 @@ export default function ClusterManagement() {
       default:
         throw new Error()
     }
-  }
-
-  const itemFilter = (item: ClusterInfo) => {
-    return showRegistered || (!showRegistered && item.status !== 'Registered')
   }
 
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
@@ -159,123 +145,48 @@ export default function ClusterManagement() {
     },
   ]
 
-  const renderItemColumn = useCallback(
-    (item?: any, index?: number, column?: IColumn) => {
-      return <div />
-    },
-    []
-  )
+  const renderItemColumn = useCallback((item?: any, index?: number, column?: IColumn) => {
+    return <div />
+  }, [])
 
   return (
     /** background */
-    <Paper sx={{ width: '100%', height: '100%' }}>
-      {/* actual container */}
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'stretch',
-        }}
-      >
-        {/* Header Menu Container */}
-        <Paper
-          elevation={0}
+    <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
+      <Paper sx={{ width: '100%', height: '100%' }}>
+        {/* actual container */}
+        <Box
           sx={{
             width: '100%',
-            height: '128px',
-            display: 'flex',
-            borderBottom: '2px solid gray',
-          }}
-        >
-          <Stack
-            direction="row"
-            width="100%"
-            justifyContent="space-between"
-            margin="32px 32px 32px 32px"
-          >
-            <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
-              <TextField
-                size="small"
-                id="outlined-basic"
-                label="filter by name"
-                variant="outlined"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    onChange={(e) => setShowRegistered(e.target.checked)}
-                  />
-                }
-                label="Show Registered"
-              />
-              <Autocomplete
-                multiple
-                options={mockTags}
-                disableCloseOnSelect
-                getOptionLabel={(opt) => opt}
-                style={{ width: '256px' }}
-                size="small"
-                renderInput={(params) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <TextField {...params} label="Group with Tag" />
-                )}
-                renderOption={(props, option, { selected }) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <li {...props}>
-                    <Checkbox checked={selected} />
-                    {option}
-                  </li>
-                )}
-              />
-            </FormGroup>
-            <Stack direction="row">
-              <Button variant="outlined" startIcon={<Refresh />}>
-                Reload
-              </Button>
-            </Stack>
-          </Stack>
-        </Paper>
-
-        {/* list container */}
-        <Box
-          sx={{
             height: '100%',
-            overflow: 'hidden',
-            overflowY: 'scroll',
-            marginTop: '4px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'stretch',
           }}
         >
-          <DetailsList
-            items={listItems.filter(itemFilter)}
-            columns={columns}
-            onColumnHeaderClick={onColumnClick}
-            // layoutMode={DetailsListLayoutMode.justified}
-            // onRenderItemColumn={renderItemColumn}
-          />
-          <Menu open={!!menuAnchor} anchorEl={menuAnchor}>
-            <MenuItem onClick={onMenuClick}>Register</MenuItem>
-            <MenuItem onClick={onMenuClick}>Unregister</MenuItem>
-            <MenuItem onClick={onMenuClick}>Inspect</MenuItem>
-          </Menu>
-        </Box>
+          {/* Header Menu Container */}
+          <Paper
+            elevation={0}
+            sx={{
+              width: '100%',
+              height: '128px',
+              display: 'flex',
+              borderBottom: '2px solid gray',
+            }}
+          >
+            <TopBar />
+          </Paper>
 
-        {/* bottom sidebar container */}
-        <Box
-          width="100%"
-          height="64px"
-          display="flex"
-          alignItems="center"
-          margin="8px"
-          paddingLeft="16px"
-        >
-          <Stack direction="row" width="100%" alignItems="center" gap="16px">
-            <Button variant="outlined">Register ALL</Button>
-            <Typography>0 Clusters Selected.</Typography>
-          </Stack>
+          <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+            {clusterMetadataStore.state === 'fetching' && <p>loading...</p>}
+            <ClusterInfoList />
+          </Box>
+
+          {/* bottom sidebar container */}
+          <Box width="100%" height="64px" display="flex" alignItems="center" margin="8px" paddingLeft="16px">
+            <BottomBar />
+          </Box>
         </Box>
-      </Box>
-    </Paper>
+      </Paper>
+    </ClusterMetadataStoreContext.Provider>
   )
-}
+})

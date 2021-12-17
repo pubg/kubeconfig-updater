@@ -39,8 +39,12 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'))
 })
 
-const isDevelopment =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support')
+  sourceMapSupport.install()
+}
+
+const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
 const isProduction = process.env.NODE_ENV === 'production'
 
 if (isDevelopment) {
@@ -117,6 +121,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      webSecurity: !isDevelopment,
     },
   })
 
@@ -144,6 +149,21 @@ const createWindow = async () => {
   mainWindow.webContents.on('new-window', (event, url) => {
     event.preventDefault()
     shell.openExternal(url)
+  })
+
+  // https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+    callback({ requestHeaders: { ...details.requestHeaders, Origin: '*' } })
+  })
+
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Access-Control-Allow-Origin': ['*'],
+        'Access-Control-Allow-Methods': ['*'],
+      },
+    })
   })
 
   // Remove this if your app does not use auto updates
@@ -174,6 +194,3 @@ app
     })
   })
   .catch(console.log)
-
-const manager = container.resolve(BackendManager)
-manager.start()

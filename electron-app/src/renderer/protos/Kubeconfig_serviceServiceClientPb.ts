@@ -28,7 +28,7 @@ export class KubeconfigClient {
                options?: null | { [index: string]: any; }) {
     if (!options) options = {};
     if (!credentials) credentials = {};
-    options['format'] = 'text';
+    options['format'] = 'binary';
 
     this.client_ = new grpcWeb.GrpcWebClientBase(options);
     this.hostname_ = hostname;
@@ -378,6 +378,92 @@ export class KubeconfigClient {
     request,
     metadata || {},
     this.methodInfoRegisterCluster);
+  }
+
+  methodInfoSyncAvailableClusters = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/SyncAvailableClusters',
+    grpcWeb.MethodType.UNARY,
+    protos_common_pb.CommonReq,
+    protos_common_pb.CommonRes,
+    (request: protos_common_pb.CommonReq) => {
+      return request.serializeBinary();
+    },
+    protos_common_pb.CommonRes.deserializeBinary
+  );
+
+  syncAvailableClusters(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
+
+  syncAvailableClusters(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
+
+  syncAvailableClusters(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Kubeconfig/SyncAvailableClusters',
+        request,
+        metadata || {},
+        this.methodInfoSyncAvailableClusters,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Kubeconfig/SyncAvailableClusters',
+    request,
+    metadata || {},
+    this.methodInfoSyncAvailableClusters);
+  }
+
+  methodInfoPing = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/Ping',
+    grpcWeb.MethodType.UNARY,
+    protos_common_pb.CommonReq,
+    protos_common_pb.CommonRes,
+    (request: protos_common_pb.CommonReq) => {
+      return request.serializeBinary();
+    },
+    protos_common_pb.CommonRes.deserializeBinary
+  );
+
+  ping(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
+
+  ping(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
+
+  ping(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Kubeconfig/Ping',
+        request,
+        metadata || {},
+        this.methodInfoPing,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Kubeconfig/Ping',
+    request,
+    metadata || {},
+    this.methodInfoPing);
   }
 
 }
