@@ -34,7 +34,8 @@ jobs:
         with:
           node-version: '16'
       - run: |
-          npm install
+          npm install --global pnpm
+          pnpm install
         working-directory: electron-app
 
       - run: |
