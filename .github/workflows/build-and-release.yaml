@@ -39,7 +39,6 @@ jobs:
         working-directory: electron-app
 
       - run: |
-          make package-darwin
           make package-linux
           make publish
         working-directory: electron-app
