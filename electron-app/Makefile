@@ -17,6 +17,15 @@ copy-backend-to-package:
 package-only:
 	npm run package:only
 
+package-darwin:
+	npm run package:only:darwin
+
+package-linux:
+	npm run package:only:linux
+
+package-windows:
+	npm run package:only:windows
+
 package-all: build-backend copy-backend-to-package build-frontend
 	npm run package:only:allplatform
 
