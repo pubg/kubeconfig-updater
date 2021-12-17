@@ -28,6 +28,8 @@ import {
   ClusterMetadataStore,
   ClusterMetadataStoreContext,
 } from './clusterMetadataStore'
+import TopBar from './topBar'
+import ClusterInfoList from './clusterInfoList'
 
 const mockTags = ['stage', 'vendor', 'region']
 
@@ -37,7 +39,8 @@ export default function ClusterManagement() {
   const [showRegistered, setShowRegistered] = useState(false)
 
   const [listItems, setListItems] = useState(items)
-  const clusterMetadataStore = container.resolve(ClusterMetadataStore)
+  // const clusterMetadataStore = container.resolve(ClusterMetadataStore)
+  const clusterMetadataStore = new ClusterMetadataStore()
 
   // TODO: improve this
   clusterMetadataStore.items = listItems.map((item) => ({ data: item as any }))
@@ -173,7 +176,7 @@ export default function ClusterManagement() {
   return (
     /** background */
     <ClusterMetadataStoreContext.Provider
-      value={container.resolve(ClusterMetadataStore)}
+      value={clusterMetadataStore}
     >
       <Paper sx={{ width: '100%', height: '100%' }}>
         {/* actual container */}
@@ -196,10 +199,10 @@ export default function ClusterManagement() {
               borderBottom: '2px solid gray',
             }}
           >
-            <FilterBarContainer />
+            <TopBar />
           </Paper>
 
-          <ClusterInfoListContainer />
+          <ClusterInfoList />
 
           {/* bottom sidebar container */}
           <Box

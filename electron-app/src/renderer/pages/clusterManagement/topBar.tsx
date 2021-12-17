@@ -11,6 +11,7 @@ import {
   SwitchProps,
   Switch,
 } from '@mui/material'
+import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import { Filter, MetadataItem, useStore } from './clusterMetadataStore'
@@ -21,18 +22,23 @@ function filterFactory(
   showRegistered: boolean
 ): Filter {
   const filter = ({ data }: MetadataItem): boolean => {
+    // filter by name
+    // TODO: implement case sensitive option
     if (!data.metadata.clustername.includes(name)) {
       return false
     }
 
+    // filter by tags
+    // TODO: implement this
+
+    // filter by registered state
     if (
-      !showRegistered ||
-      (showRegistered && data.status === ClusterInformationStatus.REGISTERED_OK)
+      showRegistered ||
+      (!showRegistered &&
+        data.status === ClusterInformationStatus.REGISTERED_OK)
     ) {
       return false
     }
-
-    // TODO: add group filter function
 
     return true
   }
@@ -40,7 +46,7 @@ function filterFactory(
   return filter
 }
 
-export default function TopBar() {
+function TopBar() {
   const store = useStore()
 
   // define variables
@@ -50,9 +56,6 @@ export default function TopBar() {
 
   // update store's filter when filter variables are changed
   useEffect(() => {
-    console.log(
-      `filter updated, value: ${nameFilter}, ${selectedTags}, ${showRegistered}`
-    )
     store.setFilter(filterFactory(nameFilter, selectedTags, showRegistered))
   }, [store, nameFilter, selectedTags, showRegistered])
 
@@ -126,3 +129,5 @@ export default function TopBar() {
     </Stack>
   )
 }
+
+export default observer(TopBar)

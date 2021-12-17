@@ -1,5 +1,12 @@
 import React from 'react'
-import { action, computed, flow, observable } from 'mobx'
+import {
+  action,
+  autorun,
+  computed,
+  flow,
+  makeObservable,
+  observable,
+} from 'mobx'
 import { container, singleton } from 'tsyringe'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
 import GetAvailableClusters from '../../services/getAvailableClusters'
@@ -7,7 +14,7 @@ import GetAvailableClusters from '../../services/getAvailableClusters'
 export const ClusterMetadataStoreContext =
   React.createContext<ClusterMetadataStore | null>(null)
 
-export const useStore = () => {
+export const useStore = (): ClusterMetadataStore => {
   const store = React.useContext(ClusterMetadataStoreContext)
   if (!store) {
     throw new Error(
@@ -27,8 +34,12 @@ export interface MetadataItem {
 
 export type Filter = (metadata: MetadataItem) => boolean
 
-@singleton()
+// @singleton()
 export class ClusterMetadataStore {
+  constructor() {
+    makeObservable(this)
+  }
+
   // TODO: computed decorator for array? consider render/compute optimization
   @observable
   items: MetadataItem[] = []
@@ -37,16 +48,11 @@ export class ClusterMetadataStore {
   state: 'fetching' | 'ready' = 'ready'
 
   @observable
-  private _filter: Filter | null = null
-
-  @computed
-  get filter(): Filter | null {
-    return this._filter
-  }
+  filter: Filter | null = null
 
   @action
   setFilter(filter: Filter | null) {
-    this._filter = filter
+    this.filter = filter
   }
 
   @computed
