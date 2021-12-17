@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import { exec, ChildProcess } from 'child_process'
 import { inject, injectable } from 'tsyringe'
+import os from 'os'
+import { dialog } from 'electron'
 import { CoreExecCmd, CoreExecCwd } from './symbols'
-import path from "path";
-import os from "os";
 
 /**
  * BackendManager manages lifetime of kubeconfig-updater go core program
@@ -40,28 +40,23 @@ export default class BackendManager {
       console.log(stderr)
     })
 
-    this.process.stdout?.on('data', (data) => {
-      const os = require('os')
-      data.split(os.EOL).forEach(line => {
+    this.process.stdout?.on('data', (data: string) => {
+      data.split('\n').forEach((line) => {
         console.log(`[BackendManager] StdOut: ${line}`)
       })
     })
 
-    this.process.stderr?.on('data', (data) => {
-      const os = require('os')
-      data.split(os.EOL).forEach(line => {
+    this.process.stderr?.on('data', (data: string) => {
+      data.split('\n').forEach((line) => {
         console.log(`[BackendManager] StdErr: ${line}`)
       })
     })
 
-    this.process.on('error', (e) => {
-
-    })
+    this.process.on('error', (e) => {})
     this.process.on('exit', async (e) => {
       if (this.status === 'running') {
         this.errorCount += 1
         if (this.errorCount >= 10) {
-          const { dialog } = require('electron')
           console.log(
             await dialog.showMessageBox({
               message: 'Cannot Connect to Logic Controller Process',

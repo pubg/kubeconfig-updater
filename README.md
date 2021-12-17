@@ -7,7 +7,31 @@ OS: Windows / Linux / MacOS
 
 Arch: x86-64(amd64) / Arm64 
 
-------------------------
+# Provided Artifact Type
+Windows: Portable Zip, Installer
+
+Linux: AppImage
+
+MacOS: App(Zip), Dmg
+
+# Config Store Path
+Config stored under your HOME directory.
+```
+Windows: /Users/<username>/.kubeconfig-updater-gui
+Linux: /home/<username>/.kubeconfig-updater-gui
+MacOS: /Users/<username>/.kubeconfig-updater-gui
+```
+
+# Organization Customized Feature
+This program will support organization specific customized options.
+We are under discussion how to get policy file in organization.
+
+Below is candidate get policy method. 
+1. Get Policy from [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) -able HTTP server. (Like public wifi web authentication)
+2. Get Policy from predefined urls, locate in company's private network.
+3. Publish Artifact with policy file.
+   - Locate to installer inside
+   - Locate to installer nearby
 
 # Develop Requirements
 

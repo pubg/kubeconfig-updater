@@ -1,5 +1,6 @@
 productName: kubeconfig-updater
 appId: com.pubg.newstate.kubeconfig-updater
+artifactName: kubeconfig-updater-${version}-${os}-${arch}.${ext}
 asar: true
 asarUnpack: '**\*.{node,dll}'
 files:
@@ -14,10 +15,10 @@ extraFiles:
 afterSign: .erb/scripts/notarize.js
 mac:
   target:
-    - target: default
+    - target: zip
       arch:
         - arm64
-#        - x64
+        - x64
   type: distribution
   hardenedRuntime: true
   entitlements: assets/entitlements.mac.plist
@@ -46,7 +47,7 @@ linux:
   target:
     - target: AppImage
       arch:
-        - arm64
+#        - arm64
         - x64
   category: Development
 directories:
@@ -55,7 +56,3 @@ directories:
   output: release/build
 extraResources:
   - ./assets/**
-publish:
-  provider: github
-  owner: pubg
-  repo: kubeconfig-updater
