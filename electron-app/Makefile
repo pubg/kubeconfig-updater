@@ -17,3 +17,6 @@ package-all: build-backend copy-backend-to-package
 	npm run clean:dist
 	npm run build
 	npm run package:only:allplatform
+
+publish:
+	gh release create v0.0.2 --prerelease --title=Kubeconfig-Updater-GUI ./release/build/*.exe ./release/build/*.dmg ./release/build/*.zip ./release/build/*.AppImage

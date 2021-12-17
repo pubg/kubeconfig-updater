@@ -1,5 +1,6 @@
 productName: kubeconfig-updater
 appId: com.pubg.newstate.kubeconfig-updater
+artifactName: kubeconfig-updater-${version}-${os}-${arch}.${ext}
 asar: true
 asarUnpack: '**\*.{node,dll}'
 files:
@@ -55,7 +56,3 @@ directories:
   output: release/build
 extraResources:
   - ./assets/**
-publish:
-  provider: github
-  owner: pubg
-  repo: kubeconfig-updater
