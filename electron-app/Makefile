@@ -11,6 +11,9 @@ copy-backend-to-package:
 	cp ../backend/dist/kubeconfig-updater_windows_arm64/kubeconfig-updater-backend.exe release/app/bin/kubeconfig-updater-backend-win-arm64.exe
 
 package-only:
-	npm run package
+	npm run package:only
 
-package-all: build-backend copy-backend-to-package package-only
+package-all: build-backend copy-backend-to-package
+	npm run clean:dist
+	npm run build
+	npm run package:only:allplatform
