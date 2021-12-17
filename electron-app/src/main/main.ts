@@ -151,6 +151,21 @@ const createWindow = async () => {
     shell.openExternal(url)
   })
 
+  // https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+    callback({ requestHeaders: { ...details.requestHeaders, Origin: '*' } })
+  })
+
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Access-Control-Allow-Origin': ['*'],
+        'Access-Control-Allow-Methods': ['*'],
+      },
+    })
+  })
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();

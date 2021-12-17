@@ -19,7 +19,7 @@ initializeIcons()
 
 // TODO: initialize grpc kubeconfigclient
 // TODO: make this customizable
-const client = new KubeconfigClient('localhost:9081')
+const client = new KubeconfigClient('http://localhost:10981')
 container.register(KubeconfigClient, { useValue: client })
 
 render(
