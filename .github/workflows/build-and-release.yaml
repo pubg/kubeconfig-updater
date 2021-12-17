@@ -1,5 +1,4 @@
 name: build-and-release
-description: Build and Release App
 on:
   push:
     tags:
