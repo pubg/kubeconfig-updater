@@ -1,9 +1,16 @@
 import { Paper } from '@mui/material'
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom'
+import { container } from 'tsyringe'
 import './App.css'
 import Sidebar from './components/sidebar/sidebar'
+import MockKubeconfigClient from './mock/grpc/grpcClient'
 import ClusterManagement from './pages/clusterManagement/clusterManagement'
 import Home from './pages/home/home'
+import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
+
+// TODO: delete this, only for testing.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+container.register(KubeconfigClient, { useClass: MockKubeconfigClient as any })
 
 export default function App() {
   return (

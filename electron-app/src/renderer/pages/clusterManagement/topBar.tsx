@@ -1,26 +1,11 @@
 import { Refresh } from '@mui/icons-material'
-import {
-  Stack,
-  FormGroup,
-  TextField,
-  Autocomplete,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  CheckboxProps,
-  SwitchProps,
-  Switch,
-} from '@mui/material'
+import { Stack, FormGroup, TextField, Autocomplete, Checkbox, FormControlLabel, Button, CheckboxProps, SwitchProps, Switch } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import { Filter, MetadataItem, useStore } from './clusterMetadataStore'
 
-function filterFactory(
-  name: string,
-  selectedTags: Set<string>,
-  showRegistered: boolean
-): Filter {
+function filterFactory(name: string, selectedTags: Set<string>, showRegistered: boolean): Filter {
   const filter = ({ data }: MetadataItem): boolean => {
     // filter by name
     // TODO: implement case sensitive option
@@ -32,11 +17,7 @@ function filterFactory(
     // TODO: implement this
 
     // filter by registered state
-    if (
-      showRegistered ||
-      (!showRegistered &&
-        data.status === ClusterInformationStatus.REGISTERED_OK)
-    ) {
+    if (showRegistered || (!showRegistered && data.status === ClusterInformationStatus.REGISTERED_OK)) {
       return false
     }
 
@@ -77,23 +58,14 @@ function TopBar() {
     setShowRegistered(checked)
   }
 
-  const onReloadClick = () => {}
+  const onReloadClick = useCallback(() => {
+    store.fetchMetadata()
+  }, [store])
 
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      width="100%"
-    >
+    <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
       <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
-        <TextField
-          size="small"
-          label="filter..."
-          variant="outlined"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
-        />
+        <TextField size="small" label="filter..." variant="outlined" value={nameFilter} onChange={(e) => setNameFilter(e.target.value)} />
         <Autocomplete
           multiple
           options={store.tags}
@@ -112,17 +84,10 @@ function TopBar() {
             </li>
           )}
         />
-        <FormControlLabel
-          control={<Switch onChange={onShowRegisteredToggled} />}
-          label="Show Registered"
-        />
+        <FormControlLabel control={<Switch onChange={onShowRegisteredToggled} />} label="Show Registered" />
       </FormGroup>
       <Stack>
-        <Button
-          variant="outlined"
-          startIcon={<Refresh />}
-          onClick={onReloadClick}
-        >
+        <Button variant="outlined" startIcon={<Refresh />} onClick={onReloadClick}>
           Reload
         </Button>
       </Stack>

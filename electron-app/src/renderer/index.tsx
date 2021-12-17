@@ -15,6 +15,8 @@ const theme = createTheme({
 
 initializeIcons()
 
+// TODO: initialize grpc kubeconfigclient
+
 render(
   <ThemeProvider theme={theme}>
     <App />

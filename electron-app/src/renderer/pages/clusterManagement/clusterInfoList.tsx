@@ -1,11 +1,7 @@
 import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
-import {
-  IObjectWithKey,
-  ISelection,
-  Selection,
-} from '@fluentui/react/lib/DetailsList'
+import { IObjectWithKey, ISelection, Selection } from '@fluentui/react/lib/DetailsList'
 import { observer } from 'mobx-react-lite'
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { MetadataItem, useStore } from './clusterMetadataStore'
 
 interface ListItem extends IObjectWithKey {
@@ -28,17 +24,13 @@ function ClusterInfoList() {
   const [selection, setSelection] = useState(
     new Selection<ListItem>({
       onSelectionChanged: () => {
-        store.setSelectedItems(
-          selection.getSelection().map((item) => item.data)
-        )
+        store.setSelectedItems(selection.getSelection().map((item) => item.data))
       },
     })
   )
 
   const items = useMemo((): ListItem[] => {
-    const filteredItems = store.filter
-      ? store.items.filter(store.filter)
-      : store.items
+    const filteredItems = store.filter ? store.items.filter(store.filter) : store.items
 
     return filteredItems.map((item) => ({
       clusterName: item.data.metadata.clustername,
@@ -68,12 +60,7 @@ function ClusterInfoList() {
 
   return (
     <>
-      <DetailsList
-        columns={columns}
-        items={items}
-        onColumnHeaderClick={onHeaderNameClicked}
-        selection={selection as Selection}
-      />
+      <DetailsList columns={columns} items={items} onColumnHeaderClick={onHeaderNameClicked} selection={selection as Selection} />
       {/* <Menu></Menu> */}
     </>
   )

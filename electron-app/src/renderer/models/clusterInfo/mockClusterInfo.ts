@@ -1,11 +1,6 @@
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import {
-  AggregatedClusterMetadata,
-  ClusterInformationStatus,
-  ClusterMetadata,
-  MetadataResolverType,
-} from '../../protos/kubeconfig_service_pb'
+import { AggregatedClusterMetadata, ClusterInformationStatus, ClusterMetadata, MetadataResolverType } from '../../protos/kubeconfig_service_pb'
 import { ClusterInfo, Status } from './clusterInfo'
 import regions from './mockRegions.json'
 import { Vendor } from './vendor'
@@ -15,11 +10,7 @@ interface MockRegion {
   infraVendor: Vendor
 }
 
-export const mockRegions = [
-  ...(regions.AWS as MockRegion[]),
-  ...(regions.Azure as MockRegion[]),
-  ...(regions.Tencent as MockRegion[]),
-]
+export const mockRegions = [...(regions.AWS as MockRegion[]), ...(regions.Azure as MockRegion[]), ...(regions.Tencent as MockRegion[])]
 
 function randStage(): string {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -45,12 +36,7 @@ function randAccountUUID() {
 }
 
 function randDataResolversList() {
-  const values = [
-    MetadataResolverType.CRED_RESOLVER,
-    MetadataResolverType.FOX,
-    MetadataResolverType.KUBECONFIG,
-    MetadataResolverType.META_RESOLVER_NOT_SETTED,
-  ].filter(() => Math.random() > 0.5)
+  const values = [MetadataResolverType.CRED_RESOLVER, MetadataResolverType.FOX, MetadataResolverType.KUBECONFIG, MetadataResolverType.META_RESOLVER_NOT_SETTED].filter(() => Math.random() > 0.5)
 
   if (values.length === 0) {
     values.push(MetadataResolverType.KUBECONFIG)
@@ -88,9 +74,7 @@ function randMetadata(): ClusterMetadata.AsObject {
   const region = _.sample(mockRegions)!
 
   return {
-    clustername: `${randStage()}-${region.fullName}-${
-      region.infraVendor
-    }-${hash()}`,
+    clustername: `${randStage()}-${region.fullName}-${region.infraVendor}-${hash()}`,
     clustertagsMap: [
       ['vendor', region.infraVendor],
       ['account', account(region.infraVendor)],
@@ -99,12 +83,7 @@ function randMetadata(): ClusterMetadata.AsObject {
   }
 }
 
-const status: Status[] = [
-  'Registered',
-  'Unauthorized',
-  'Unknown',
-  'Unregistered',
-]
+const status: Status[] = ['Registered', 'Unauthorized', 'Unknown', 'Unregistered']
 
 export function generateMockClusterInfo(): AggregatedClusterMetadata.AsObject {
   return {
@@ -114,9 +93,7 @@ export function generateMockClusterInfo(): AggregatedClusterMetadata.AsObject {
   }
 }
 
-export function generateMockClusterInfos(
-  len: number
-): AggregatedClusterMetadata.AsObject[] {
+export function generateMockClusterInfos(len: number): AggregatedClusterMetadata.AsObject[] {
   const clusterInfos: AggregatedClusterMetadata.AsObject[] = []
 
   for (let i = 0; i < len; i += 1) {

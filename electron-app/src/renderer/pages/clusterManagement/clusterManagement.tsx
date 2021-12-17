@@ -1,38 +1,35 @@
 import { MoreVertOutlined } from '@mui/icons-material'
-import { Box, IconButton, Paper, Typography } from '@mui/material'
+import { Box, IconButton, Paper, Skeleton, Typography } from '@mui/material'
 import Enumerable from 'linq'
-import _ from 'lodash'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { container } from 'tsyringe'
+import { IColumn } from '@fluentui/react'
+import { observer } from 'mobx-react-lite'
 import { ClusterInfo, Status } from '../../models/clusterInfo/clusterInfo'
 import { generateMockClusterInfos } from '../../models/clusterInfo/mockClusterInfo'
-import {
-  ClusterMetadataStore,
-  ClusterMetadataStoreContext,
-} from './clusterMetadataStore'
+import { ClusterMetadataStore, ClusterMetadataStoreContext } from './clusterMetadataStore'
 import TopBar from './topBar'
 import BottomBar from './bottomBar'
 import ClusterInfoList from './clusterInfoList'
-
-const mockTags = ['stage', 'vendor', 'region']
+import { KubeconfigClient } from '../../protos/Kubeconfig_serviceServiceClientPb'
 
 const items = generateMockClusterInfos(64)
 
-export default function ClusterManagement() {
-  const [showRegistered, setShowRegistered] = useState(false)
-
+export default observer(function ClusterManagement() {
   const [listItems, setListItems] = useState(items)
   const clusterMetadataStore = container.resolve(ClusterMetadataStore)
 
+  // TODO: remove this temp client variable
+
   // TODO: improve this
-  clusterMetadataStore.items = listItems.map((item) => ({ data: item as any }))
+  useEffect(() => {
+    clusterMetadataStore.fetchMetadata()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // FIXME: sorting works but only one time, this is incorrect implementation (for mock-ups)
   // and need to be fixed when doing proper implementation
-  const onColumnClick = (
-    e?: React.MouseEvent<HTMLElement>,
-    column?: IColumn
-  ): void => {
+  const onColumnClick = (e?: React.MouseEvent<HTMLElement>, column?: IColumn): void => {
     const sortKey = column?.fieldName
     if (!sortKey) {
       return
@@ -148,12 +145,9 @@ export default function ClusterManagement() {
     },
   ]
 
-  const renderItemColumn = useCallback(
-    (item?: any, index?: number, column?: IColumn) => {
-      return <div />
-    },
-    []
-  )
+  const renderItemColumn = useCallback((item?: any, index?: number, column?: IColumn) => {
+    return <div />
+  }, [])
 
   return (
     /** background */
@@ -183,22 +177,16 @@ export default function ClusterManagement() {
           </Paper>
 
           <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+            {clusterMetadataStore.state === 'fetching' && <p>loading...</p>}
             <ClusterInfoList />
           </Box>
 
           {/* bottom sidebar container */}
-          <Box
-            width="100%"
-            height="64px"
-            display="flex"
-            alignItems="center"
-            margin="8px"
-            paddingLeft="16px"
-          >
+          <Box width="100%" height="64px" display="flex" alignItems="center" margin="8px" paddingLeft="16px">
             <BottomBar />
           </Box>
         </Box>
       </Paper>
     </ClusterMetadataStoreContext.Provider>
   )
-}
+})

@@ -1,25 +1,15 @@
 import React from 'react'
-import {
-  action,
-  autorun,
-  computed,
-  flow,
-  makeObservable,
-  observable,
-} from 'mobx'
+import { action, computed, flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
 import GetAvailableClusters from '../../services/getAvailableClusters'
 
-export const ClusterMetadataStoreContext =
-  React.createContext<ClusterMetadataStore | null>(null)
+export const ClusterMetadataStoreContext = React.createContext<ClusterMetadataStore | null>(null)
 
 export const useStore = (): ClusterMetadataStore => {
   const store = React.useContext(ClusterMetadataStoreContext)
   if (!store) {
-    throw new Error(
-      'tried to use ClusterMetadataStoreContext but object is null.'
-    )
+    throw new Error('tried to use ClusterMetadataStoreContext but object is null.')
   }
 
   return store
@@ -72,8 +62,8 @@ export class ClusterMetadataStore {
   }
 
   fetchMetadata = flow(function* (this: ClusterMetadataStore) {
-    console.log('fetching cluster metadata...')
     this.state = 'fetching'
+    this.items = []
 
     const fetch = async () => {
       const req = container.resolve(GetAvailableClusters)
@@ -84,6 +74,7 @@ export class ClusterMetadataStore {
 
     try {
       const clusterList: AggregatedClusterMetadata[] = yield fetch()
+
       this.items = clusterList.map((metadata) => ({
         data: metadata.toObject(),
       })) as MetadataItem[]
