@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { exec, ChildProcess } from 'child_process'
-import { inject, injectable } from 'tsyringe'
+import {inject, injectable, singleton} from 'tsyringe'
 import os from 'os'
 import { dialog } from 'electron'
 import { CoreExecCmd, CoreExecCwd } from './symbols'
@@ -8,28 +8,37 @@ import { CoreExecCmd, CoreExecCwd } from './symbols'
 /**
  * BackendManager manages lifetime of kubeconfig-updater go core program
  */
-@injectable()
+@singleton()
 export default class BackendManager {
+
   private process: ChildProcess | null = null
 
   private status: 'running' | 'exited' = 'running'
 
-  private readonly grpcPort: number
+  private readonly _grpcPort: number
 
-  private readonly grpbWebPort: number
+  private readonly _grpbWebPort: number
 
   private errorCount: number = 0
+
+  get grpcPort(): number {
+    return this._grpcPort
+  }
+
+  get grpbWebPort(): number {
+    return this._grpbWebPort
+  }
 
   constructor(
     @inject(CoreExecCmd) private readonly cmd: string,
     @inject(CoreExecCwd) private readonly cwd: string
   ) {
-    this.grpcPort = _.random(10000, 20000, false)
-    this.grpbWebPort = _.random(10000, 20000, false)
+    this._grpcPort = _.random(10000, 20000, false)
+    this._grpbWebPort = _.random(10000, 20000, false)
   }
 
   start() {
-    const cmd = `${this.cmd} server --port=${this.grpcPort} --web-port=${this.grpbWebPort}`
+    const cmd = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpbWebPort}`
     console.log(`[BackendManager] CMD ${cmd}`)
     console.log(`[BackendManager] CWD ${this.cwd}`)
     this.process = exec(cmd, { cwd: this.cwd }, (err, stdout, stderr) => {

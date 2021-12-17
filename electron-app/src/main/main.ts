@@ -14,7 +14,7 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, shell, contextBridge } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { container } from 'tsyringe'
@@ -194,3 +194,15 @@ app
     })
   })
   .catch(console.log)
+
+const manager = container.resolve(BackendManager)
+manager.start()
+
+ipcMain.on('getGrpcWebPort', (event, arg) => {
+  console.log(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
+  event.returnValue = manager.grpbWebPort
+})
+
+app.on('quit', () => {
+  manager.end()
+})

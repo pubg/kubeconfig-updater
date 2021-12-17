@@ -38,6 +38,7 @@ func SyncAvailableClusters() error {
 		metadatas, err := resolver.ListClusters()
 		if err != nil {
 			fmt.Printf("List cluster metadata occurred error, resolver type:%s, err:%s\n", resolver.GetResolverType().String(), err.Error())
+			continue
 		}
 		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters\n", resolver.GetResolverDescription(), len(metadatas))
 		for _, metadata := range metadatas {
