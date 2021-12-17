@@ -52,6 +52,8 @@ jobs:
           retention-days: 1
 
   package:
+    needs:
+      - build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -73,3 +75,11 @@ jobs:
           ls -ahl
           ls -ahl backend
           ls -ahl electron-app
+
+  publish:
+    needs:
+      - package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
