@@ -39,6 +39,11 @@ jobs:
         working-directory: electron-app
 
       - run: |
+          make build-backend
+          make build-frontend
+          make copy-backend-to-package
           make package-linux
+          make package-windows
+          make package-mac
           make publish
         working-directory: electron-app
