@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import _ from 'lodash'
 import { generateMockClusterInfos } from '../../models/clusterInfo/mockClusterInfo'
 import { AggregatedClusterMetadata, ClusterMetadata, GetAvailableClustersRes } from '../../protos/kubeconfig_service_pb'
 import sleep from '../../utils/sleep'
@@ -24,5 +25,10 @@ export default class MockKubeconfigClient {
     await sleep(2000)
 
     return mockResponse
+  }
+
+  async registerCluster(accountId: string, clusterName: string) {
+    console.log(`mock object register cluster accountId: ${accountId}, clusterName: ${clusterName}`)
+    await sleep(_.random(200, 1000))
   }
 }

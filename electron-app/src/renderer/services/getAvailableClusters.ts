@@ -4,7 +4,7 @@ import { KubeconfigClient } from '../protos/Kubeconfig_serviceServiceClientPb'
 import { GetAvailableClustersRes } from '../protos/kubeconfig_service_pb'
 
 @injectable()
-export default class GetAvailableClusters {
+export default class GetAvailableClusterService {
   constructor(private readonly client: KubeconfigClient) {}
 
   async request(): Promise<GetAvailableClustersRes> {

@@ -1,8 +1,12 @@
+/* eslint-disable func-names */
 import React from 'react'
 import { action, computed, flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
+import _ from 'lodash'
+import { ResultCode } from '../../protos/common_pb'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
-import GetAvailableClusters from '../../services/getAvailableClusters'
+import GetAvailableClusterService from '../../services/getAvailableClusters'
+import RegisterClusterService from '../../services/registerClusters'
 
 export const ClusterMetadataStoreContext = React.createContext<ClusterMetadataStore | null>(null)
 
@@ -19,6 +23,7 @@ export interface MetadataItem {
   data: AggregatedClusterMetadata.AsObject & {
     metadata: NonNullable<AggregatedClusterMetadata.AsObject['metadata']>
   }
+  /** @deprecated unused */
   selected?: boolean
 }
 
@@ -66,7 +71,7 @@ export class ClusterMetadataStore {
     this.items = []
 
     const fetch = async () => {
-      const req = container.resolve(GetAvailableClusters)
+      const req = container.resolve(GetAvailableClusterService)
       const res = await req.request()
 
       return res.getClustersList()
