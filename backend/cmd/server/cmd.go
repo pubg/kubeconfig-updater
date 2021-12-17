@@ -8,10 +8,10 @@ import (
 	"os"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"github.com/spf13/cobra"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -29,8 +29,8 @@ func Cmd() *cobra.Command {
 	//daemonMode := false
 
 	flags := serverCmd.Flags()
-	flags.IntVar(&grpcPort, "port", 9080, "Grpc Listen Port")
-	flags.IntVar(&grpbWebPort, "web-port", 9081, "Grpc-Web Listen Port")
+	flags.IntVar(&grpcPort, "port", 10980, "Grpc Listen Port")
+	flags.IntVar(&grpbWebPort, "web-port", 10981, "Grpc-Web Listen Port")
 	flags.BoolVar(&useMock, "mock", false, "Use Mock Controller")
 	//flags.BoolVar(&daemonMode, "daemon", false, "Run as background process")
 
@@ -87,15 +87,18 @@ func runGrpcServer(port int, server *grpc.Server, done chan bool) {
 func runGrpcWebServer(port int, server *grpc.Server, done chan bool) {
 	fmt.Printf("Grpc Web Server listen http://localhost:%d\n", port)
 	wrappedGrpc := grpcweb.WrapServer(server)
-	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsGrpcWebRequest(req) {
 			wrappedGrpc.ServeHTTP(res, req)
 			return
 		}
+		fmt.Println("Web Requests")
 		// Fall back to other servers.
 		http.DefaultServeMux.ServeHTTP(res, req)
 	})
-	err := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), mux)
 	if err != nil {
 		log.Fatalf("failed to start grpc-web server: %v", err)
 	}
