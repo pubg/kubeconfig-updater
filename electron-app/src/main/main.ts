@@ -39,9 +39,12 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'))
 })
 
-const isDevelopment =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-const isProduction = process.env.NODE_ENV === 'production'
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support')
+  sourceMapSupport.install()
+}
+
+const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
 
 if (isDevelopment) {
   require('electron-debug')()
@@ -102,9 +105,7 @@ const createWindow = async () => {
     await installExtensions()
   }
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets')
+  const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets')
 
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths)
@@ -117,6 +118,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      webSecurity: !isDevelopment,
     },
   })
 
@@ -174,6 +176,3 @@ app
     })
   })
   .catch(console.log)
-
-const manager = container.resolve(BackendManager)
-manager.start()

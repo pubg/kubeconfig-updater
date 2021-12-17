@@ -10,7 +10,7 @@ import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 
 // TODO: delete this, only for testing.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-container.register(KubeconfigClient, { useClass: MockKubeconfigClient as any })
+// container.register(KubeconfigClient, { useClass: MockKubeconfigClient as any })
 
 export default function App() {
   return (
