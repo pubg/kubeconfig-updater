@@ -34,7 +34,8 @@ export interface MetadataItem {
 
 export type Filter = (metadata: MetadataItem) => boolean
 
-// @singleton()
+// REFACTOR: this store is trying to be "god class" should break down this
+@singleton()
 export class ClusterMetadataStore {
   constructor() {
     makeObservable(this)
@@ -60,6 +61,14 @@ export class ClusterMetadataStore {
   get tags(): string[] {
     // TODO: group 에 사용되는 태그를 보여줌
     return []
+  }
+
+  @observable
+  selectedItems: MetadataItem[] = []
+
+  @action
+  setSelectedItems(items: MetadataItem[]) {
+    this.selectedItems = items
   }
 
   fetchMetadata = flow(function* (this: ClusterMetadataStore) {

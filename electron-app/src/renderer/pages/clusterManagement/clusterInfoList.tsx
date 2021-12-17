@@ -1,11 +1,14 @@
 import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
-import { Box } from '@mui/material'
-import { computed } from 'mobx'
+import {
+  IObjectWithKey,
+  ISelection,
+  Selection,
+} from '@fluentui/react/lib/DetailsList'
 import { observer } from 'mobx-react-lite'
-import { useMemo } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { MetadataItem, useStore } from './clusterMetadataStore'
 
-interface ListItem {
+interface ListItem extends IObjectWithKey {
   clusterName: string
   credentialsResolverId: string
   tags: Map<string, string>
@@ -19,6 +22,18 @@ function tagArrayToMap(arr: [string, string][]): Map<string, string> {
 
 function ClusterInfoList() {
   const store = useStore()
+
+  // variables
+  // QUESTION: should I use setSelection? does it notify other components to update?
+  const [selection, setSelection] = useState(
+    new Selection<ListItem>({
+      onSelectionChanged: () => {
+        store.setSelectedItems(
+          selection.getSelection().map((item) => item.data)
+        )
+      },
+    })
+  )
 
   const items = useMemo((): ListItem[] => {
     const filteredItems = store.filter
@@ -49,17 +64,18 @@ function ClusterInfoList() {
   ]
 
   // TODO:
-  const onHeaderNameClicked = () => {}
+  const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
 
   return (
-    <Box height="100%">
+    <>
       <DetailsList
         columns={columns}
         items={items}
         onColumnHeaderClick={onHeaderNameClicked}
+        selection={selection as Selection}
       />
       {/* <Menu></Menu> */}
-    </Box>
+    </>
   )
 }
 

@@ -1,34 +1,17 @@
-import { DetailsList, IColumn } from '@fluentui/react'
-import { MoreVertOutlined, Refresh } from '@mui/icons-material'
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  IconButton,
-  Menu,
-  MenuItem,
-  Paper,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { MoreVertOutlined } from '@mui/icons-material'
+import { Box, IconButton, Paper, Typography } from '@mui/material'
 import Enumerable from 'linq'
 import _ from 'lodash'
 import React, { useCallback, useState } from 'react'
 import { container } from 'tsyringe'
 import { ClusterInfo, Status } from '../../models/clusterInfo/clusterInfo'
 import { generateMockClusterInfos } from '../../models/clusterInfo/mockClusterInfo'
-import ClusterInfoListContainer from '../../containers/clusterInfoList'
-import FilterBarContainer from '../../containers/filterBar'
 import {
   ClusterMetadataStore,
   ClusterMetadataStoreContext,
 } from './clusterMetadataStore'
 import TopBar from './topBar'
+import BottomBar from './bottomBar'
 import ClusterInfoList from './clusterInfoList'
 
 const mockTags = ['stage', 'vendor', 'region']
@@ -39,8 +22,7 @@ export default function ClusterManagement() {
   const [showRegistered, setShowRegistered] = useState(false)
 
   const [listItems, setListItems] = useState(items)
-  // const clusterMetadataStore = container.resolve(ClusterMetadataStore)
-  const clusterMetadataStore = new ClusterMetadataStore()
+  const clusterMetadataStore = container.resolve(ClusterMetadataStore)
 
   // TODO: improve this
   clusterMetadataStore.items = listItems.map((item) => ({ data: item as any }))
@@ -175,9 +157,7 @@ export default function ClusterManagement() {
 
   return (
     /** background */
-    <ClusterMetadataStoreContext.Provider
-      value={clusterMetadataStore}
-    >
+    <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
       <Paper sx={{ width: '100%', height: '100%' }}>
         {/* actual container */}
         <Box
@@ -202,7 +182,9 @@ export default function ClusterManagement() {
             <TopBar />
           </Paper>
 
-          <ClusterInfoList />
+          <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+            <ClusterInfoList />
+          </Box>
 
           {/* bottom sidebar container */}
           <Box
@@ -213,10 +195,7 @@ export default function ClusterManagement() {
             margin="8px"
             paddingLeft="16px"
           >
-            <Stack direction="row" width="100%" alignItems="center" gap="16px">
-              <Button variant="outlined">Register ALL</Button>
-              <Typography>0 Clusters Selected.</Typography>
-            </Stack>
+            <BottomBar />
           </Box>
         </Box>
       </Paper>
