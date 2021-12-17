@@ -1,4 +1,5 @@
 module.exports = {
+  plugins: ['prettier'],
   extends: ['erb', 'prettier'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
@@ -13,6 +14,7 @@ module.exports = {
     semi: ['error', 'never'],
     'no-case-declarations': 'error',
     'no-underscore-dangle': 'off',
+    'prettier/prettier': 'warn',
   },
   parserOptions: {
     ecmaVersion: 2020,
