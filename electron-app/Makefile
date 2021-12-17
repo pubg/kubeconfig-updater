@@ -30,4 +30,4 @@ package-all: build-backend copy-backend-to-package build-frontend
 	npm run package:only:allplatform
 
 publish:
-	gh release create v0.0.2 --prerelease --title=Kubeconfig-Updater-GUI ./release/build/*.exe ./release/build/*.dmg ./release/build/*.zip ./release/build/*.AppImage
+	gh release create v0.0.2 --prerelease --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2 ./release/build/*.exe ./release/build/*.zip ./release/build/*.AppImage
