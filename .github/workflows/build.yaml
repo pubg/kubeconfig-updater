@@ -1,17 +1,11 @@
-name: build-and-release
-on:
-  push:
-    tags:
-      - 'v*'
+name: build
+on: workflow_dispatch
 jobs:
-  build-and-release:
-    runs-on: Ubuntu-20.04
+  build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Unshallow
-        run: git fetch --prune --unshallow
 
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -40,20 +34,19 @@ jobs:
 
       - run: |
           make build-backend
+        working-directory: electron-app
+        name: Build-Backend
+
+      - run: |
           make build-frontend
         working-directory: electron-app
-        name: Build
+        name: Build-Frontend
 
-      - run: |
-          make copy-backend-to-package
-          make package-linux
-          make package-darwin
-        working-directory: electron-app
-        name: Package
-
-      - run: |
-          make publish
-        working-directory: electron-app
-        name: Publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: |
+            backend/dist/**
+            electron-app/release/**
+          if-no-files-found: error
+          retention-days: 1
