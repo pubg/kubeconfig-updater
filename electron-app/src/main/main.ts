@@ -45,6 +45,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+const isProduction = process.env.NODE_ENV === 'production'
 
 if (isDevelopment) {
   require('electron-debug')()
@@ -105,7 +106,9 @@ const createWindow = async () => {
     await installExtensions()
   }
 
-  const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets')
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets')
 
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths)
