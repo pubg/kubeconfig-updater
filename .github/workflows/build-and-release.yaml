@@ -1,0 +1,44 @@
+name: build-and-release
+description: Build and Release App
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build-and-release:
+    runs-on: Ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - run: |
+          set -eux
+          echo "machine github.krafton.com login xtrm-cicd-bot password ${{ secrets.MY_GITHUB_TOKEN }}" >> ~/.netrc
+        name: Login ECR and GHES
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          install-only: true
+      - run: |
+          go mod download
+        working-directory: backend
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: |
+          npm install
+        working-directory: electron-app
+
+      - run: |
+          make package-all
+          make publish
+        working-directory: electron-app
