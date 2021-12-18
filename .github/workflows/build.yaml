@@ -62,7 +62,7 @@ jobs:
           - os: ubuntu-latest
             artifactName: linux
           - os: macos-latest
-            artifactName: macos
+            artifactName: darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v2
