@@ -117,5 +117,6 @@ jobs:
           path: ./packages
       - run: |
           ls -al packages
-      - run: |
           gh release create v0.0.2-alpha --prerelease --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2-alpha ./packages/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
