@@ -71,12 +71,12 @@ jobs:
           name: build-artifact
       - run: |
           make copy-backend-to-package
-          make package-${{ matric.artifactName }}
+          make package-${{ matrix.artifactName }}
         working-directory: electron-app
         name: Package
       - uses: actions/upload-artifact@v2
         with:
-          name: package-artifact-${{ matric.artifactName }}
+          name: package-artifact-${{ matrix.artifactName }}
           path: |
             electron-app/release/build/*.zip
             electron-app/release/build/*.dmg
