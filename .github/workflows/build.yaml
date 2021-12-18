@@ -51,18 +51,16 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  package:
+  package-xnix:
     needs:
       - build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest ]
         include:
           - os: ubuntu-latest
             artifactName: linux
-          - os: windows-latest
-            artifactName: windows
           - os: macos-latest
             artifactName: macos
     steps:
@@ -72,9 +70,44 @@ jobs:
         with:
           name: build-artifact
       - run: |
-          ls -ahl
-          ls -ahl backend
-          ls -ahl electron-app
+          make copy-backend-to-package
+          make package-${{ matric.artifactName }}
+        working-directory: electron-app
+        name: Package
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package-artifact-${{ matric.artifactName }}
+          path: |
+            electron-app/release/build/*.zip
+            electron-app/release/build/*.dmg
+            electron-app/release/build/*.AppImage
+          if-no-files-found: warn
+          retention-days: 1
+
+  package-windows:
+    needs:
+      - build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+      - run: |
+          make copy-backend-to-package
+          make package-windows
+        working-directory: electron-app
+        name: Package
+        shell: bash
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package-artifact-windows
+          path: |
+            electron-app/release/build/*.zip
+            electron-app/release/build/*.exe
+          if-no-files-found: warn
+          retention-days: 1
 
   publish:
     needs:
@@ -83,3 +116,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-artifact-windows
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-artifact-darwin
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-artifact-linux
+      - run: |
+          ls -al electron-app/release/
+          ls -al electron-app/release/build/
