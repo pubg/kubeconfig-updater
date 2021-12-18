@@ -92,6 +92,7 @@ jobs:
             electron-app/release/build/*.dmg
             electron-app/release/build/*.AppImage
             electron-app/release/build/*.exe
+            electron-app/release/build/*.tar.gz
           if-no-files-found: warn
           retention-days: 1
 
