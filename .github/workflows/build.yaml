@@ -111,7 +111,8 @@ jobs:
 
   publish:
     needs:
-      - package
+      - package-xnix
+      - package-windows
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
