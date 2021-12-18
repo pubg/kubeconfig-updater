@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { exec, ChildProcess } from 'child_process'
 import {inject, injectable, singleton} from 'tsyringe'
-import os from 'os'
 import { dialog } from 'electron'
+import kill from 'tree-kill'
 import { CoreExecCmd, CoreExecCwd } from './symbols'
 
 /**
@@ -82,7 +82,10 @@ export default class BackendManager {
   end() {
     this.status = 'exited'
     if (this.process) {
-      this.process.kill()
+      console.log(`[BackendManager] tree kill backend process pid:${this.process.pid}`)
+      kill(Number(this.process.pid), (error) => {
+        console.log(`[BackendManager] tree kill response error:${error}`)
+      })
       this.process = null
     }
   }

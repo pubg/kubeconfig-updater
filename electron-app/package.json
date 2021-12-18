@@ -175,6 +175,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.9",
     "source-map-support": "^0.5.21",
+    "tree-kill": "^1.2.2",
     "tsyringe": "^4.6.0",
     "uuid": "^8.3.2"
   },

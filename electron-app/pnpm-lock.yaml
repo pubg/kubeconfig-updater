@@ -87,6 +87,7 @@ specifiers:
   source-map-support: ^0.5.21
   style-loader: ^3.3.1
   terser-webpack-plugin: ^5.2.4
+  tree-kill: ^1.2.2
   ts-jest: ^27.0.7
   ts-loader: ^9.2.6
   ts-node: ^10.4.0
@@ -123,6 +124,7 @@ dependencies:
   reflect-metadata: 0.1.13
   regenerator-runtime: 0.13.9
   source-map-support: 0.5.21
+  tree-kill: 1.2.2
   tsyringe: 4.6.0
   uuid: 8.3.2
 
@@ -10578,7 +10580,6 @@ packages:
   /tree-kill/1.2.2:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
-    dev: true
 
   /truncate-utf8-bytes/1.0.2:
     resolution: {integrity: sha1-QFkjkJWS1W94pYGENLC3hInKXys=}
