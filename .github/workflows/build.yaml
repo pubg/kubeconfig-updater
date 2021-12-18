@@ -76,7 +76,7 @@ jobs:
           node-version: '16'
       - run: |
           npm install --global pnpm
-          pnpm install
+          pnpm install --global electron-builder
         working-directory: electron-app
       - run: |
           make copy-backend-to-package
@@ -117,6 +117,6 @@ jobs:
           path: ./packages
       - run: |
           ls -al packages
-          gh release create v0.0.2-alpha --prerelease --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2-alpha ./packages/*
+          gh release create v0.0.2-beta --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2-beta ./packages/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
