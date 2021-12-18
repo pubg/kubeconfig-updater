@@ -69,6 +69,13 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-artifact
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: |
+          npm install --global pnpm
+          pnpm install
+        working-directory: electron-app
       - run: |
           make copy-backend-to-package
           make package-${{ matrix.artifactName }}
@@ -94,6 +101,13 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-artifact
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: |
+          npm install --global pnpm
+          pnpm install
+        working-directory: electron-app
       - run: |
           make copy-backend-to-package
           make package-windows
