@@ -76,8 +76,7 @@ jobs:
           node-version: '16'
       - run: |
           npm install --global pnpm
-          pnpm install --prod
-          pnpm install --global electron-builder
+          pnpm install
         working-directory: electron-app
       - run: |
           make copy-backend-to-package
