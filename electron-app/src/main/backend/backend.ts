@@ -3,6 +3,8 @@ import { exec, ChildProcess } from 'child_process'
 import { inject, injectable, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
+import 'util'
+import * as util from 'util'
 import { CoreExecCmd, CoreExecCwd } from './symbols'
 import sleep from '../../renderer/utils/sleep'
 
@@ -85,11 +87,19 @@ export default class BackendManager {
     this._status = 'exited'
     if (this.process) {
       console.log(`[BackendManager] tree kill backend process pid:${this.process.pid}`)
-      kill(Number(this.process.pid), (error) => {
-        console.log(`[BackendManager] tree kill response error:${error}`)
-      })
+      const killPromise = (pid: number) => {
+        return new Promise((resolve) => {
+          kill(pid, (error) => {
+            resolve(error)
+          })
+        })
+      }
+      const error = await killPromise(Number(this.process.pid))
+      if (error) {
+        console.log(`[BackendManager] tree kill process occurred error ${error}`)
+      }
+      console.log('[BackendManager] kill process finished')
       this.process = null
-      await sleep(500)
     }
   }
 }
