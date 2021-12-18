@@ -1,9 +1,10 @@
 import _ from 'lodash'
 import { exec, ChildProcess } from 'child_process'
-import {inject, injectable, singleton} from 'tsyringe'
+import { inject, injectable, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
 import { CoreExecCmd, CoreExecCwd } from './symbols'
+import sleep from '../../renderer/utils/sleep'
 
 /**
  * BackendManager manages lifetime of kubeconfig-updater go core program
@@ -13,13 +14,17 @@ export default class BackendManager {
 
   private process: ChildProcess | null = null
 
-  private status: 'running' | 'exited' = 'running'
+  private _status: 'running' | 'exited' = 'running'
 
   private readonly _grpcPort: number
 
   private readonly _grpbWebPort: number
 
   private errorCount: number = 0
+
+  get status(): "running" | "exited" {
+    return this._status;
+  }
 
   get grpcPort(): number {
     return this._grpcPort
@@ -29,10 +34,7 @@ export default class BackendManager {
     return this._grpbWebPort
   }
 
-  constructor(
-    @inject(CoreExecCmd) private readonly cmd: string,
-    @inject(CoreExecCwd) private readonly cwd: string
-  ) {
+  constructor(@inject(CoreExecCmd) private readonly cmd: string, @inject(CoreExecCwd) private readonly cwd: string) {
     this._grpcPort = _.random(10000, 20000, false)
     this._grpbWebPort = _.random(10000, 20000, false)
   }
@@ -45,8 +47,6 @@ export default class BackendManager {
       if (err) {
         console.error(err)
       }
-      console.log(stdout)
-      console.log(stderr)
     })
 
     this.process.stdout?.on('data', (data: string) => {
@@ -63,7 +63,8 @@ export default class BackendManager {
 
     this.process.on('error', (e) => {})
     this.process.on('exit', async (e) => {
-      if (this.status === 'running') {
+      console.log(`[BackendManager] recerived childprocess exit event, status:${this._status}`)
+      if (this._status === 'running') {
         this.errorCount += 1
         if (this.errorCount >= 10) {
           console.log(
@@ -73,20 +74,22 @@ export default class BackendManager {
           )
           process.exit(1)
         }
-        console.log('kubeconfig-updater-backend died, try restart')
+        console.log('[BackendManager] kubeconfig-updater-backend died, try restart')
         this.start()
       }
     })
   }
 
-  end() {
-    this.status = 'exited'
+  async end() {
+    console.log('[BackendManager] change backendmanager status to exited')
+    this._status = 'exited'
     if (this.process) {
       console.log(`[BackendManager] tree kill backend process pid:${this.process.pid}`)
       kill(Number(this.process.pid), (error) => {
         console.log(`[BackendManager] tree kill response error:${error}`)
       })
       this.process = null
+      await sleep(500)
     }
   }
 }
