@@ -51,18 +51,20 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  package-xnix:
+  package:
     needs:
       - build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         include:
           - os: ubuntu-latest
             artifactName: linux
           - os: macos-latest
             artifactName: darwin
+          - os: windows-latest
+            artifactName: windows
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -80,6 +82,7 @@ jobs:
           make copy-backend-to-package
           make package-${{ matrix.artifactName }}
         working-directory: electron-app
+        shell: bash
         name: Package
       - uses: actions/upload-artifact@v2
         with:
@@ -88,45 +91,13 @@ jobs:
             electron-app/release/build/*.zip
             electron-app/release/build/*.dmg
             electron-app/release/build/*.AppImage
-          if-no-files-found: warn
-          retention-days: 1
-
-  package-windows:
-    needs:
-      - build
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: build-artifact
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - run: |
-          npm install --global pnpm
-          pnpm install
-        working-directory: electron-app
-      - run: |
-          make copy-backend-to-package
-          make package-windows
-        working-directory: electron-app
-        name: Package
-        shell: bash
-      - uses: actions/upload-artifact@v2
-        with:
-          name: package-artifact-windows
-          path: |
-            electron-app/release/build/*.zip
             electron-app/release/build/*.exe
           if-no-files-found: warn
           retention-days: 1
 
   publish:
     needs:
-      - package-xnix
-      - package-windows
+      - package
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -134,12 +105,16 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: package-artifact-windows
+          path: ./packages
       - uses: actions/download-artifact@v2
         with:
           name: package-artifact-darwin
+          path: ./packages
       - uses: actions/download-artifact@v2
         with:
           name: package-artifact-linux
+          path: ./packages
       - run: |
-          ls -al electron-app/release/
-          ls -al electron-app/release/build/
+          ls -al packages
+      - run: |
+          gh release create v0.0.2-alpha --prerelease --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2-alpha ./packages/*
