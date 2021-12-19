@@ -1,6 +1,7 @@
 package configs
 
 type ApplicationConfig struct {
+	AutoUpdate bool
 	Extensions struct {
 		Fox FoxExtension
 		Eks EksExtension
