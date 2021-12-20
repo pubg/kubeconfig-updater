@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from 'mobx'
+import { action, computed, makeAutoObservable, makeObservable, observable } from 'mobx'
 import React from 'react'
 import { injectable } from 'tsyringe'
 import { IObjectWithKey, Selection } from '@fluentui/react'
@@ -47,8 +47,7 @@ export class MetadataSelectionListStore {
     this.filter = predicate
   }
 
-  @observable
-  selection = new Selection<MetadataItem>()
+  selection = makeAutoObservable(new Selection<MetadataItem>(), undefined, { deep: true })
 
   @computed
   get selectedItems() {
