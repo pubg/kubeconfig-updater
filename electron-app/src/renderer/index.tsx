@@ -8,6 +8,7 @@ import {createTheme} from '@mui/material/styles'
 import {container} from 'tsyringe'
 import App from './App'
 import {KubeconfigClient} from './protos/Kubeconfig_serviceServiceClientPb'
+import logger from '../logger/logger'
 
 const theme = createTheme({
   palette: {
@@ -38,3 +39,5 @@ render(
   </ThemeProvider>,
   document.getElementById('root')
 )
+
+logger.info('hello renderer')
