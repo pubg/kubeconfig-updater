@@ -1,5 +1,5 @@
-import browserLogger from "./browserLogger"
-import mainLogger from "./mainLogger"
+import browserLogger from './browserLogger'
+import mainLogger from './mainLogger'
 
 function runtimeType(): 'main' | 'browser' {
   if (typeof process === 'object') {
