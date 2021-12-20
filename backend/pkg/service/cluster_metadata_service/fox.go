@@ -83,10 +83,6 @@ func (f *FoxResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	return clusterMetas, nil
 }
 
-func (f *FoxResolver) GetResolverType() protos.MetadataResolverType {
-	return protos.MetadataResolverType_FOX
-}
-
 func parseDoc(doc *document.Document) (*protos.ClusterMetadata, error) {
 	var foxMetadata FoxClusterMetadata
 	err := mapstructure.Decode(doc.Data, &foxMetadata)

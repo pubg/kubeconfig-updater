@@ -120,7 +120,3 @@ func (r *TencentResolver) listTke(region string) ([]*protos.ClusterMetadata, err
 	}
 	return clusters, nil
 }
-
-func (r *TencentResolver) GetResolverType() protos.MetadataResolverType {
-	return protos.MetadataResolverType_CRED_RESOLVER
-}

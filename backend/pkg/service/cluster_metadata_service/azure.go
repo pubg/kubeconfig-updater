@@ -65,7 +65,3 @@ func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	}
 	return clusters, nil
 }
-
-func (r *AzureResolver) GetResolverType() protos.MetadataResolverType {
-	return protos.MetadataResolverType_CRED_RESOLVER
-}

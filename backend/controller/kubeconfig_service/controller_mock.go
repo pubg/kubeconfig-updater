@@ -118,7 +118,7 @@ func NewMockController() protos.KubeconfigServer {
 					"ClusterRegion": "ap-northeast-2",
 				},
 			},
-			DataResolvers: []protos.MetadataResolverType{protos.MetadataResolverType_KUBECONFIG},
+			DataResolvers: []string{"kubeconfig"},
 			Status:           protos.ClusterInformationStatus_REGISTERED_OK,
 		},
 		{
@@ -133,7 +133,7 @@ func NewMockController() protos.KubeconfigServer {
 					"ClusterRegion": "ap-northeast-2",
 				},
 			},
-			DataResolvers: []protos.MetadataResolverType{protos.MetadataResolverType_KUBECONFIG},
+			DataResolvers: []string{"kubeconfig"},
 			Status:           protos.ClusterInformationStatus_REGISTERED_OK,
 		},
 		{
@@ -148,7 +148,7 @@ func NewMockController() protos.KubeconfigServer {
 					"ClusterRegion": "ap-southeast-1",
 				},
 			},
-			DataResolvers: []protos.MetadataResolverType{protos.MetadataResolverType_FOX},
+			DataResolvers: []string{"Pubg-Fox"},
 			Status:           protos.ClusterInformationStatus_REGISTERED_NOTOK_CRED_RES_NOTOK,
 		},
 	}

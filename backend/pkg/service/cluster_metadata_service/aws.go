@@ -106,7 +106,3 @@ func (r *AwsResolver) listEks(region string) ([]*protos.ClusterMetadata, error) 
 	}
 	return clusters, nil
 }
-
-func (r *AwsResolver) GetResolverType() protos.MetadataResolverType {
-	return protos.MetadataResolverType_CRED_RESOLVER
-}

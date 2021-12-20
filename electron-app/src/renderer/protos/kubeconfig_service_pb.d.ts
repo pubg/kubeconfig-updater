@@ -185,10 +185,10 @@ export class AggregatedClusterMetadata extends jspb.Message {
   hasMetadata(): boolean;
   clearMetadata(): AggregatedClusterMetadata;
 
-  getDataresolversList(): Array<MetadataResolverType>;
-  setDataresolversList(value: Array<MetadataResolverType>): AggregatedClusterMetadata;
+  getDataresolversList(): Array<string>;
+  setDataresolversList(value: Array<string>): AggregatedClusterMetadata;
   clearDataresolversList(): AggregatedClusterMetadata;
-  addDataresolvers(value: MetadataResolverType, index?: number): AggregatedClusterMetadata;
+  addDataresolvers(value: string, index?: number): AggregatedClusterMetadata;
 
   getStatus(): ClusterInformationStatus;
   setStatus(value: ClusterInformationStatus): AggregatedClusterMetadata;
@@ -204,7 +204,7 @@ export class AggregatedClusterMetadata extends jspb.Message {
 export namespace AggregatedClusterMetadata {
   export type AsObject = {
     metadata?: ClusterMetadata.AsObject,
-    dataresolversList: Array<MetadataResolverType>,
+    dataresolversList: Array<string>,
     status: ClusterInformationStatus,
   }
 }
@@ -274,12 +274,6 @@ export enum CredentialResolverStatus {
   CRED_REGISTERED_OK = 1,
   CRED_REGISTERED_NOT_OK = 2,
   CRED_SUGGESTION_OK = 101,
-}
-export enum MetadataResolverType { 
-  META_RESOLVER_NOT_SETTED = 0,
-  FOX = 2,
-  KUBECONFIG = 3,
-  CRED_RESOLVER = 4,
 }
 export enum ClusterInformationStatus { 
   INFO_NOT_SETTED = 0,

@@ -12,7 +12,6 @@ import (
 
 type ClusterMetadataResolver interface {
 	ListClusters() ([]*protos.ClusterMetadata, error)
-	GetResolverType() protos.MetadataResolverType
 	GetResolverDescription() string
 }
 
@@ -37,18 +36,18 @@ func SyncAvailableClusters() error {
 	for _, resolver := range resolvers {
 		metadatas, err := resolver.ListClusters()
 		if err != nil {
-			fmt.Printf("List cluster metadata occurred error, resolver type:%s, err:%s\n", resolver.GetResolverType().String(), err.Error())
+			fmt.Printf("List cluster metadata occurred error, resolver desc:%s, err:%s\n", resolver.GetResolverDescription(), err.Error())
 			continue
 		}
 		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters\n", resolver.GetResolverDescription(), len(metadatas))
 		for _, metadata := range metadatas {
 			if aggrMeta, exists := aggrMetaMap[metadata.ClusterName]; exists {
 				aggrMeta.Metadata = mergeMetadata(aggrMeta.Metadata, metadata)
-				aggrMeta.DataResolvers = append(aggrMeta.DataResolvers, resolver.GetResolverType())
+				aggrMeta.DataResolvers = append(aggrMeta.DataResolvers, resolver.GetResolverDescription())
 			} else {
 				aggrMetaMap[metadata.ClusterName] = &protos.AggregatedClusterMetadata{
 					Metadata:      metadata,
-					DataResolvers: []protos.MetadataResolverType{resolver.GetResolverType()},
+					DataResolvers: []string{resolver.GetResolverDescription()},
 					Status:        protos.ClusterInformationStatus_SUGGESTION_OK,
 				}
 			}
@@ -101,6 +100,14 @@ func ListMetadataResolvers() ([]ClusterMetadataResolver, error) {
 		return nil, err
 	}
 	metaResolvers = append(metaResolvers, fox)
+
+	kubeconfigs, err := NewKubeconfigResolvers()
+	if err != nil {
+		return nil, err
+	}
+	for _, resolver := range kubeconfigs {
+		metaResolvers = append(metaResolvers, resolver)
+	}
 
 	credResolvers := cred_resolver_service.ListCredResolvers()
 	for _, cr := range credResolvers {
