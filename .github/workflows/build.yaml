@@ -57,24 +57,44 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         include:
           - os: ubuntu-latest
             artifactName: linux
+          - os: macos-latest
+            artifactName: darwin
           - os: windows-latest
             artifactName: windows
-          - os: macos-latest
-            artifactName: macos
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: build-artifact
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - run: |
-          ls -ahl
-          ls -ahl backend
-          ls -ahl electron-app
+          npm install --global pnpm
+          pnpm install
+        working-directory: electron-app
+      - run: |
+          make copy-backend-to-package
+          make package-${{ matrix.artifactName }}
+        working-directory: electron-app
+        shell: bash
+        name: Package
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package-artifact-${{ matrix.artifactName }}
+          path: |
+            electron-app/release/build/*.zip
+            electron-app/release/build/*.dmg
+            electron-app/release/build/*.AppImage
+            electron-app/release/build/*.exe
+            electron-app/release/build/*.tar.gz
+          if-no-files-found: warn
+          retention-days: 1
 
   publish:
     needs:
@@ -83,3 +103,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-artifact-windows
+          path: ./packages
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-artifact-darwin
+          path: ./packages
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-artifact-linux
+          path: ./packages
+      - run: |
+          ls -al packages
+          gh release create v0.0.2-beta --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2-beta ./packages/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

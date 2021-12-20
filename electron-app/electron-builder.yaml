@@ -15,7 +15,7 @@ extraFiles:
 afterSign: .erb/scripts/notarize.js
 mac:
   target:
-    - target: zip
+    - target: default
       arch:
         - arm64
         - x64
@@ -47,7 +47,11 @@ linux:
   target:
     - target: AppImage
       arch:
-#        - arm64
+        - arm64
+        - x64
+    - target: tar.gz
+      arch:
+        - arm64
         - x64
   category: Development
 directories:
