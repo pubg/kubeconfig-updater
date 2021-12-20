@@ -7,6 +7,7 @@ import MockKubeconfigClient from './mock/grpc/grpcClient'
 import ClusterManagement from './pages/clusterManagement/clusterManagement'
 import Home from './pages/home/home'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
+import About from './pages/about/about'
 
 // TODO: delete this, only for testing.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,6 +41,7 @@ export default function App() {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/cluster-management" component={ClusterManagement} />
+          <Route path="/about" component={About} />
         </Switch>
       </Paper>
     </Router>
