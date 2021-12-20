@@ -1,12 +1,24 @@
 import { Refresh } from '@mui/icons-material'
-import { Stack, FormGroup, TextField, Autocomplete, Checkbox, FormControlLabel, Button, CheckboxProps, SwitchProps, Switch } from '@mui/material'
+import {
+  Stack,
+  FormGroup,
+  TextField,
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
+  Button,
+  CheckboxProps,
+  SwitchProps,
+  Switch,
+} from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
-import { Filter, MetadataItem, useStore } from './clusterMetadataStore'
+import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
+import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter, ClusterMetadata } from './clusterMetadataStore'
 
-function filterFactory(name: string, selectedTags: Set<string>, showRegistered: boolean): Filter {
-  const filter = ({ data }: MetadataItem): boolean => {
+function filterFactory(name: string, selectedTags: Set<string>, showRegistered: boolean): ClusterMetadataItemFilter {
+  const filter = ({ data }: ClusterMetadataItem): boolean => {
     // filter by name
     // TODO: implement case sensitive option
     if (!data.metadata.clustername.includes(name)) {
@@ -14,7 +26,7 @@ function filterFactory(name: string, selectedTags: Set<string>, showRegistered: 
     }
 
     // filter by tags
-    // TODO: implement this
+    // TODO
 
     // filter by registered state
     if (showRegistered || (!showRegistered && data.status === ClusterInformationStatus.REGISTERED_OK)) {
@@ -27,8 +39,9 @@ function filterFactory(name: string, selectedTags: Set<string>, showRegistered: 
   return filter
 }
 
-function TopBar() {
+export default observer(function TopBar() {
   const store = useStore()
+  const requester = ClusterMetadataRequester.useContext()
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
@@ -58,14 +71,25 @@ function TopBar() {
     setShowRegistered(checked)
   }
 
-  const onReloadClick = useCallback(() => {
-    store.fetchMetadata()
-  }, [store])
+  // TODO: refactor this hard-coded requester binding to parent?
+  const onReloadClick = useCallback(async () => {
+    await requester.fetchMetadata()
+    store.items = requester.items.map((item) => {
+      const obj = item.toObject() as ClusterMetadata
+      return { key: obj.metadata?.clustername, data: obj }
+    })
+  }, [requester, store])
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
       <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
-        <TextField size="small" label="filter..." variant="outlined" value={nameFilter} onChange={(e) => setNameFilter(e.target.value)} />
+        <TextField
+          size="small"
+          label="filter..."
+          variant="outlined"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+        />
         <Autocomplete
           multiple
           options={store.tags}
@@ -93,6 +117,4 @@ function TopBar() {
       </Stack>
     </Stack>
   )
-}
-
-export default observer(TopBar)
+})
