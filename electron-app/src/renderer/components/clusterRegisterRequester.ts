@@ -1,6 +1,6 @@
 import { flow, makeObservable, observable } from 'mobx'
 import React from 'react'
-import { container, singleton } from 'tsyringe'
+import { container, injectable, singleton } from 'tsyringe'
 import { ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'
 
@@ -12,6 +12,7 @@ type RequestType = {
 /**
  * manages Cluster Register Request to backend
  */
+@injectable()
 export class ClusterRegisterRequester {
   @observable
   state: 'ready' | 'processing' | 'finished' = 'ready'

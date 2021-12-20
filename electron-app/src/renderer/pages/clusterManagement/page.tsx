@@ -8,20 +8,15 @@ import { ClusterMetadataItem, ClusterMetadataStore, ClusterMetadataStoreContext 
 import TopBar from './topBar'
 import BottomBar from './bottomBar'
 import ClusterInfoList from './clusterInfoList'
+import * as containerHooks from '../../hooks/container'
 
 export default observer(function ClusterManagement() {
-  const clusterMetadataStore = container.resolve(ClusterMetadataStore)
-  const clusterRegisterRequester = container.resolve(ClusterRegisterRequester)
-  const clusterMetadataRequester = container.resolve(ClusterMetadataRequester)
-  const syncRequester = container.resolve()
+  const clusterMetadataStore = containerHooks.useResolve(ClusterMetadataStore)
+  const clusterRegisterRequester = containerHooks.useResolve(ClusterRegisterRequester)
+  const clusterMetadataRequester = containerHooks.useResolve(ClusterMetadataRequester)
 
   // TODO: improve this
   useEffect(() => {
-    // TODO: move this sync call to other place...
-    (async () => {
-      await
-    })()
-
     // IIFE
     ;(async () => {
       await clusterMetadataRequester.fetchMetadata()

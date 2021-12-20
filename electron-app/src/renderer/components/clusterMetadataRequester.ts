@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import React from 'react'
 import { flow, makeObservable, observable } from 'mobx'
-import { container } from 'tsyringe'
+import { container, injectable } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import GetAvailableClusterService from '../services/getAvailableClusters'
@@ -10,6 +10,7 @@ import SyncAvailableClustersService from '../services/syncAvailableClusters'
 /**
  * manages cluster metadata requesting
  */
+@injectable()
 export class ClusterMetadataRequester {
   constructor() {
     makeObservable(this)

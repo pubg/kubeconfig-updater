@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import tsyringe, { DependencyContainer, InjectionToken } from 'tsyringe'
 
-export function useResolveHook<T>(token: InjectionToken<T>, c?: DependencyContainer): T {
+export function useResolve<T>(token: InjectionToken<T>, c?: DependencyContainer): T {
   const container = c ?? tsyringe.container
 
   const [instance] = useState(() => container.resolve(token))
