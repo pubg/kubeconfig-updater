@@ -23,7 +23,7 @@ export default function About() {
         </Box>
         <Box textAlign="center">
           <Typography variant="caption" component="div" gutterBottom>
-            @ 2021 Krafton
+            @2021 Krafton
           </Typography>
         </Box>
       </Stack>
