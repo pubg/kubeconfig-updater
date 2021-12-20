@@ -3,8 +3,8 @@ package server
 import (
 	"fmt"
 
+	"github.com/pubg/kubeconfig-updater/backend/internal/application"
 	"github.com/pubg/kubeconfig-updater/backend/internal/common"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
 	"github.com/spf13/cobra"
 )
 
