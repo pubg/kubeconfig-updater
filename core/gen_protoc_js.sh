@@ -6,8 +6,8 @@
 
 # set -eux
 
-SRC_PATH="./core/protos"
-OUTPUT_PATH="./electron-app/src/renderer"
+SRC_PATH="./protos"
+OUTPUT_PATH="./../electron-app/src/renderer"
 
 rm -rf "$OUTPUT_PATH/protos"
 mkdir "$OUTPUT_PATH/protos"

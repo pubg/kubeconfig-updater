@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime/debug"
 	"strings"
 	"syscall"
@@ -46,4 +48,15 @@ func Execute(commandLine string) (stdout *string, stderr *string, exit int) {
 func IsBinaryExists(name string) bool {
 	_, err := exec.LookPath(name)
 	return err == nil
+}
+
+func ResolvePathToAbs(path string) (string, error) {
+	if strings.HasPrefix(path, "~") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		path = strings.Replace(path,"~", home, 1)
+	}
+	return filepath.Abs(path)
 }
