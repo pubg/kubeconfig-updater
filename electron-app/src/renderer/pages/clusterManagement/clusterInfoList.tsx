@@ -1,8 +1,9 @@
 import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
+import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
-import { ClusterMetadataStore, useStore } from './clusterMetadataStore'
+import { ClusterMetadataItem, ClusterMetadataStore, useStore } from './clusterMetadataStore'
 
 /*
 const columns: IColumn[] = [
@@ -74,9 +75,21 @@ export default observer(function ClusterInfoList() {
   let store: ClusterMetadataStore | null = null
   store = useStore()
 
-  // TODO
+  // TODO: add dyanmic column add/delete
   const columns = useMemo<IColumn[]>(() => {
-    return []
+    const items: IColumn[] = [
+      {
+        key: 'clusterName',
+        name: 'Cluster Name',
+        minWidth: 0,
+        isResizable: true,
+        onRender: (item: ClusterMetadataItem) => {
+          return <Typography>{item.data.metadata.clustername}</Typography>
+        },
+      },
+    ]
+
+    return items
   }, [])
 
   // TODO
