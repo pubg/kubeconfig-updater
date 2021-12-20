@@ -4,7 +4,6 @@ import {
   AggregatedClusterMetadata,
   ClusterInformationStatus,
   ClusterMetadata,
-  MetadataResolverType,
 } from '../../protos/kubeconfig_service_pb'
 import { ClusterInfo, Status } from './clusterInfo'
 import regions from './mockRegions.json'

@@ -23,14 +23,6 @@ export default function Sidebar() {
           <ListItemText primary="Cluster Management" />
         </ListItemButton>
       </ListItem>
-      <ListItem>
-        <ListItemButton>
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          <ListItemText primary="KubeConfig Setting" />
-        </ListItemButton>
-      </ListItem>
       <Divider />
       <ListItem>
         <ListItemButton>
@@ -41,11 +33,11 @@ export default function Sidebar() {
         </ListItemButton>
       </ListItem>
       <ListItem>
-        <ListItemButton>
+        <ListItemButton component={Link} to="/about">
           <ListItemIcon>
             <InfoIcon />
           </ListItemIcon>
-          <ListItemText primary="Information" />
+          <ListItemText primary="About" />
         </ListItemButton>
       </ListItem>
     </List>
