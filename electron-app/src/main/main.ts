@@ -14,14 +14,14 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, ipcMain, shell, contextBridge } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import {app, BrowserWindow, ipcMain, shell} from 'electron'
+import {autoUpdater} from 'electron-updater'
 import log from 'electron-log'
-import { container } from 'tsyringe'
+import {container} from 'tsyringe'
 import MenuBuilder from './menu'
-import { resolveHtmlPath } from './util'
+import {resolveHtmlPath} from './util'
 import BackendManager from './backend/backend'
-import { CoreExecCmd, CoreExecCwd } from './backend/symbols'
+import {CoreExecCmd, CoreExecCwd} from './backend/symbols'
 
 export default class AppUpdater {
   constructor() {
@@ -85,7 +85,7 @@ if (app.isPackaged) {
   container.register(CoreExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
-  container.register(CoreExecCmd, { useValue: 'go run main.go server' })
+  container.register(CoreExecCmd, {useValue: 'go run main.go server'})
 }
 
 const installExtensions = async () => {
@@ -153,7 +153,7 @@ const createWindow = async () => {
 
   // https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-    callback({ requestHeaders: { ...details.requestHeaders, Origin: '*' } })
+    callback({requestHeaders: {...details.requestHeaders, Origin: '*'}})
   })
 
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
@@ -175,14 +175,6 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
-app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
 app
   .whenReady()
   .then(() => {
@@ -203,6 +195,18 @@ ipcMain.on('getGrpcWebPort', (event, arg) => {
   event.returnValue = manager.grpbWebPort
 })
 
-app.on('quit', () => {
-  manager.end()
+app.on('window-all-closed', () => {
+  // Respect the OSX convention of having the application in memory even
+  // after all windows have been closed
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
+
+app.on('before-quit', async (event) => {
+  if (manager.status === 'running') {
+    event.preventDefault()
+    await manager.end()
+    app.quit()
+  }
 })
