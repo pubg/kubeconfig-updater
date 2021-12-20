@@ -28,7 +28,6 @@ export default observer(function BottomBar() {
 
   // TODO: refactor this
   useEffect(() => {
-    console.log('useEffect')
     if (requester?.state === 'finished' && store.selectedItems.length > 0) {
       setShowSelection(true)
     }

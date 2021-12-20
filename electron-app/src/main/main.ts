@@ -36,7 +36,7 @@ let mainWindow: BrowserWindow | null = null
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`
-  console.log(msgTemplate(arg))
+  logger.info(msgTemplate(arg))
   event.reply('ipc-example', msgTemplate('pong'))
 })
 
@@ -57,9 +57,9 @@ if (isProduction) {
   sourceMapSupport.install()
 }
 
-console.log(`[Debug] isPacked: ${app.isPackaged}`)
-console.log(`[Debug] getAppPath: ${app.getAppPath()}`)
-console.log(`[Debug] getPath('exe'): ${app.getPath('exe')}`)
+logger.debug(`isPacked: ${app.isPackaged}`)
+logger.debug(`getAppPath: ${app.getAppPath()}`)
+logger.debug(`getPath('exe'): ${app.getPath('exe')}`)
 
 if (app.isPackaged) {
   const parsedPath = path.parse(app.getPath('exe'))
@@ -99,7 +99,7 @@ const installExtensions = async () => {
       extensions.map((name) => installer[name]),
       forceDownload
     )
-    .catch(console.log)
+    .catch(log.error)
 }
 
 const createWindow = async () => {
@@ -186,13 +186,13 @@ app
       if (mainWindow === null) createWindow()
     })
   })
-  .catch(console.log)
+  .catch(logger.error)
 
 const manager = container.resolve(BackendManager)
 manager.start()
 
 ipcMain.on('getGrpcWebPort', (event, arg) => {
-  console.log(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
+  logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
   event.returnValue = manager.grpbWebPort
 })
 

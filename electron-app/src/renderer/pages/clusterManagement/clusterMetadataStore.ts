@@ -7,6 +7,7 @@ import { ResultCode } from '../../protos/common_pb'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
 import GetAvailableClusterService from '../../services/getAvailableClusters'
 import RegisterClusterService from '../../services/registerClusters'
+import logger from '../../../logger/logger'
 
 export const ClusterMetadataStoreContext = React.createContext<ClusterMetadataStore | null>(null)
 
@@ -84,7 +85,7 @@ export class ClusterMetadataStore {
         data: metadata.toObject(),
       })) as MetadataItem[]
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
 
     this.state = 'ready'
