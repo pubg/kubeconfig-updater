@@ -41,5 +41,3 @@ render(
   </ThemeProvider>,
   document.getElementById('root')
 )
-
-logger.info('hello renderer')

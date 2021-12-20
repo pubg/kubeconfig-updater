@@ -211,5 +211,3 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
-
-logger.info('hello main')
