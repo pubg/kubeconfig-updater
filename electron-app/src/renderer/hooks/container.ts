@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import { useState } from 'react'
-import tsyringe, { DependencyContainer, InjectionToken } from 'tsyringe'
+import { DependencyContainer, InjectionToken, container as defaultContainer } from 'tsyringe'
 
 export function useResolve<T>(token: InjectionToken<T>, c?: DependencyContainer): T {
-  const container = c ?? tsyringe.container
+  const container = c ?? defaultContainer
 
   const [instance] = useState(() => container.resolve(token))
 
