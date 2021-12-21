@@ -21,7 +21,7 @@ import { container } from 'tsyringe'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
-import { CoreExecCmd, CoreExecCwd } from './backend/symbols'
+import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
 import logger from '../logger/logger'
 
 export default class AppUpdater {
@@ -64,29 +64,29 @@ logger.debug(`getPath('exe'): ${app.getPath('exe')}`)
 if (app.isPackaged) {
   const parsedPath = path.parse(app.getPath('exe'))
   if (process.platform === 'darwin') {
-    container.register(CoreExecCwd, {
+    container.register(BackendExecCwd, {
       useValue: path.join(parsedPath.dir, '../'),
     })
   } else {
-    container.register(CoreExecCwd, {
+    container.register(BackendExecCwd, {
       useValue: path.join(parsedPath.dir, './'),
     })
   }
 
   if (process.platform === 'win32') {
-    container.register(CoreExecCmd, {
+    container.register(BackendExecCmd, {
       useValue: 'kubeconfig-updater-backend.exe',
     })
   } else {
-    container.register(CoreExecCmd, {
+    container.register(BackendExecCmd, {
       useValue: './kubeconfig-updater-backend',
     })
   }
 } else {
-  container.register(CoreExecCwd, {
+  container.register(BackendExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
-  container.register(CoreExecCmd, { useValue: 'go run main.go server' })
+  container.register(BackendExecCmd, { useValue: 'go run main.go server' })
 }
 
 const installExtensions = async () => {
@@ -188,10 +188,15 @@ app
   })
   .catch(logger.error)
 
+if (isDevelopment) {
+  container.register(BackendGrpcPort, { useValue: 10980 })
+  container.register(BackendGrpcWebPort, { useValue: 10981 })
+}
+
 const manager = container.resolve(BackendManager)
 manager.start()
 
-ipcMain.on('getGrpcWebPort', (event, arg) => {
+ipcMain.on('getGrpcWebPort', (event) => {
   logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
   event.returnValue = manager.grpbWebPort
 })
