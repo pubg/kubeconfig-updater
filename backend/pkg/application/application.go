@@ -1,45 +1,147 @@
 package application
 
 import (
+	"fmt"
 	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/pubg/kubeconfig-updater/backend/controller/application_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
-var app *ServerApplication
-
-func GetInstance() *ServerApplication {
-	if app == nil {
-		log.Fatalf("Application is not initialized")
-	}
-	return app
-}
-
-func SetApplication(appInput *ServerApplication) {
-	app = appInput
-}
-
 type ServerApplication struct {
-	CredResolverConfigStorage *cred_resolver_config_persist.CredResolverConfigStorage
-	ClusterMetadataCacheStorage *cluster_metadata_persist.ClusterMetadataStorage
+	CredResolverConfigStorage             *cred_resolver_config_persist.CredResolverConfigStorage
 	AggreagtedClusterMetadataCacheStorage *cluster_metadata_persist.AggregatedClusterMetadataStorage
+
+	CredService     *cred_resolver_service.CredResolverService
+	RegisterService *cluster_register_service.ClusterRegisterService
+	MetaService     *cluster_metadata_service.ClusterMetadataService
+
+	KubeconfigController  protos.KubeconfigServer
+	ApplicationController protos.ApplicationServer
+
+	GrpcServer    *grpc.Server
+	GrpcWebServer *http.Server
+
+	//Lifecycle
+	ApplicationClose chan bool
 }
 
 func (s *ServerApplication) InitApplication(option *ServerApplicationOption) error {
+	err := s.initPersistLayer(option)
+	if err != nil {
+		return err
+	}
+	s.initServiceLayer(option)
+	s.initControllerLayer(option)
+	return nil
+}
+
+type ServerApplicationOption struct {
+	//Persist
+	CredResolverConfigPath             string
+	AggregatedClusterMetadataCachePath string
+
+	//Listener
+	UseMockController bool
+}
+
+func (s *ServerApplication) StartApplication(grpcPort int, grpcWebPort int) {
+	go func() {
+		listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", grpcPort))
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+		fmt.Printf("Grpc Server listen http://localhost:%d\n", grpcPort)
+		err = s.GrpcServer.Serve(listener)
+		if err != nil {
+			log.Fatalf("failed to start grpc server: %v", err)
+		}
+	}()
+
+	go func() {
+		fmt.Printf("Grpc Web Server listen http://localhost:%d\n", grpcWebPort)
+		s.GrpcWebServer.Addr = fmt.Sprintf("localhost:%d", grpcWebPort)
+		err := s.GrpcWebServer.ListenAndServe()
+		if err != nil {
+			log.Fatalf("failed to start grpc-web server: %v", err)
+		}
+	}()
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+	go func() {
+		sig := <-sigc
+		fmt.Printf("Received signal %+v\n", sig)
+		s.CloseApplication()
+		fmt.Printf("Closed Application\n")
+		s.ApplicationClose <- true
+	}()
+}
+
+func (s *ServerApplication) CloseApplication() {
+	s.GrpcServer.Stop()
+	err := s.GrpcWebServer.Close()
+	if err != nil {
+		log.Fatalf("Failed to close Grpc-Web Server: %+v\n", err)
+	}
+}
+
+func (s *ServerApplication) initControllerLayer(option *ServerApplicationOption) {
+	s.GrpcServer = grpc.NewServer()
+	reflection.Register(s.GrpcServer)
+	protos.RegisterApplicationServer(s.GrpcServer, application_service.NewController())
+	if option.UseMockController {
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_service.NewMockController())
+	} else {
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_service.NewKubeconfigService(s.CredService, s.RegisterService, s.MetaService))
+	}
+
+	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		if wrappedGrpc.IsGrpcWebRequest(req) {
+			wrappedGrpc.ServeHTTP(res, req)
+			return
+		}
+		fmt.Println("Web Requests")
+		// Fall back to other servers.
+		// TODO: Add Grpc-Web Swagger
+		http.DefaultServeMux.ServeHTTP(res, req)
+	})
+	s.GrpcWebServer = &http.Server{Addr: "fill-after-func", Handler: mux}
+	s.ApplicationClose = make(chan bool, 1)
+}
+
+func (s *ServerApplication) initServiceLayer(option *ServerApplicationOption) {
+	//Where is DI?
+	s.CredService = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
+	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.AggreagtedClusterMetadataCacheStorage)
+	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService)
+}
+
+func (s *ServerApplication) initPersistLayer(option *ServerApplicationOption) error {
 	s.CredResolverConfigStorage = &cred_resolver_config_persist.CredResolverConfigStorage{
 		StoragePath: option.CredResolverConfigPath,
 	}
 	firstLoad, err := s.CredResolverConfigStorage.LoadStorage()
-	if err != nil {
-		return err
-	}
-
-	s.ClusterMetadataCacheStorage = &cluster_metadata_persist.ClusterMetadataStorage{
-		StoragePath: option.ClusterMetadataCachePath,
-	}
-	_, err = s.ClusterMetadataCacheStorage.LoadStorage()
 	if err != nil {
 		return err
 	}
@@ -132,10 +234,4 @@ func (s *ServerApplication) InitApplication(option *ServerApplicationOption) err
 	}
 
 	return nil
-}
-
-type ServerApplicationOption struct {
-	CredResolverConfigPath             string
-	ClusterMetadataCachePath           string
-	AggregatedClusterMetadataCachePath string
 }

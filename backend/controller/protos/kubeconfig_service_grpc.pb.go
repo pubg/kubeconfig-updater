@@ -4,6 +4,7 @@ package protos
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -27,7 +28,6 @@ type KubeconfigClient interface {
 	GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error)
 	RegisterCluster(ctx context.Context, in *RegisterClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
 	SyncAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
-	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 }
 
 type kubeconfigClient struct {
@@ -119,15 +119,6 @@ func (c *kubeconfigClient) SyncAvailableClusters(ctx context.Context, in *Common
 	return out, nil
 }
 
-func (c *kubeconfigClient) Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
-	out := new(CommonRes)
-	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/Ping", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // KubeconfigServer is the server API for Kubeconfig service.
 // All implementations must embed UnimplementedKubeconfigServer
 // for forward compatibility
@@ -141,7 +132,6 @@ type KubeconfigServer interface {
 	GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error)
 	RegisterCluster(context.Context, *RegisterClusterReq) (*CommonRes, error)
 	SyncAvailableClusters(context.Context, *CommonReq) (*CommonRes, error)
-	Ping(context.Context, *CommonReq) (*CommonRes, error)
 	mustEmbedUnimplementedKubeconfigServer()
 }
 
@@ -175,9 +165,6 @@ func (UnimplementedKubeconfigServer) RegisterCluster(context.Context, *RegisterC
 }
 func (UnimplementedKubeconfigServer) SyncAvailableClusters(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncAvailableClusters not implemented")
-}
-func (UnimplementedKubeconfigServer) Ping(context.Context, *CommonReq) (*CommonRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
 func (UnimplementedKubeconfigServer) mustEmbedUnimplementedKubeconfigServer() {}
 
@@ -354,24 +341,6 @@ func _Kubeconfig_SyncAvailableClusters_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Kubeconfig_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommonReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KubeconfigServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kubeconfig.Kubeconfig/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KubeconfigServer).Ping(ctx, req.(*CommonReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Kubeconfig_ServiceDesc is the grpc.ServiceDesc for Kubeconfig service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -415,9 +384,163 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SyncAvailableClusters",
 			Handler:    _Kubeconfig_SyncAvailableClusters_Handler,
 		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "protos/kubeconfig_service.proto",
+}
+
+// ApplicationClient is the client API for Application service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ApplicationClient interface {
+	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+	Stop(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+	Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+}
+
+type applicationClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewApplicationClient(cc grpc.ClientConnInterface) ApplicationClient {
+	return &applicationClient{cc}
+}
+
+func (c *applicationClient) Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Application/Ping", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationClient) Stop(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Application/Stop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationClient) Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Application/Version", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ApplicationServer is the server API for Application service.
+// All implementations must embed UnimplementedApplicationServer
+// for forward compatibility
+type ApplicationServer interface {
+	Ping(context.Context, *CommonReq) (*CommonRes, error)
+	Stop(context.Context, *CommonReq) (*CommonRes, error)
+	Version(context.Context, *CommonReq) (*CommonRes, error)
+	mustEmbedUnimplementedApplicationServer()
+}
+
+// UnimplementedApplicationServer must be embedded to have forward compatible implementations.
+type UnimplementedApplicationServer struct {
+}
+
+func (UnimplementedApplicationServer) Ping(context.Context, *CommonReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedApplicationServer) Stop(context.Context, *CommonReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
+}
+func (UnimplementedApplicationServer) Version(context.Context, *CommonReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
+func (UnimplementedApplicationServer) mustEmbedUnimplementedApplicationServer() {}
+
+// UnsafeApplicationServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ApplicationServer will
+// result in compilation errors.
+type UnsafeApplicationServer interface {
+	mustEmbedUnimplementedApplicationServer()
+}
+
+func RegisterApplicationServer(s grpc.ServiceRegistrar, srv ApplicationServer) {
+	s.RegisterService(&Application_ServiceDesc, srv)
+}
+
+func _Application_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Application/Ping",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServer).Ping(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Application_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServer).Stop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Application/Stop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServer).Stop(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Application_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServer).Version(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Application/Version",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServer).Version(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Application_ServiceDesc is the grpc.ServiceDesc for Application service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Application_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "kubeconfig.Application",
+	HandlerType: (*ApplicationServer)(nil),
+	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Ping",
-			Handler:    _Kubeconfig_Ping_Handler,
+			Handler:    _Application_Ping_Handler,
+		},
+		{
+			MethodName: "Stop",
+			Handler:    _Application_Stop_Handler,
+		},
+		{
+			MethodName: "Version",
+			Handler:    _Application_Version_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

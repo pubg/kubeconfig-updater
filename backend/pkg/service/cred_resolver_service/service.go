@@ -11,43 +11,50 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/application"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
-func ListCredResolvers() []*protos.CredResolverConfig {
-	cfgs := application.GetInstance().CredResolverConfigStorage.ListConfigs()
-	return cfgs
+type CredResolverService struct {
+	store *cred_resolver_config_persist.CredResolverConfigStorage
 }
 
-func GetCredResolver(credResolverId string) (*protos.CredResolverConfig, bool, error) {
+func NewCredResolverService(store *cred_resolver_config_persist.CredResolverConfigStorage) *CredResolverService {
+	return &CredResolverService{store: store}
+}
+
+func (s *CredResolverService) ListCredResolvers() []*protos.CredResolverConfig {
+	return s.store.ListConfigs()
+}
+
+func (s *CredResolverService) GetCredResolver(credResolverId string) (*protos.CredResolverConfig, bool, error) {
 	if credResolverId == "" {
 		return nil, false, fmt.Errorf("credResolverId should not be empty")
 	}
 
-	cfg, exists := application.GetInstance().CredResolverConfigStorage.GetConfig(credResolverId)
+	cfg, exists := s.store.GetConfig(credResolverId)
 	if !exists {
 		return nil, false, nil
 	}
 	return cfg, true, nil
 }
 
-func SetCredResolver(cfg *protos.CredResolverConfig) error {
+func (s *CredResolverService) SetCredResolver(cfg *protos.CredResolverConfig) error {
 	if cfg == nil {
 		return fmt.Errorf("credResolverConfig should not be null")
 	}
 
-	return application.GetInstance().CredResolverConfigStorage.SetAndSaveConfig(cfg)
+	return s.store.SetAndSaveConfig(cfg)
 }
 
-func DeleteCredResolver(credResolverId string) error {
-	return application.GetInstance().CredResolverConfigStorage.DeleteConfig(credResolverId)
+func (s *CredResolverService) DeleteCredResolver(credResolverId string) error {
+	return s.store.DeleteConfig(credResolverId)
 }
 
 const attribute_profile = "profile"
 
-func GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (*aws.Config, string, error) {
+func (s *CredResolverService) GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (*aws.Config, string, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
 		cfg, err := config.LoadDefaultConfig(ctx)
@@ -75,7 +82,7 @@ func GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (
 }
 
 // Azure Cli는 멀티어카운트를 지원하지 않는다
-func GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (autorest.Authorizer, error) {
+func (s *CredResolverService) GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (autorest.Authorizer, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
 		return auth.NewAuthorizerFromCLI()
@@ -89,7 +96,7 @@ func GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig)
 		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
 	}}
 
-func GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
+func (s *CredResolverService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
 		return common.DefaultProviderChain(), nil

@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/schollz/jsonstore"
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
 )
 
 type AggregatedClusterMetadataStorage struct {

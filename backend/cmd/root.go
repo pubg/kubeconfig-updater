@@ -16,28 +16,22 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/pubg/kubeconfig-updater/backend/cmd/register"
 	"github.com/pubg/kubeconfig-updater/backend/cmd/server"
-	"github.com/pubg/kubeconfig-updater/backend/cmd/shared"
+	"github.com/pubg/kubeconfig-updater/backend/internal/versions"
+	"github.com/spf13/cobra"
 )
-
-var Version = "dev-build"
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:     "kubeconfig-updater",
-	Version: Version,
+	Version: versions.GetVersion(),
 	Short:   "EKS, AKS, TKE에 대한 접속 정보를 ~/.kube/config 파일에 등록할 수 있습니다",
 	Long:    ``,
 }
 
 func init() {
 	RootCmd.SetVersionTemplate("kubeconfig-updater: {{ .Version }}\n")
-
-	RootCmd.PersistentFlags().StringVar(&shared.GlobalAWSProfile, "aws-profile", "", "aws profile name to use. (overrides kubeconfig-updater configuration)")
-	RootCmd.PersistentFlags().StringVar(&shared.GlobalAWSProfile, "tencent-profile", "", "tencent profile name to use. (overrides kubeconfig-updater configuration)")
-
 	RootCmd.AddCommand(server.Cmd())
 	RootCmd.AddCommand(register.Cmd())
 }

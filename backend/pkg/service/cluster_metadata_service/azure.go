@@ -7,13 +7,13 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	aks "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2021-10-01/containerservice"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAzureResolver(credCfg *protos.CredResolverConfig, tenantId string) (*AzureResolver, error) {
-	auth, err := cred_resolver_service.GetAzureSdkConfig(context.Background(), credCfg)
+func NewAzureResolver(credCfg *protos.CredResolverConfig, tenantId string, credService *cred_resolver_service.CredResolverService) (*AzureResolver, error) {
+	auth, err := credService.GetAzureSdkConfig(context.Background(), credCfg)
 	if err != nil {
 		return nil, err
 	}

@@ -3,12 +3,11 @@ package register
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
-	"github.com/pubg/kubeconfig-updater/backend/cmd/shared"
 	"github.com/pubg/kubeconfig-updater/backend/internal/aks_helper"
 	"github.com/pubg/kubeconfig-updater/backend/internal/eks_helper"
 	"github.com/pubg/kubeconfig-updater/backend/internal/tke_helper"
+	"github.com/spf13/cobra"
+	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 )
 
 func Cmd() *cobra.Command {
@@ -32,13 +31,13 @@ func eksCommand() *cobra.Command {
 		Long:  ``,
 		Args:  cobra.ExactValidArgs(2),
 	}
-
-	eksCmd.UsageTemplate()
+	var awsProfile string
+	eksCmd.Flags().StringVar(&awsProfile, "aws-profile", "", "aws profile name to use. (if empty, use default credential chain)")
 
 	eksCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		region := args[0]
 		clusterName := args[1]
-		err := eks_helper.RegisterEksWithIamUser(clusterName, region, shared.GlobalAWSProfile)
+		err := eks_helper.RegisterEksWithIamUser(clusterName, region, awsProfile)
 		if err != nil {
 			return err
 		}
@@ -73,12 +72,10 @@ func tkeCommand() *cobra.Command {
 		Long:  ``,
 		Args:  cobra.ExactValidArgs(2),
 	}
-	tkeCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		var tencentProfile string
-		if shared.GlobalTencentProfile != "" {
-			tencentProfile = shared.GlobalTencentProfile
-		}
+	var tencentProfile string
+	tkeCmd.Flags().StringVar(&tencentProfile, "tencent-profile", "default", "tencent profile name to use.")
 
+	tkeCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		region := args[0]
 		clusterName := args[1]
 		clusters, err := tke_helper.ListTke(region, tencentProfile)
