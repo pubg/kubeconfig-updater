@@ -3,6 +3,7 @@ import { Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
+import LINQ from 'linq'
 import logger from '../../../logger/logger'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 
@@ -75,6 +76,8 @@ const columns: IColumn[] = [
 export default observer(function ClusterInfoList() {
   const store = useStore()
 
+  const [descending, setDescending] = useState(false)
+
   // TODO: add dyanmic column add/delete
   const columns = useMemo<IColumn[]>(() => {
     return [
@@ -91,8 +94,14 @@ export default observer(function ClusterInfoList() {
   }, [])
 
   const items = useMemo<ClusterMetadataItem[]>(() => {
-    return store.items.filter(store.filter ?? (() => true))
-  }, [store.filter, store.items])
+    let linq = LINQ.from(store.items).where(store.filter ?? (() => true))
+
+    // TODO: add sorting key selector
+    const sortKeySelector = ({ data }: ClusterMetadataItem) => data.metadata.clustername
+    linq = descending ? linq.orderByDescending(sortKeySelector) : linq.orderBy(sortKeySelector)
+
+    return linq.toArray()
+  }, [descending, store.filter, store.items])
 
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
