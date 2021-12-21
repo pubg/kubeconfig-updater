@@ -177,10 +177,13 @@ const createWindow = async () => {
  */
 
 // TODO: change this
-// if (isDevelopment) {
-container.register(BackendGrpcPort, { useValue: 10980 })
-container.register(BackendGrpcWebPort, { useValue: 10981 })
-// }
+if (isDevelopment) {
+  container.register(BackendGrpcPort, { useValue: 10980 })
+  container.register(BackendGrpcWebPort, { useValue: 10981 })
+} else {
+  container.register(BackendGrpcPort, { useValue: undefined })
+  container.register(BackendGrpcWebPort, { useValue: undefined })
+}
 
 const manager = container.resolve(BackendManager)
 logger.debug(`NO_BACKEND: ${process.env.NO_BACKEND}`)
