@@ -110,6 +110,14 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
+	err = s.metadataService.SetClusterRegisteredStatus(req.ClusterName)
+	if err != nil {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
+	}
+
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("%s cluster register success", req.ClusterName),
 	}, nil

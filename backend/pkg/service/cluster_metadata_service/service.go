@@ -34,6 +34,16 @@ func (s *ClusterMetadataService) GetClusterMetadata(clusterName string) (*protos
 	return s.cache.GetAggrMetadata(clusterName)
 }
 
+func (s *ClusterMetadataService) SetClusterRegisteredStatus(clusterName string) error {
+	meta, exists := s.cache.GetAggrMetadata(clusterName)
+	if !exists {
+		fmt.Printf("Cache not hit to find registered cluster, skip update cache ClusterName:%s\n", clusterName)
+		return nil
+	}
+	meta.Status = protos.ClusterInformationStatus_REGISTERED_OK
+	return s.cache.SetAggrMetadata(meta)
+}
+
 func (s *ClusterMetadataService) SyncAvailableClusters() error {
 	resolvers, err := s.ListMetadataResolvers()
 	if err != nil {
@@ -61,6 +71,10 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 					DataResolvers: []string{resolver.GetResolverDescription()},
 					Status:        protos.ClusterInformationStatus_SUGGESTION_OK,
 				}
+			}
+
+			if _, ok := resolver.(*KubeconfigResolver); ok {
+				aggrMetaMap[metadata.ClusterName].Status = protos.ClusterInformationStatus_REGISTERED_OK
 			}
 		}
 	}
