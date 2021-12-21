@@ -50,3 +50,7 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 	}
 	return fmt.Errorf("not supported infraVendor value %s", credConf.GetInfraVendor())
 }
+
+func (s ClusterRegisterService) DeleteCluster(ctx context.Context, clusterName string) error {
+	return nil
+}

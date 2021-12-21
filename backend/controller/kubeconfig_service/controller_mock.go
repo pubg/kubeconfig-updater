@@ -55,14 +55,6 @@ func (s *kubeconfigServiceMock) DeleteCredResolver(context.Context, *protos.Dele
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCredResolver not implemented")
 }
 
-func (s *kubeconfigServiceMock) GetKubeConfig(context.Context, *protos.CommonReq) (*protos.KubeConfigRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetKubeConfig not implemented")
-}
-
-func (s *kubeconfigServiceMock) SetKubeConfig(context.Context, *protos.KubeConfigReq) (*protos.CommonRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetKubeConfig not implemented")
-}
-
 func (s *kubeconfigServiceMock) GetAvailableClusters(context.Context, *protos.CommonReq) (*protos.GetAvailableClustersRes, error) {
 	return &protos.GetAvailableClustersRes{
 		CommonRes: &protos.CommonRes{

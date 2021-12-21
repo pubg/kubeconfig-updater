@@ -8,6 +8,8 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type kubeconfigService struct {
@@ -121,6 +123,15 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("%s cluster register success", req.ClusterName),
 	}, nil
+}
+
+func (s *kubeconfigService) DeleteCluster(ctx context.Context, req *protos.DeleteClusterReq) (*protos.CommonRes, error) {
+	if req.ClusterName == "" {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_INVALID_ARGUMENT,
+			Message: "ClusterName should not be empty",
+		}, nil
+	}
 }
 
 func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {

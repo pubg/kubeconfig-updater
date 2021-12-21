@@ -4,7 +4,6 @@ package protos
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,10 +22,9 @@ type KubeconfigClient interface {
 	SetCredResolver(ctx context.Context, in *CredResolverConfig, opts ...grpc.CallOption) (*CommonRes, error)
 	SetCredResolvers(ctx context.Context, in *CredResolversReq, opts ...grpc.CallOption) (*CommonRes, error)
 	DeleteCredResolver(ctx context.Context, in *DeleteCredResolverReq, opts ...grpc.CallOption) (*CommonRes, error)
-	GetKubeConfig(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*KubeConfigRes, error)
-	SetKubeConfig(ctx context.Context, in *KubeConfigReq, opts ...grpc.CallOption) (*CommonRes, error)
 	GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error)
 	RegisterCluster(ctx context.Context, in *RegisterClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
+	DeleteCluster(ctx context.Context, in *DeleteClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
 	SyncAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 }
 
@@ -74,24 +72,6 @@ func (c *kubeconfigClient) DeleteCredResolver(ctx context.Context, in *DeleteCre
 	return out, nil
 }
 
-func (c *kubeconfigClient) GetKubeConfig(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*KubeConfigRes, error) {
-	out := new(KubeConfigRes)
-	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/GetKubeConfig", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *kubeconfigClient) SetKubeConfig(ctx context.Context, in *KubeConfigReq, opts ...grpc.CallOption) (*CommonRes, error) {
-	out := new(CommonRes)
-	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/SetKubeConfig", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *kubeconfigClient) GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error) {
 	out := new(GetAvailableClustersRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/GetAvailableClusters", in, out, opts...)
@@ -104,6 +84,15 @@ func (c *kubeconfigClient) GetAvailableClusters(ctx context.Context, in *CommonR
 func (c *kubeconfigClient) RegisterCluster(ctx context.Context, in *RegisterClusterReq, opts ...grpc.CallOption) (*CommonRes, error) {
 	out := new(CommonRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/RegisterCluster", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kubeconfigClient) DeleteCluster(ctx context.Context, in *DeleteClusterReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/DeleteCluster", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -127,10 +116,9 @@ type KubeconfigServer interface {
 	SetCredResolver(context.Context, *CredResolverConfig) (*CommonRes, error)
 	SetCredResolvers(context.Context, *CredResolversReq) (*CommonRes, error)
 	DeleteCredResolver(context.Context, *DeleteCredResolverReq) (*CommonRes, error)
-	GetKubeConfig(context.Context, *CommonReq) (*KubeConfigRes, error)
-	SetKubeConfig(context.Context, *KubeConfigReq) (*CommonRes, error)
 	GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error)
 	RegisterCluster(context.Context, *RegisterClusterReq) (*CommonRes, error)
+	DeleteCluster(context.Context, *DeleteClusterReq) (*CommonRes, error)
 	SyncAvailableClusters(context.Context, *CommonReq) (*CommonRes, error)
 	mustEmbedUnimplementedKubeconfigServer()
 }
@@ -151,17 +139,14 @@ func (UnimplementedKubeconfigServer) SetCredResolvers(context.Context, *CredReso
 func (UnimplementedKubeconfigServer) DeleteCredResolver(context.Context, *DeleteCredResolverReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCredResolver not implemented")
 }
-func (UnimplementedKubeconfigServer) GetKubeConfig(context.Context, *CommonReq) (*KubeConfigRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetKubeConfig not implemented")
-}
-func (UnimplementedKubeconfigServer) SetKubeConfig(context.Context, *KubeConfigReq) (*CommonRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetKubeConfig not implemented")
-}
 func (UnimplementedKubeconfigServer) GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableClusters not implemented")
 }
 func (UnimplementedKubeconfigServer) RegisterCluster(context.Context, *RegisterClusterReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterCluster not implemented")
+}
+func (UnimplementedKubeconfigServer) DeleteCluster(context.Context, *DeleteClusterReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCluster not implemented")
 }
 func (UnimplementedKubeconfigServer) SyncAvailableClusters(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncAvailableClusters not implemented")
@@ -251,42 +236,6 @@ func _Kubeconfig_DeleteCredResolver_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Kubeconfig_GetKubeConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommonReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KubeconfigServer).GetKubeConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kubeconfig.Kubeconfig/GetKubeConfig",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KubeconfigServer).GetKubeConfig(ctx, req.(*CommonReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Kubeconfig_SetKubeConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(KubeConfigReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KubeconfigServer).SetKubeConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kubeconfig.Kubeconfig/SetKubeConfig",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KubeconfigServer).SetKubeConfig(ctx, req.(*KubeConfigReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Kubeconfig_GetAvailableClusters_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CommonReq)
 	if err := dec(in); err != nil {
@@ -319,6 +268,24 @@ func _Kubeconfig_RegisterCluster_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KubeconfigServer).RegisterCluster(ctx, req.(*RegisterClusterReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Kubeconfig_DeleteCluster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteClusterReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KubeconfigServer).DeleteCluster(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Kubeconfig/DeleteCluster",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KubeconfigServer).DeleteCluster(ctx, req.(*DeleteClusterReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -365,20 +332,16 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Kubeconfig_DeleteCredResolver_Handler,
 		},
 		{
-			MethodName: "GetKubeConfig",
-			Handler:    _Kubeconfig_GetKubeConfig_Handler,
-		},
-		{
-			MethodName: "SetKubeConfig",
-			Handler:    _Kubeconfig_SetKubeConfig_Handler,
-		},
-		{
 			MethodName: "GetAvailableClusters",
 			Handler:    _Kubeconfig_GetAvailableClusters_Handler,
 		},
 		{
 			MethodName: "RegisterCluster",
 			Handler:    _Kubeconfig_RegisterCluster_Handler,
+		},
+		{
+			MethodName: "DeleteCluster",
+			Handler:    _Kubeconfig_DeleteCluster_Handler,
 		},
 		{
 			MethodName: "SyncAvailableClusters",
@@ -394,7 +357,6 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApplicationClient interface {
 	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
-	Stop(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 	Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 }
 
@@ -415,15 +377,6 @@ func (c *applicationClient) Ping(ctx context.Context, in *CommonReq, opts ...grp
 	return out, nil
 }
 
-func (c *applicationClient) Stop(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
-	out := new(CommonRes)
-	err := c.cc.Invoke(ctx, "/kubeconfig.Application/Stop", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *applicationClient) Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
 	out := new(CommonRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Application/Version", in, out, opts...)
@@ -438,7 +391,6 @@ func (c *applicationClient) Version(ctx context.Context, in *CommonReq, opts ...
 // for forward compatibility
 type ApplicationServer interface {
 	Ping(context.Context, *CommonReq) (*CommonRes, error)
-	Stop(context.Context, *CommonReq) (*CommonRes, error)
 	Version(context.Context, *CommonReq) (*CommonRes, error)
 	mustEmbedUnimplementedApplicationServer()
 }
@@ -449,9 +401,6 @@ type UnimplementedApplicationServer struct {
 
 func (UnimplementedApplicationServer) Ping(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
-func (UnimplementedApplicationServer) Stop(context.Context, *CommonReq) (*CommonRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
 func (UnimplementedApplicationServer) Version(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
@@ -487,24 +436,6 @@ func _Application_Ping_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Application_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommonReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApplicationServer).Stop(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kubeconfig.Application/Stop",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServer).Stop(ctx, req.(*CommonReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Application_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CommonReq)
 	if err := dec(in); err != nil {
@@ -533,10 +464,6 @@ var Application_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _Application_Ping_Handler,
-		},
-		{
-			MethodName: "Stop",
-			Handler:    _Application_Stop_Handler,
 		},
 		{
 			MethodName: "Version",
