@@ -1,12 +1,9 @@
 import { Paper } from '@mui/material'
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom'
-import { container } from 'tsyringe'
 import './App.css'
 import Sidebar from './components/sidebar/sidebar'
-import MockKubeconfigClient from './mock/grpc/grpcClient'
 import ClusterManagement from './pages/clusterManagement/clusterManagement'
 import Home from './pages/home/home'
-import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import About from './pages/about/about'
 
 // TODO: delete this, only for testing.

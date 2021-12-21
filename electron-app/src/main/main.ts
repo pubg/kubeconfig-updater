@@ -14,14 +14,15 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import {app, BrowserWindow, ipcMain, shell} from 'electron'
-import {autoUpdater} from 'electron-updater'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
-import {container} from 'tsyringe'
+import { container } from 'tsyringe'
 import MenuBuilder from './menu'
-import {resolveHtmlPath} from './util'
+import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
-import {CoreExecCmd, CoreExecCwd} from './backend/symbols'
+import { CoreExecCmd, CoreExecCwd } from './backend/symbols'
+import logger from '../logger/logger'
 
 export default class AppUpdater {
   constructor() {
@@ -35,7 +36,7 @@ let mainWindow: BrowserWindow | null = null
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`
-  console.log(msgTemplate(arg))
+  logger.info(msgTemplate(arg))
   event.reply('ipc-example', msgTemplate('pong'))
 })
 
@@ -56,9 +57,9 @@ if (isProduction) {
   sourceMapSupport.install()
 }
 
-console.log(`[Debug] isPacked: ${app.isPackaged}`)
-console.log(`[Debug] getAppPath: ${app.getAppPath()}`)
-console.log(`[Debug] getPath('exe'): ${app.getPath('exe')}`)
+logger.debug(`isPacked: ${app.isPackaged}`)
+logger.debug(`getAppPath: ${app.getAppPath()}`)
+logger.debug(`getPath('exe'): ${app.getPath('exe')}`)
 
 if (app.isPackaged) {
   const parsedPath = path.parse(app.getPath('exe'))
@@ -85,7 +86,7 @@ if (app.isPackaged) {
   container.register(CoreExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
-  container.register(CoreExecCmd, {useValue: 'go run main.go server'})
+  container.register(CoreExecCmd, { useValue: 'go run main.go server' })
 }
 
 const installExtensions = async () => {
@@ -98,7 +99,7 @@ const installExtensions = async () => {
       extensions.map((name) => installer[name]),
       forceDownload
     )
-    .catch(console.log)
+    .catch(log.error)
 }
 
 const createWindow = async () => {
@@ -153,7 +154,7 @@ const createWindow = async () => {
 
   // https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-    callback({requestHeaders: {...details.requestHeaders, Origin: '*'}})
+    callback({ requestHeaders: { ...details.requestHeaders, Origin: '*' } })
   })
 
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
@@ -185,13 +186,13 @@ app
       if (mainWindow === null) createWindow()
     })
   })
-  .catch(console.log)
+  .catch(logger.error)
 
 const manager = container.resolve(BackendManager)
 manager.start()
 
 ipcMain.on('getGrpcWebPort', (event, arg) => {
-  console.log(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
+  logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
   event.returnValue = manager.grpbWebPort
 })
 
