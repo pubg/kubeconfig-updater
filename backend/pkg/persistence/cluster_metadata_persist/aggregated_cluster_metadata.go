@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/schollz/jsonstore"
@@ -13,6 +14,12 @@ import (
 type AggregatedClusterMetadataStorage struct {
 	keyStore    *jsonstore.JSONStore
 	StoragePath string
+
+	swapLock sync.RWMutex
+}
+
+func (c *AggregatedClusterMetadataStorage) InitStorage() {
+	c.keyStore = new(jsonstore.JSONStore)
 }
 
 //FirstLoad, Error
@@ -39,8 +46,15 @@ func (c *AggregatedClusterMetadataStorage) SaveStorage() error {
 	return jsonstore.Save(c.keyStore, c.StoragePath)
 }
 
-func (c *AggregatedClusterMetadataStorage) ClearStorage() {
-	c.keyStore = new(jsonstore.JSONStore)
+func (c *AggregatedClusterMetadataStorage) ClearAndSet(metas []*protos.AggregatedClusterMetadata) {
+	c.swapLock.Lock()
+	defer c.swapLock.Unlock()
+	newStorage := &AggregatedClusterMetadataStorage{}
+	newStorage.InitStorage()
+	for _, meta := range metas {
+		newStorage.SetAggrMetadata(meta)
+	}
+	c.keyStore = newStorage.keyStore
 }
 
 func (c *AggregatedClusterMetadataStorage) ListAggrMetadata() []*protos.AggregatedClusterMetadata {
