@@ -35,7 +35,7 @@ func CheckExistsOrCreateDefault(absPath string) error {
 			Extensions: &Extension{
 				Fox: &FoxExtension{
 					Enable: true,
-					Address:  "https://fox.xtrm-central.io",
+					Address:  "https://fox.xtrm-dev.io",
 					UseCache: true,
 				},
 				Eks: &EksExtension{
