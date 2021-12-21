@@ -7,12 +7,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAwsResolver(credCfg *protos.CredResolverConfig, accountId string) (*AwsResolver, error) {
-	awsCfg, _, err := cred_resolver_service.GetAwsSdkConfig(context.Background(), credCfg)
+func NewAwsResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolverService) (*AwsResolver, error) {
+	awsCfg, _, err := credService.GetAwsSdkConfig(context.Background(), credCfg)
 	if err != nil {
 		return nil, err
 	}

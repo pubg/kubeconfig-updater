@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
 	"github.com/pubg/kubeconfig-updater/backend/internal/fox"
 	"github.krafton.com/xtrm/fox/client"

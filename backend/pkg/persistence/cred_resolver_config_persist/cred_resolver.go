@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/schollz/jsonstore"
 )
 

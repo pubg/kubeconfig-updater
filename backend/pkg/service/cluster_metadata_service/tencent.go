@@ -3,7 +3,7 @@ package cluster_metadata_service
 import (
 	"fmt"
 
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
@@ -13,8 +13,8 @@ import (
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 )
 
-func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string) (*TencentResolver, error) {
-	credProvider, err := cred_resolver_service.GetTencentSdkConfig(credCfg)
+func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolverService) (*TencentResolver, error) {
+	credProvider, err := credService.GetTencentSdkConfig(credCfg)
 	if err != nil {
 		return nil, err
 	}

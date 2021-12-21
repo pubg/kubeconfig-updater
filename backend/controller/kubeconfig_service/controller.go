@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service/protos"
+	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
@@ -12,14 +12,18 @@ import (
 
 type kubeconfigService struct {
 	protos.UnimplementedKubeconfigServer
+
+	credService     *cred_resolver_service.CredResolverService
+	registerService *cluster_register_service.ClusterRegisterService
+	metadataService *cluster_metadata_service.ClusterMetadataService
 }
 
-func NewController() protos.KubeconfigServer {
-	return &kubeconfigService{}
+func NewKubeconfigService(credService *cred_resolver_service.CredResolverService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
+	return &kubeconfigService{credService: credService, registerService: registerService, metadataService: metadataService}
 }
 
 func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.GetCredResolversRes, error) {
-	cfgs := cred_resolver_service.ListCredResolvers()
+	cfgs := s.credService.ListCredResolvers()
 
 	res := &protos.GetCredResolversRes{
 		CommonRes: &protos.CommonRes{
@@ -32,7 +36,7 @@ func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.C
 }
 
 func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.CredResolverConfig) (*protos.CommonRes, error) {
-	err := cred_resolver_service.SetCredResolver(req)
+	err := s.credService.SetCredResolver(req)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +48,7 @@ func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.Cre
 func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.CredResolversReq) (*protos.CommonRes, error) {
 	cfgs := req.GetConfigs()
 	for _, cfg := range cfgs {
-		err := cred_resolver_service.SetCredResolver(cfg)
+		err := s.credService.SetCredResolver(cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +59,7 @@ func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.Cr
 }
 
 func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.DeleteCredResolverReq) (*protos.CommonRes, error) {
-	err := cred_resolver_service.DeleteCredResolver(cfg.AccountId)
+	err := s.credService.DeleteCredResolver(cfg.AccountId)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +69,7 @@ func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.
 }
 
 func (s *kubeconfigService) GetAvailableClusters(context.Context, *protos.CommonReq) (*protos.GetAvailableClustersRes, error) {
-	clusters := cluster_metadata_service.ListClusterMetadatas()
+	clusters := s.metadataService.ListClusterMetadatas()
 
 	return &protos.GetAvailableClustersRes{
 		CommonRes: &protos.CommonRes{
@@ -83,7 +87,7 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
-	cfg, exists, err := cred_resolver_service.GetCredResolver(req.AccountId)
+	cfg, exists, err := s.credService.GetCredResolver(req.AccountId)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -98,7 +102,7 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
-	err = cluster_register_service.RegisterCluster(ctx, req.ClusterName, cfg)
+	err = s.registerService.RegisterCluster(ctx, req.ClusterName, cfg)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -113,18 +117,12 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 
 func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
 	fmt.Printf("Start SyncAvailableClusters\n")
-	err := cluster_metadata_service.SyncAvailableClusters()
+	err := s.metadataService.SyncAvailableClusters()
 	fmt.Printf("Success SyncAvailableClusters\n")
 	if err != nil {
 		return nil, err
 	}
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("sync success"),
-	}, nil
-}
-
-func (s *kubeconfigService) Ping(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
-	return &protos.CommonRes{
-		Message: fmt.Sprintf("pong"),
 	}, nil
 }
