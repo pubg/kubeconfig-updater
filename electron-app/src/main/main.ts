@@ -194,7 +194,12 @@ if (isDevelopment) {
 }
 
 const manager = container.resolve(BackendManager)
-manager.start()
+logger.debug(`NO_BACKEND: ${process.env.NO_BACKEND}`)
+if (process.env.NO_BACKEND) {
+  logger.warn('starting without backend...')
+} else {
+  manager.start()
+}
 
 ipcMain.on('getGrpcWebPort', (event) => {
   logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
