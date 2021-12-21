@@ -74,10 +74,12 @@ export default observer(function TopBar() {
   // TODO: refactor this hard-coded requester binding to parent?
   const onReloadClick = useCallback(async () => {
     await requester.fetchMetadata()
-    store.items = requester.items.map((item) => {
-      const obj = item.toObject() as ClusterMetadata
-      return { key: obj.metadata?.clustername, data: obj }
-    })
+    store.setItems(
+      requester.items.map((item) => {
+        const obj = item.toObject() as ClusterMetadata
+        return { key: obj.metadata?.clustername, data: obj }
+      })
+    )
   }, [requester, store])
 
   return (

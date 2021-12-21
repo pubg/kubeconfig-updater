@@ -50,6 +50,7 @@ export class ClusterMetadataStore {
   @observable
   items: ClusterMetadataItem[] = []
 
+  @action
   setItems(items: ClusterMetadataItem[]) {
     this.items = items
     this.resetSelection()
@@ -68,7 +69,7 @@ export class ClusterMetadataStore {
     this.filter = predicate
   }
 
-  selection = makeAutoObservable(new Selection<ClusterMetadataItem>(), undefined, { deep: true })
+  selection = makeAutoObservable(new Selection<ClusterMetadataItem>(), undefined)
 
   @computed
   get selectedItems() {
