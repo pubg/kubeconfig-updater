@@ -2,7 +2,6 @@ package application_service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/versions"
@@ -18,7 +17,7 @@ func NewController() protos.ApplicationServer {
 
 func (s *applicationService) Ping(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
 	return &protos.CommonRes{
-		Message: fmt.Sprintf("pong"),
+		Message: "pong",
 	}, nil
 }
 

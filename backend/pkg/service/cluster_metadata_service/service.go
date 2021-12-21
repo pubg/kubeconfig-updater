@@ -6,6 +6,7 @@ import (
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
+	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
@@ -18,6 +19,7 @@ type ClusterMetadataResolver interface {
 type ClusterMetadataService struct {
 	credService *cred_resolver_service.CredResolverService
 	cache       *cluster_metadata_persist.AggregatedClusterMetadataStorage
+	cfg         *configs.ApplicationConfig
 }
 
 func NewClusterMetadataService(credService *cred_resolver_service.CredResolverService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage) *ClusterMetadataService {
@@ -101,11 +103,13 @@ func mergeMetadata(a *protos.ClusterMetadata, b *protos.ClusterMetadata) *protos
 
 func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResolver, error) {
 	var metaResolvers []ClusterMetadataResolver
-	fox, err := NewFoxResolver()
-	if err != nil {
-		return nil, err
+	if s.cfg.Extensions.Fox.Enable {
+		fox, err := NewFoxResolver(s.cfg.Extensions.Fox.Address)
+		if err != nil {
+			return nil, err
+		}
+		metaResolvers = append(metaResolvers, fox)
 	}
-	metaResolvers = append(metaResolvers, fox)
 
 	kubeconfigs, err := NewKubeconfigResolvers()
 	if err != nil {

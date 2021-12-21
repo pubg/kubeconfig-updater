@@ -18,33 +18,33 @@ func Cmd() *cobra.Command {
 	grpcPort := 0
 	grpcWebPort := 0
 	useMock := false
+	configPath := ""
 
 	flags := serverCmd.Flags()
 	flags.IntVar(&grpcPort, "port", 10980, "Grpc Listen Port")
 	flags.IntVar(&grpcWebPort, "web-port", 10981, "Grpc-Web Listen Port")
 	flags.BoolVar(&useMock, "mock", false, "Use Mock Controller")
+	flags.StringVar(&configPath, "config", "~/.kubeconfig-updater-gui/config.yaml", "Application config path (yaml and json support)")
 
 	serverCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		credResolverPath, err := common.ResolvePathToAbs("~/.kubeconfig-updater-gui/cred-resolver-config.json")
+		absConfigPath, err := common.ResolvePathToAbs(configPath)
 		if err != nil {
+			fmt.Printf("Error occurred while normalize config path, path:%s\n", configPath)
 			return err
 		}
-		aggrMetadataCachePath, err := common.ResolvePathToAbs("~/.kubeconfig-updater-gui/aggregated-cluster-metadata-cache.json")
-		if err != nil {
-			return err
-		}
+
 		app := &application.ServerApplication{}
 		err = app.InitApplication(&application.ServerApplicationOption{
-			CredResolverConfigPath:             credResolverPath,
-			AggregatedClusterMetadataCachePath: aggrMetadataCachePath,
-
+			GrpcPort:          grpcPort,
+			GrpcWebPort:       grpcWebPort,
+			ConfigPath:        absConfigPath,
 			UseMockController: useMock,
 		})
 		if err != nil {
 			return err
 		}
 		fmt.Printf("Wait until server close...\n")
-		app.StartApplication(grpcPort, grpcWebPort)
+		app.StartApplication()
 		<-app.ApplicationClose
 		fmt.Printf("Server closed, exit process\n")
 		return nil
