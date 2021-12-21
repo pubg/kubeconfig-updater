@@ -1,6 +1,7 @@
 import { flow, makeObservable, observable } from 'mobx'
 import React from 'react'
 import { container, injectable, singleton } from 'tsyringe'
+import logger from '../../logger/logger'
 import { ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'
 
@@ -28,6 +29,7 @@ export class ClusterRegisterRequester {
   }
 
   request = flow(function* (this: ClusterRegisterRequester, items: RequestType[]) {
+    logger.info(`requesting cluster register ${items.length} items`)
     this.length = items.length
     this.processedCount = 0
 
@@ -44,13 +46,14 @@ export class ClusterRegisterRequester {
           }
         })()
       } catch (err) {
-        console.error(err)
+        logger.error(err)
       }
 
       this.processedCount += 1
     }
 
     this.state = 'finished'
+    logger.info('finished cluster register request')
   })
 }
 
