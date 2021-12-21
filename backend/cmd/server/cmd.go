@@ -18,11 +18,13 @@ func Cmd() *cobra.Command {
 	grpcPort := 0
 	grpcWebPort := 0
 	useMock := false
+	origin := ""
 	configPath := ""
 
 	flags := serverCmd.Flags()
 	flags.IntVar(&grpcPort, "port", 10980, "Grpc Listen Port")
 	flags.IntVar(&grpcWebPort, "web-port", 10981, "Grpc-Web Listen Port")
+	flags.StringVar(&origin, "origin-url", "http://localhost:1212", "origin url for CORS")
 	flags.BoolVar(&useMock, "mock", false, "Use Mock Controller")
 	flags.StringVar(&configPath, "config", "~/.kubeconfig-updater-gui/config.yaml", "Application config path (yaml and json support)")
 
@@ -39,6 +41,7 @@ func Cmd() *cobra.Command {
 			GrpcWebPort:       grpcWebPort,
 			ConfigPath:        absConfigPath,
 			UseMockController: useMock,
+			Origin:            origin,
 		})
 		if err != nil {
 			return err
