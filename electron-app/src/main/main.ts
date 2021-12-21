@@ -176,6 +176,20 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
+// TODO: change this
+// if (isDevelopment) {
+container.register(BackendGrpcPort, { useValue: 10980 })
+container.register(BackendGrpcWebPort, { useValue: 10981 })
+// }
+
+const manager = container.resolve(BackendManager)
+logger.debug(`NO_BACKEND: ${process.env.NO_BACKEND}`)
+if (process.env.NO_BACKEND) {
+  logger.warn('starting without backend...')
+} else {
+  manager.start()
+}
+
 app
   .whenReady()
   .then(() => {
@@ -185,21 +199,15 @@ app
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow()
     })
+
+    // on SIGTERM (SIGINT on windows) it doesn't triggered
+    // https://github.com/electron/electron/issues/5273
+    // backend manager finalizer when unexpected exit
+    process.on('exit', async () => {
+      manager.kill()
+    })
   })
   .catch(logger.error)
-
-if (isDevelopment) {
-  container.register(BackendGrpcPort, { useValue: 10980 })
-  container.register(BackendGrpcWebPort, { useValue: 10981 })
-}
-
-const manager = container.resolve(BackendManager)
-logger.debug(`NO_BACKEND: ${process.env.NO_BACKEND}`)
-if (process.env.NO_BACKEND) {
-  logger.warn('starting without backend...')
-} else {
-  manager.start()
-}
 
 ipcMain.on('getGrpcWebPort', (event) => {
   logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
@@ -220,9 +228,4 @@ app.on('before-quit', async (event) => {
     await manager.end()
     app.quit()
   }
-})
-
-// backend manager finalizer when unexpected exit
-process.on('beforeExit', async () => {
-  await manager.end()
 })
