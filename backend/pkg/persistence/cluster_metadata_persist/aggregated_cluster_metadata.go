@@ -29,11 +29,11 @@ func (c *AggregatedClusterMetadataStorage) LoadStorage() (bool, error) {
 		return false, err
 	}
 	if _, err = os.Stat(c.StoragePath); errors.Is(err, os.ErrNotExist) {
-		fmt.Printf("Initialize New AggregatedClusterMetadata Cache in %s\n", c.StoragePath)
+		fmt.Printf("Initialize New AggregatedClusterMetadataCache in %s\n", c.StoragePath)
 		c.keyStore = new(jsonstore.JSONStore)
 		return true, nil
 	}
-	fmt.Printf("Load AggregatedClusterMetadata Cache From %s\n", c.StoragePath)
+	fmt.Printf("Load AggregatedClusterMetadataCache From %s\n", c.StoragePath)
 	ks, err := jsonstore.Open(c.StoragePath)
 	if err != nil {
 		return false, err

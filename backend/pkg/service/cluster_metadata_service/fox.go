@@ -8,16 +8,18 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
-	"github.com/pubg/kubeconfig-updater/backend/internal/fox"
 	"github.krafton.com/xtrm/fox/client"
 	"github.krafton.com/xtrm/fox/source/pkg/document"
 )
 
-func NewFoxResolver() (*FoxResolver, error) {
-	foxClient, err := fox.GetFoxClient()
+func NewFoxResolver(addr string) (*FoxResolver, error) {
+	foxClient, err := client.NewClient(&client.FoxClientConfig{
+		APIUrl: addr,
+	})
 	if err != nil {
 		return nil, err
 	}
+
 	return &FoxResolver{
 		foxClient: foxClient,
 	}, nil

@@ -22,11 +22,11 @@ func (c *CredResolverConfigStorage) LoadStorage() (bool, error) {
 		return false, err
 	}
 	if _, err = os.Stat(c.StoragePath); errors.Is(err, os.ErrNotExist) {
-		fmt.Printf("Initialize New Cres Resolver Config in %s\n", c.StoragePath)
+		fmt.Printf("Initialize New CredResolverConfig in %s\n", c.StoragePath)
 		c.keyStore = new(jsonstore.JSONStore)
 		return true, nil
 	}
-	fmt.Printf("Load Cred Resolver Config From %s\n", c.StoragePath)
+	fmt.Printf("Load CredResolverConfig From %s\n", c.StoragePath)
 	ks, err := jsonstore.Open(c.StoragePath)
 	if err != nil {
 		return false, err

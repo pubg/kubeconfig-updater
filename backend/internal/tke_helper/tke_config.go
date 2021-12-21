@@ -3,16 +3,19 @@ package tke_helper
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
+
+	"github.com/pubg/kubeconfig-updater/backend/internal/common"
 )
 
 func GetProfiles() ([]string, error) {
 	// TODO: intl 는 .tccli, china 버전은 .tencentcloud 참조함
 	profileNames := make([]string, 0)
 
-	dirPath := getCredentialsDirectoryPath()
+	dirPath,err := getCredentialsDirectoryPath()
+	if err != nil {
+		return nil, err
+	}
 
 	dir, err := os.Stat(dirPath)
 	if err != nil {
@@ -38,27 +41,7 @@ func GetProfiles() ([]string, error) {
 	return profileNames, nil
 }
 
-// DefaultProfileProvider return a default Profile  provider
-// profile path :
-//  1. The value of the environment variable TENCENTCLOUD_CREDENTIALS_FILE
-//  2. linux: ~/.tencentcloud/credentials
-// 	  windows: \c:\Users\NAME\.tencentcloud\credentials
-
-// getHomePath return home directory according to the system.
-// if the environmental variables does not exist, it will return empty string
-func getHomePath() string {
-	// Windows
-	if runtime.GOOS == "windows" {
-		return os.Getenv("USERPROFILE")
-	}
-	// *nix
-	return os.Getenv("HOME")
-}
-
-func getCredentialsDirectoryPath() string {
-	homePath := getHomePath()
-	if homePath == "" {
-		return homePath
-	}
-	return filepath.Join(homePath, ".tccli")
+func getCredentialsDirectoryPath() (string, error) {
+	path, err := common.ResolvePathToAbs("~/.tccli")
+	return path, err
 }
