@@ -99,6 +99,6 @@ export class ClusterMetadataStore {
   @action
   // eslint-disable-next-line class-methods-use-this
   resetSelection() {
-    this.selectionRef.toggleRangeSelected(0, 0)
+    this.selectionRef.setAllSelected(false)
   }
 }

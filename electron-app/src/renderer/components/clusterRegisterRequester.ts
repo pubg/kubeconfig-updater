@@ -16,7 +16,7 @@ type RequestType = {
 @injectable()
 export class ClusterRegisterRequester {
   @observable
-  state: 'ready' | 'processing' | 'finished' = 'ready'
+  state: 'ready' | 'processing' = 'ready'
 
   @observable
   length = 0
@@ -52,7 +52,7 @@ export class ClusterRegisterRequester {
       this.processedCount += 1
     }
 
-    this.state = 'finished'
+    this.state = 'ready'
     logger.info('finished cluster register request')
   })
 }
