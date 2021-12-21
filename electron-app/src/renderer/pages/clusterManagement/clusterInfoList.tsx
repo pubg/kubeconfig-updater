@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react'
 import LINQ from 'linq'
 import logger from '../../../logger/logger'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
+import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 
 /*
 const columns: IColumn[] = [
@@ -88,6 +89,27 @@ export default observer(function ClusterInfoList() {
         isResizable: true,
         onRender: (item: ClusterMetadataItem) => {
           return <Typography>{item.data.metadata.clustername}</Typography>
+        },
+      },
+      {
+        key: 'status',
+        name: 'Status',
+        minWidth: 0,
+        isResizable: true,
+        onRender(item: ClusterMetadataItem) {
+          switch (item.data.status) {
+            case ClusterInformationStatus.REGISTERED_OK:
+              return <Typography>Registered</Typography>
+
+            case ClusterInformationStatus.SUGGESTION_OK:
+              return <Typography>Not Registered</Typography>
+
+            case ClusterInformationStatus.REGISTERED_UNKNOWN:
+              return <Typography>Unknown</Typography>
+
+            default:
+              return <Typography>Error</Typography>
+          }
         },
       },
     ]

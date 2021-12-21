@@ -53,10 +53,10 @@ export class ClusterMetadataRequester {
     return false
   }
 
-  fetchMetadata = flow(function* (this: ClusterMetadataRequester) {
+  fetchMetadata = flow(function* (this: ClusterMetadataRequester, resync?: boolean) {
     this.items = []
 
-    if (this.shouldResync) {
+    if (resync || this.shouldResync) {
       logger.debug('request backend cluster metadata sync')
       this.state = 'in-sync'
 

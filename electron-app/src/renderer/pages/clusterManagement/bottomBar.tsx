@@ -18,19 +18,23 @@ export default observer(function BottomBar() {
   const [isProcessing, setIsProcessing] = useState(false)
 
   const onRegisterAllClicked = useCallback(() => {
-    registerRequester.request(
-      store.selectedItems.map((item) => ({
-        clusterName: item.data.metadata.clustername,
-        accountId: item.data.metadata.credresolverid,
-      }))
-    )
+    ;(async () => {
+      // clear items after request
+      const { selectedItems } = store
+      store.resetSelection()
 
-    // clear items after request
-    store.resetSelection()
-  }, [registerRequester, store])
+      await registerRequester.request(
+        selectedItems.map((item) => ({
+          clusterName: item.data.metadata.clustername,
+          accountId: item.data.metadata.credresolverid,
+        }))
+      )
+
+      await metadataRequester.fetchMetadata()
+    })()
+  }, [metadataRequester, registerRequester, store])
 
   useEffect(() => {
-    logger.debug('set state')
     if (metadataRequester.state !== 'ready') {
       return setIsProcessing(true)
     }

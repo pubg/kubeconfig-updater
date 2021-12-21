@@ -39,6 +39,9 @@ export class ClusterRegisterRequester {
       try {
         yield (async () => {
           const req = container.resolve(RegisterClusterService)
+          logger.debug(
+            `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
+          )
           const res = await req.request(item.clusterName, item.accountId)
 
           if (res.getStatus() !== ResultCode.SUCCESS) {
