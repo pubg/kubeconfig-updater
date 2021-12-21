@@ -1,0 +1,29 @@
+// source code: https://github.com/zzzz465/rwxml-language-server/blob/d31c22aa83f61db88e5002a763172400eb656a8d/language-server/src/data-structures/trie-ext/lcs.ts
+/* eslint-disable no-param-reassign */
+export function longestCommonSequence(heystack: string, needle: string, caseSensitive = false): number {
+  if (!caseSensitive) {
+    heystack = heystack.toLowerCase()
+    needle = needle.toLowerCase()
+  }
+
+  const table = Array.from(Array(needle.length + 1), () => Array.from(Array(heystack.length + 1), () => 0))
+
+  for (let i = 1; i <= heystack.length; i += 1) {
+    for (let j = 1; j <= needle.length; j += 1) {
+      const heystackChar = heystack[i - 1]
+      const needleChar = needle[j - 1]
+
+      if (heystackChar === needleChar) {
+        table[j][i] = table[j - 1][i - 1] + 1
+      } else {
+        table[j][i] = Math.max(table[j - 1][i], table[j][i - 1])
+      }
+    }
+  }
+
+  return table[needle.length][heystack.length]
+}
+
+export function getMatchingText(heystacks: string[], needle: string): string[] {
+  return heystacks.filter((heystack) => longestCommonSequence(heystack, needle) === needle.length)
+}
