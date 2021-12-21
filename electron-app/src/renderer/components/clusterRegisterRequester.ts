@@ -1,6 +1,6 @@
 import { flow, makeObservable, observable } from 'mobx'
 import React from 'react'
-import { container, injectable, singleton } from 'tsyringe'
+import { container, injectable } from 'tsyringe'
 import logger from '../../logger/logger'
 import { ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'

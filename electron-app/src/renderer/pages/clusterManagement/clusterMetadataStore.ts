@@ -1,6 +1,5 @@
-import { action, computed, makeAutoObservable, makeObservable, observable } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 import React from 'react'
-import { singleton } from 'tsyringe'
 import { IObjectWithKey, Selection } from '@fluentui/react'
 import _ from 'lodash'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
