@@ -65,6 +65,7 @@ export class ClusterMetadataStore {
   @observable
   filter: ClusterMetadataItemFilter | null = null
 
+  @action
   setFilter(predicate: ClusterMetadataItemFilter | null) {
     this.filter = predicate
   }
