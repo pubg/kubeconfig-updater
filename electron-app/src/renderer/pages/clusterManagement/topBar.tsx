@@ -16,12 +16,13 @@ import { useCallback, useEffect, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
 import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter, ClusterMetadata } from './clusterMetadataStore'
+import { longestCommonSequence } from '../../utils/strings/lcs'
 
 function filterFactory(name: string, selectedTags: Set<string>, showRegistered: boolean): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
-    // filter by name
-    // TODO: implement case sensitive option
-    if (!data.metadata.clustername.includes(name)) {
+    // fuzzy search
+    const clusterName = data.metadata.clustername
+    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === name.length)) {
       return false
     }
 

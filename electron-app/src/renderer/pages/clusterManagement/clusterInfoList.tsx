@@ -77,7 +77,7 @@ export default observer(function ClusterInfoList() {
 
   // TODO: add dyanmic column add/delete
   const columns = useMemo<IColumn[]>(() => {
-    const items: IColumn[] = [
+    return [
       {
         key: 'clusterName',
         name: 'Cluster Name',
@@ -88,9 +88,11 @@ export default observer(function ClusterInfoList() {
         },
       },
     ]
-
-    return items
   }, [])
+
+  const items = useMemo<ClusterMetadataItem[]>(() => {
+    return store.items.filter(store.filter ?? (() => true))
+  }, [store.filter, store.items])
 
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
@@ -99,7 +101,7 @@ export default observer(function ClusterInfoList() {
     <>
       <DetailsList
         columns={columns}
-        items={store.items}
+        items={items}
         onColumnHeaderClick={onHeaderNameClicked}
         selection={store.selectionRef as Selection}
       />
