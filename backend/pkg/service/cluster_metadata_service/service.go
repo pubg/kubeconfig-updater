@@ -63,13 +63,11 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		}
 	}
 
-	s.cache.ClearStorage()
-	for _, aggrMeta := range aggrMetaMap {
-		err = s.cache.SetAggrMetadata(aggrMeta)
-		if err != nil {
-			return err
-		}
+	var metas []*protos.AggregatedClusterMetadata
+	for _, meta := range aggrMetaMap {
+		metas = append(metas, meta)
 	}
+	s.cache.ClearAndSet(metas)
 	err = s.cache.SaveStorage()
 	if err != nil {
 		return err
