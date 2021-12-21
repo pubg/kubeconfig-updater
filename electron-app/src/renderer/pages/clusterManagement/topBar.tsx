@@ -30,8 +30,10 @@ function filterFactory(name: string, selectedTags: Set<string>, showRegistered: 
     // TODO
 
     // filter by registered state
-    if (showRegistered || (!showRegistered && data.status === ClusterInformationStatus.REGISTERED_OK)) {
-      return false
+    if (!showRegistered) {
+      if (data.status === ClusterInformationStatus.REGISTERED_OK) {
+        return false
+      }
     }
 
     return true
