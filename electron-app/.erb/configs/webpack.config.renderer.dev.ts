@@ -32,19 +32,6 @@ if (!requiredByDLLConfig && !(fs.existsSync(webpackPaths.dllPath) && fs.existsSy
   execSync('pnpm run postinstall')
 }
 
-let mainProcess: ChildProcess | null = null
-
-process.on('exit', () => {
-  if (mainProcess && !mainProcess.killed) {
-    console.log('SIGTERM backend process...')
-    const success = mainProcess.kill()
-
-    if (!success) {
-      console.error('cannot kill backend process')
-    }
-  }
-})
-
 export default merge(baseConfig, {
   devtool: 'inline-source-map',
 
@@ -176,7 +163,7 @@ export default merge(baseConfig, {
     },
     onBeforeSetupMiddleware() {
       console.log('Starting Main Process...')
-      mainProcess = spawn('pnpm', ['run', 'start:main'], {
+      spawn('pnpm', ['run', 'start:main'], {
         shell: true,
         env: process.env,
         stdio: 'inherit',

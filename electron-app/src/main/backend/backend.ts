@@ -110,15 +110,4 @@ export default class BackendManager {
       this.process = null
     }
   }
-
-  kill() {
-    // need because if when process.on('exit') event loop exited so async job cannot be processed
-    if (this.process) {
-      console.warn('forcefully kill backend process')
-      const success = this.process.kill()
-      if (!success) {
-        console.error('cannot kill backend process')
-      }
-    }
-  }
 }

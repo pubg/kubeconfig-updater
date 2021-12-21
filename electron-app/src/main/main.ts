@@ -222,11 +222,3 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
-
-// on SIGTERM (SIGINT on windows) it doesn't triggered
-// https://github.com/electron/electron/issues/5273
-// ;(['SIGTERM', 'SIGINT'] as NodeJS.Signals[]).map((sig) =>
-//   process.on(sig, async () => {
-//     manager.kill()
-//   })
-// )
