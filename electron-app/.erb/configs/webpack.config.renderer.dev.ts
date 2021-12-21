@@ -4,7 +4,7 @@ import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import chalk from 'chalk'
 import { merge } from 'webpack-merge'
-import { spawn, execSync } from 'child_process'
+import { spawn, execSync, ChildProcess } from 'child_process'
 import baseConfig from './webpack.config.base'
 import webpackPaths from './webpack.paths'
 import checkNodeEnv from '../scripts/check-node-env'
@@ -31,6 +31,15 @@ if (!requiredByDLLConfig && !(fs.existsSync(webpackPaths.dllPath) && fs.existsSy
   )
   execSync('pnpm run postinstall')
 }
+
+let backendProcess: ChildProcess | null = null
+
+process.on('exit', () => {
+  if (backendProcess && !backendProcess.killed) {
+    console.log('SIGTERM backend process...')
+    backendProcess.kill()
+  }
+})
 
 export default merge(baseConfig, {
   devtool: 'inline-source-map',
@@ -163,7 +172,7 @@ export default merge(baseConfig, {
     },
     onBeforeSetupMiddleware() {
       console.log('Starting Main Process...')
-      spawn('pnpm', ['run', 'start:main'], {
+      backendProcess = spawn('pnpm', ['run', 'start:main'], {
         shell: true,
         env: process.env,
         stdio: 'inherit',
