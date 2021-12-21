@@ -1,93 +1,104 @@
-/* eslint-disable func-names */
+import { action, computed, makeObservable, observable } from 'mobx'
 import React from 'react'
-import { action, computed, flow, makeObservable, observable } from 'mobx'
-import { container, singleton } from 'tsyringe'
+import { IObjectWithKey, Selection } from '@fluentui/react'
 import _ from 'lodash'
-import { ResultCode } from '../../protos/common_pb'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
-import GetAvailableClusterService from '../../services/getAvailableClusters'
-import RegisterClusterService from '../../services/registerClusters'
-import logger from '../../../logger/logger'
 
 export const ClusterMetadataStoreContext = React.createContext<ClusterMetadataStore | null>(null)
 
-export const useStore = (): ClusterMetadataStore => {
+export function useStore() {
   const store = React.useContext(ClusterMetadataStoreContext)
   if (!store) {
-    throw new Error('tried to use ClusterMetadataStoreContext but object is null.')
+    throw new Error()
+    // throw new Error(`tried to use ${ClusterMetadataStore.name} but context is null.`)
   }
 
   return store
 }
 
-export interface MetadataItem {
-  data: AggregatedClusterMetadata.AsObject & {
-    metadata: NonNullable<AggregatedClusterMetadata.AsObject['metadata']>
-  }
-  /** @deprecated unused */
-  selected?: boolean
+export type ClusterMetadata = AggregatedClusterMetadata.AsObject & {
+  metadata: NonNullable<AggregatedClusterMetadata.AsObject['metadata']>
 }
 
-export type Filter = (metadata: MetadataItem) => boolean
+export interface ClusterMetadataItem extends IObjectWithKey {
+  data: ClusterMetadata
+}
 
-// REFACTOR: this store is trying to be "god class" should break down this
-@singleton()
+export namespace ClusterMetadataItem {
+  export function fromObject(metadata: AggregatedClusterMetadata): ClusterMetadataItem {
+    const data = metadata.toObject() as ClusterMetadata
+    return {
+      key: data.metadata.clustername,
+      data,
+    }
+  }
+}
+
+/**
+ * predicate of ListItemFilter
+ */
+export type ClusterMetadataItemFilter = (item: ClusterMetadataItem) => boolean
+
+/**
+ * ListItemStore manages cluster metadata list used for UI
+ */
 export class ClusterMetadataStore {
   constructor() {
     makeObservable(this)
   }
 
-  // TODO: computed decorator for array? consider render/compute optimization
   @observable
-  items: MetadataItem[] = []
-
-  @observable
-  state: 'fetching' | 'ready' = 'ready'
-
-  @observable
-  filter: Filter | null = null
+  items: ClusterMetadataItem[] = []
 
   @action
-  setFilter(filter: Filter | null) {
-    this.filter = filter
+  setItems(items: ClusterMetadataItem[]) {
+    this.items = items
+    this.resetSelection()
   }
 
   @computed
   // eslint-disable-next-line class-methods-use-this
-  get tags(): string[] {
-    // TODO: group 에 사용되는 태그를 보여줌
+  get tags(): [string, string][] {
     return []
   }
 
   @observable
-  selectedItems: MetadataItem[] = []
+  filter: ClusterMetadataItemFilter | null = null
 
   @action
-  setSelectedItems(items: MetadataItem[]) {
-    this.selectedItems = items
+  setFilter(predicate: ClusterMetadataItemFilter | null) {
+    this.filter = predicate
   }
 
-  fetchMetadata = flow(function* (this: ClusterMetadataStore) {
-    this.state = 'fetching'
-    this.items = []
-
-    const fetch = async () => {
-      const req = container.resolve(GetAvailableClusterService)
-      const res = await req.request()
-
-      return res.getClustersList()
-    }
-
-    try {
-      const clusterList: AggregatedClusterMetadata[] = yield fetch()
-
-      this.items = clusterList.map((metadata) => ({
-        data: metadata.toObject(),
-      })) as MetadataItem[]
-    } catch (e) {
-      logger.error(e)
-    }
-
-    this.state = 'ready'
+  readonly selectionRef = new Selection<ClusterMetadataItem>({
+    onSelectionChanged: () => {
+      this.updateSelection()
+    },
   })
+
+  @observable
+  private _selection = this.selectionRef
+
+  @computed
+  get selection(): Selection<ClusterMetadataItem> {
+    return this._selection
+  }
+
+  @action
+  updateSelection(): void {
+    // to make mobX knows the value is changed, we make a shallow copy of ref instance
+    this._selection = _.clone(this.selectionRef)
+  }
+
+  // TODO: should I use this? can I just use instance field?
+  @computed
+  get selectedItems() {
+    return this.selection.getSelection()
+  }
+
+  @action
+  // eslint-disable-next-line class-methods-use-this
+  resetSelection() {
+    this.selectionRef.setAllSelected(false)
+  }
 }

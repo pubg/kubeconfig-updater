@@ -1,30 +1,22 @@
 import { flow, makeObservable, observable } from 'mobx'
 import React from 'react'
 import { container, injectable } from 'tsyringe'
-import logger from '../../../logger/logger'
-import { ResultCode } from '../../protos/common_pb'
-import RegisterClusterService from '../../services/registerClusters'
+import logger from '../../logger/logger'
+import { ResultCode } from '../protos/common_pb'
+import RegisterClusterService from '../services/registerClusters'
 
 type RequestType = {
   clusterName: string
   accountId: string
 }
 
-export const ClusterRegisterRequesterContext = React.createContext<ClusterRegisterRequester | null>(null)
-
-export const useStore = (): ClusterRegisterRequester => {
-  const store = React.useContext(ClusterRegisterRequesterContext)
-  if (!store) {
-    throw new Error('tried to use ClusterRegisterRequester but object is null')
-  }
-
-  return store
-}
-
+/**
+ * manages Cluster Register Request to backend
+ */
 @injectable()
 export class ClusterRegisterRequester {
   @observable
-  state: 'ready' | 'processing' | 'finished' = 'ready'
+  state: 'ready' | 'processing' = 'ready'
 
   @observable
   length = 0
@@ -37,6 +29,7 @@ export class ClusterRegisterRequester {
   }
 
   request = flow(function* (this: ClusterRegisterRequester, items: RequestType[]) {
+    logger.info(`requesting cluster register ${items.length} items`)
     this.length = items.length
     this.processedCount = 0
 
@@ -46,6 +39,9 @@ export class ClusterRegisterRequester {
       try {
         yield (async () => {
           const req = container.resolve(RegisterClusterService)
+          logger.debug(
+            `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
+          )
           const res = await req.request(item.clusterName, item.accountId)
 
           if (res.getStatus() !== ResultCode.SUCCESS) {
@@ -59,6 +55,18 @@ export class ClusterRegisterRequester {
       this.processedCount += 1
     }
 
-    this.state = 'finished'
+    this.state = 'ready'
+    logger.info('finished cluster register request')
   })
+}
+
+export const ClusterRegisterRequesterContext = React.createContext<ClusterRegisterRequester | null>(null)
+
+export const useContext = (): ClusterRegisterRequester => {
+  const store = React.useContext(ClusterRegisterRequesterContext)
+  if (!store) {
+    throw new Error('tried to use ClusterRegisterRequester but object is null')
+  }
+
+  return store
 }

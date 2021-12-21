@@ -1,40 +1,35 @@
-import path from 'path';
-import fs from 'fs';
-import webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import chalk from 'chalk';
-import { merge } from 'webpack-merge';
-import { spawn, execSync } from 'child_process';
-import baseConfig from './webpack.config.base';
-import webpackPaths from './webpack.paths';
-import checkNodeEnv from '../scripts/check-node-env';
-import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import path from 'path'
+import fs from 'fs'
+import webpack from 'webpack'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import chalk from 'chalk'
+import { merge } from 'webpack-merge'
+import { spawn, execSync, ChildProcess } from 'child_process'
+import baseConfig from './webpack.config.base'
+import webpackPaths from './webpack.paths'
+import checkNodeEnv from '../scripts/check-node-env'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 if (process.env.NODE_ENV === 'production') {
-  checkNodeEnv('development');
+  checkNodeEnv('development')
 }
 
-const port = process.env.PORT || 1212;
-const manifest = path.resolve(webpackPaths.dllPath, 'renderer.json');
-const requiredByDLLConfig = module.parent.filename.includes(
-  'webpack.config.renderer.dev.dll'
-);
+const port = process.env.PORT || 1212
+const manifest = path.resolve(webpackPaths.dllPath, 'renderer.json')
+const requiredByDLLConfig = module.parent.filename.includes('webpack.config.renderer.dev.dll')
 
 /**
  * Warn if the DLL is not built
  */
-if (
-  !requiredByDLLConfig &&
-  !(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))
-) {
+if (!requiredByDLLConfig && !(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))) {
   console.log(
     chalk.black.bgYellow.bold(
       'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
     )
-  );
-  execSync('pnpm run postinstall');
+  )
+  execSync('pnpm run postinstall')
 }
 
 export default merge(baseConfig, {
@@ -153,7 +148,12 @@ export default merge(baseConfig, {
     port,
     compress: true,
     hot: true,
-    headers: { 'Access-Control-Allow-Origin': '*' },
+    headers: {
+      Origin: '*',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': '*',
+      'Access-Control-Allow-Headers': '*',
+    },
     static: {
       publicPath: '/',
     },
@@ -162,14 +162,14 @@ export default merge(baseConfig, {
       disableDotRule: false,
     },
     onBeforeSetupMiddleware() {
-      console.log('Starting Main Process...');
+      console.log('Starting Main Process...')
       spawn('pnpm', ['run', 'start:main'], {
         shell: true,
         env: process.env,
         stdio: 'inherit',
       })
         .on('close', (code) => process.exit(code))
-        .on('error', (spawnError) => console.error(spawnError));
+        .on('error', (spawnError) => console.error(spawnError))
     },
   },
-});
+})

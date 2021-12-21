@@ -16,6 +16,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'prettier/prettier': 'warn',
     'no-restricted-syntax': ['off'],
+    '@typescript-eslint/no-namespace': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,

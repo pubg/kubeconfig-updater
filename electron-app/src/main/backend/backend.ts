@@ -1,12 +1,11 @@
+/* eslint-disable no-console */
 import _ from 'lodash'
 import { exec, ChildProcess } from 'child_process'
 import { inject, injectable, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
 import 'util'
-import * as util from 'util'
-import { CoreExecCmd, CoreExecCwd } from './symbols'
-import sleep from '../../renderer/utils/sleep'
+import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './symbols'
 import logger from '../../logger/logger'
 
 /**
@@ -36,9 +35,14 @@ export default class BackendManager {
     return this._grpbWebPort
   }
 
-  constructor(@inject(CoreExecCmd) private readonly cmd: string, @inject(CoreExecCwd) private readonly cwd: string) {
-    this._grpcPort = _.random(10000, 20000, false)
-    this._grpbWebPort = _.random(10000, 20000, false)
+  constructor(
+    @inject(BackendExecCmd) private readonly cmd: string,
+    @inject(BackendExecCwd) private readonly cwd: string,
+    @inject(BackendGrpcPort) grpcPort?: number,
+    @inject(BackendGrpcWebPort) grpcWebPort?: number
+  ) {
+    this._grpcPort = grpcPort ?? _.random(10000, 20000, false)
+    this._grpbWebPort = grpcWebPort ?? _.random(10000, 20000, false)
   }
 
   start() {

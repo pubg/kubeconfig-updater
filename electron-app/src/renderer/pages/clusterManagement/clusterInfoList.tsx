@@ -1,69 +1,142 @@
 import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
-import { IObjectWithKey, ISelection, Selection } from '@fluentui/react/lib/DetailsList'
+import { Selection } from '@fluentui/react/lib/DetailsList'
+import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { Fragment, useEffect, useMemo, useState } from 'react'
-import { MetadataItem, useStore } from './clusterMetadataStore'
+import { useMemo, useState } from 'react'
+import LINQ from 'linq'
+import logger from '../../../logger/logger'
+import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
+import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 
-interface ListItem extends IObjectWithKey {
-  clusterName: string
-  credentialsResolverId: string
-  tags: Map<string, string>
+/*
+const columns: IColumn[] = [
+  {
+    key: 'clusterName',
+    name: 'Cluster Name',
+    fieldName: 'clusterName',
+    minWidth: 0,
+    isResizable: true,
+    onRender: (item: ClusterInfo) => {
+      return <Typography variant="body1">{item.clusterName}</Typography>
+    },
+  },
+  {
+    key: 'vendor',
+    name: 'Infra Vendor',
+    fieldName: 'vendor',
+    minWidth: 0,
+    isResizable: true,
+    onRender: (item: ClusterInfo) => {
+      return <Typography variant="body1">{item.vendor}</Typography>
+    },
+  },
+  {
+    key: 'account',
+    name: 'Account',
+    fieldName: 'account',
+    minWidth: 256,
+    isResizable: true,
+    onRender: (item: ClusterInfo) => {
+      return <Typography variant="body1">{item.account}</Typography>
+    },
+  },
+  {
+    key: 'status',
+    name: 'Status',
+    minWidth: 0,
+    isResizable: true,
+    onRender: (item: ClusterInfo) => {
+      return (
+        <Typography variant="body1" color={colorFormatForStatus(item.status)}>
+          {item.status}
+        </Typography>
+      )
+    },
+  },
+  {
+    key: 'action',
+    name: 'action',
+    minWidth: 64,
+    isResizable: true,
+    onRender: (item: ClusterInfo) => {
+      return (
+        <IconButton
+          color="primary"
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            setMenuAnchor(e.currentTarget)
+          }}
+        >
+          <MoreVertOutlined />
+        </IconButton>
+      )
+    },
+  },
+]
+*/
 
-  data: MetadataItem
-}
-
-function tagArrayToMap(arr: [string, string][]): Map<string, string> {
-  return arr.reduce((map, [k, v]) => map.set(k, v), new Map<string, string>())
-}
-
-function ClusterInfoList() {
+export default observer(function ClusterInfoList() {
   const store = useStore()
 
-  // variables
-  // QUESTION: should I use setSelection? does it notify other components to update?
-  const [selection, setSelection] = useState(
-    new Selection<ListItem>({
-      onSelectionChanged: () => {
-        store.setSelectedItems(selection.getSelection().map((item) => item.data))
+  const [descending, setDescending] = useState(false)
+
+  // TODO: add dyanmic column add/delete
+  const columns = useMemo<IColumn[]>(() => {
+    return [
+      {
+        key: 'clusterName',
+        name: 'Cluster Name',
+        minWidth: 0,
+        isResizable: true,
+        onRender: (item: ClusterMetadataItem) => {
+          return <Typography>{item.data.metadata.clustername}</Typography>
+        },
       },
-    })
-  )
+      {
+        key: 'status',
+        name: 'Status',
+        minWidth: 0,
+        isResizable: true,
+        onRender(item: ClusterMetadataItem) {
+          switch (item.data.status) {
+            case ClusterInformationStatus.REGISTERED_OK:
+              return <Typography>Registered</Typography>
 
-  const items = useMemo((): ListItem[] => {
-    const filteredItems = store.filter ? store.items.filter(store.filter) : store.items
+            case ClusterInformationStatus.SUGGESTION_OK:
+              return <Typography>Not Registered</Typography>
 
-    return filteredItems.map((item) => ({
-      clusterName: item.data.metadata.clustername,
-      tags: tagArrayToMap(item.data.metadata.clustertagsMap),
-      credentialsResolverId: item.data.metadata.credresolverid,
-      data: item,
-    }))
-  }, [store.items, store.filter])
+            case ClusterInformationStatus.REGISTERED_UNKNOWN:
+              return <Typography>Unknown</Typography>
 
-  const columns: IColumn[] = [
-    {
-      key: 'clusterName',
-      fieldName: 'clusterName',
-      name: 'Cluster Name',
-      minWidth: 0,
-    },
-    {
-      key: 'credentialsResolverId',
-      fieldName: 'credentialsResolverId',
-      name: 'Credentials Resolver Id',
-      minWidth: 0,
-    },
-  ]
+            default:
+              return <Typography>Error</Typography>
+          }
+        },
+      },
+    ]
+  }, [])
 
-  // TODO:
+  const items = useMemo<ClusterMetadataItem[]>(() => {
+    let linq = LINQ.from(store.items).where(store.filter ?? (() => true))
+
+    // TODO: add sorting key selector
+    const sortKeySelector = ({ data }: ClusterMetadataItem) => data.metadata.clustername
+    linq = descending ? linq.orderByDescending(sortKeySelector) : linq.orderBy(sortKeySelector)
+
+    return linq.toArray()
+  }, [descending, store.filter, store.items])
+
+  // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
 
   return (
     <>
-      <DetailsList columns={columns} items={items} onColumnHeaderClick={onHeaderNameClicked} selection={selection as Selection} />
+      <DetailsList
+        columns={columns}
+        items={items}
+        onColumnHeaderClick={onHeaderNameClicked}
+        selection={store.selectionRef as Selection}
+      />
       {/* <Menu></Menu> */}
     </>
   )
-}
-
-export default observer(ClusterInfoList)
+})

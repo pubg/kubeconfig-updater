@@ -423,8 +423,29 @@ export class KubeconfigClient {
     this.methodInfoSyncAvailableClusters);
   }
 
+}
+
+export class ApplicationClient {
+  client_: grpcWeb.AbstractClientBase;
+  hostname_: string;
+  credentials_: null | { [index: string]: string; };
+  options_: null | { [index: string]: any; };
+
+  constructor (hostname: string,
+               credentials?: null | { [index: string]: string; },
+               options?: null | { [index: string]: any; }) {
+    if (!options) options = {};
+    if (!credentials) credentials = {};
+    options['format'] = 'binary';
+
+    this.client_ = new grpcWeb.GrpcWebClientBase(options);
+    this.hostname_ = hostname;
+    this.credentials_ = credentials;
+    this.options_ = options;
+  }
+
   methodInfoPing = new grpcWeb.MethodDescriptor(
-    '/kubeconfig.Kubeconfig/Ping',
+    '/kubeconfig.Application/Ping',
     grpcWeb.MethodType.UNARY,
     protos_common_pb.CommonReq,
     protos_common_pb.CommonRes,
@@ -452,7 +473,7 @@ export class KubeconfigClient {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/kubeconfig.Kubeconfig/Ping',
+          '/kubeconfig.Application/Ping',
         request,
         metadata || {},
         this.methodInfoPing,
@@ -460,10 +481,53 @@ export class KubeconfigClient {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/kubeconfig.Kubeconfig/Ping',
+      '/kubeconfig.Application/Ping',
     request,
     metadata || {},
     this.methodInfoPing);
+  }
+
+  methodInfoVersion = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Application/Version',
+    grpcWeb.MethodType.UNARY,
+    protos_common_pb.CommonReq,
+    protos_common_pb.CommonRes,
+    (request: protos_common_pb.CommonReq) => {
+      return request.serializeBinary();
+    },
+    protos_common_pb.CommonRes.deserializeBinary
+  );
+
+  version(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
+
+  version(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
+
+  version(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Application/Version',
+        request,
+        metadata || {},
+        this.methodInfoVersion,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Application/Version',
+    request,
+    metadata || {},
+    this.methodInfoVersion);
   }
 
 }
