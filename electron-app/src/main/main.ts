@@ -60,6 +60,7 @@ if (isProduction) {
 logger.debug(`isPacked: ${app.isPackaged}`)
 logger.debug(`getAppPath: ${app.getAppPath()}`)
 logger.debug(`getPath('exe'): ${app.getPath('exe')}`)
+logger.debug(`env.NO_BACKEND: ${process.env.NO_BACKEND}`)
 
 if (app.isPackaged) {
   const parsedPath = path.parse(app.getPath('exe'))
@@ -82,11 +83,15 @@ if (app.isPackaged) {
       useValue: './kubeconfig-updater-backend',
     })
   }
+  container.register(BackendGrpcPort, { useValue: 0 })
+  container.register(BackendGrpcWebPort, { useValue: 0 })
 } else {
   container.register(BackendExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
   container.register(BackendExecCmd, { useValue: 'go run main.go server' })
+  container.register(BackendGrpcPort, { useValue: 10980 })
+  container.register(BackendGrpcWebPort, { useValue: 10981 })
 }
 
 const installExtensions = async () => {
@@ -176,23 +181,6 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
-// TODO: change this
-if (isDevelopment) {
-  container.register(BackendGrpcPort, { useValue: 10980 })
-  container.register(BackendGrpcWebPort, { useValue: 10981 })
-} else {
-  container.register(BackendGrpcPort, { useValue: 0 })
-  container.register(BackendGrpcWebPort, { useValue: 0 })
-}
-
-const manager = container.resolve(BackendManager)
-logger.debug(`NO_BACKEND: ${process.env.NO_BACKEND}`)
-if (process.env.NO_BACKEND) {
-  logger.warn('starting without backend...')
-} else {
-  manager.start()
-}
-
 app
   .whenReady()
   .then(() => {
@@ -202,10 +190,18 @@ app
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow()
     })
+
+    if (process.env.NO_BACKEND) {
+      logger.warn('starting without backend...')
+    } else {
+      const manager = container.resolve(BackendManager)
+      manager.start()
+    }
   })
   .catch(logger.error)
 
 ipcMain.on('getGrpcWebPort', (event) => {
+  const manager = container.resolve(BackendManager)
   logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
   event.returnValue = manager.grpbWebPort
 })
@@ -219,6 +215,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', async (event) => {
+  const manager = container.resolve(BackendManager)
   if (manager.status === 'running') {
     event.preventDefault()
     await manager.end()
