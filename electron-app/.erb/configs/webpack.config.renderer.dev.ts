@@ -40,12 +40,12 @@ process.on('exit', () => {
     const success = mainProcess.kill()
 
     if (!success) {
-      console.error('cannot kill main process')
+      console.error('cannot kill backend process')
     }
   }
 })
 
-export default merge(baseConfig, { 
+export default merge(baseConfig, {
   devtool: 'inline-source-map',
 
   mode: 'development',
