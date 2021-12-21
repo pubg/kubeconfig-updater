@@ -199,13 +199,6 @@ app
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow()
     })
-
-    // on SIGTERM (SIGINT on windows) it doesn't triggered
-    // https://github.com/electron/electron/issues/5273
-    // backend manager finalizer when unexpected exit
-    process.on('exit', async () => {
-      manager.kill()
-    })
   })
   .catch(logger.error)
 
@@ -229,3 +222,11 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
+
+// on SIGTERM (SIGINT on windows) it doesn't triggered
+// https://github.com/electron/electron/issues/5273
+// ;(['SIGTERM', 'SIGINT'] as NodeJS.Signals[]).map((sig) =>
+//   process.on(sig, async () => {
+//     manager.kill()
+//   })
+// )
