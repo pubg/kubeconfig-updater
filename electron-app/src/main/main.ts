@@ -216,3 +216,8 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
+
+// backend manager finalizer when unexpected exit
+process.on('beforeExit', async () => {
+  await manager.end()
+})
