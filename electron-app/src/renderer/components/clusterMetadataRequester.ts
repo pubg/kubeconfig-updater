@@ -6,6 +6,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import GetAvailableClusterService from '../services/getAvailableClusters'
 import SyncAvailableClustersService from '../services/syncAvailableClusters'
+import logger from '../../logger/logger'
 
 /**
  * manages cluster metadata requesting
@@ -26,8 +27,10 @@ export class ClusterMetadataRequester {
   // minute
   ResyncInterval = 5
 
+  private readonly syncedString = 'lastSynced'
+
   @observable
-  private _lastSynced: Dayjs | null = null
+  private _lastSynced: Dayjs | null = dayjs(localStorage.getItem(this.syncedString))
 
   get lastSynced(): Dayjs | null {
     return this._lastSynced
@@ -35,6 +38,7 @@ export class ClusterMetadataRequester {
 
   set lastSynced(time: Dayjs | null) {
     this._lastSynced = time
+    localStorage.setItem(this.syncedString, (time ?? dayjs('1970-01-01')).toISOString())
   }
 
   get shouldResync(): boolean {
@@ -42,8 +46,7 @@ export class ClusterMetadataRequester {
       return true
     }
 
-    const now = dayjs()
-    if (now.diff(this.lastSynced, 'minute') >= this.ResyncInterval) {
+    if (dayjs().diff(this.lastSynced, 'minute') >= this.ResyncInterval) {
       return true
     }
 
@@ -54,22 +57,24 @@ export class ClusterMetadataRequester {
     this.items = []
 
     if (this.shouldResync) {
+      logger.debug('request backend cluster metadata sync')
       this.state = 'in-sync'
 
       try {
         yield ClusterMetadataRequester.sync()
       } catch (e) {
-        console.error(e)
+        logger.error(e)
       }
     }
 
+    logger.debug('request backend cluster metadata fetch')
     this.state = 'fetch'
 
     try {
       this.items = yield ClusterMetadataRequester.fetch()
     } catch (e) {
       // TODO: replace this to winston logger
-      console.error(e)
+      logger.error(e)
     }
 
     this.state = 'ready'
