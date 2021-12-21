@@ -1,12 +1,12 @@
 import { Button, Stack, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
-import * as MetadataSelectionListStore from './clusterMetadataStore'
+import * as clusterMetadataStore from './clusterMetadataStore'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
 import * as ClusterRegisterRequester from '../../components/clusterRegisterRequester'
 
 export default observer(function BottomBar() {
-  const store = MetadataSelectionListStore.useStore()
+  const store = clusterMetadataStore.useStore()
   const metadataRequester = ClusterMetadataRequester.useContext()
   const registerRequester = ClusterRegisterRequester.useContext()
 
@@ -40,7 +40,7 @@ export default observer(function BottomBar() {
         Register ALL
       </Button>
       {/* on ready (selecting items...) */}
-      {showSelection && <Typography>{store.selectedItems.length} Clusters Selected.</Typography>}
+      {showSelection && <Typography>{store.selection.count} Clusters Selected.</Typography>}
     </Stack>
   )
 })

@@ -2,6 +2,7 @@ import { action, computed, makeAutoObservable, makeObservable, observable } from
 import React from 'react'
 import { singleton } from 'tsyringe'
 import { IObjectWithKey, Selection } from '@fluentui/react'
+import _ from 'lodash'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
 
 export const ClusterMetadataStoreContext = React.createContext<ClusterMetadataStore | null>(null)
@@ -69,20 +70,35 @@ export class ClusterMetadataStore {
     this.filter = predicate
   }
 
-  selection = makeAutoObservable(new Selection<ClusterMetadataItem>(), undefined)
+  readonly selectionRef = new Selection<ClusterMetadataItem>({
+    onSelectionChanged: () => {
+      this.updateSelection()
+    },
+  })
 
+  @observable
+  private _selection = this.selectionRef
+
+  @computed
+  get selection(): Selection<ClusterMetadataItem> {
+    return this._selection
+  }
+
+  @action
+  updateSelection(): void {
+    // to make mobX knows the value is changed, we make a shallow copy of ref instance
+    this._selection = _.clone(this.selectionRef)
+  }
+
+  // TODO: should I use this? can I just use instance field?
   @computed
   get selectedItems() {
     return this.selection.getSelection()
   }
 
   @action
-  setSelectedItems(selection: Selection<ClusterMetadataItem>) {
-    this.selection = selection
-  }
-
-  @action
+  // eslint-disable-next-line class-methods-use-this
   resetSelection() {
-    this.selection = new Selection()
+    this.selectionRef.toggleRangeSelected(0, 0)
   }
 }

@@ -2,8 +2,9 @@ import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { useMemo } from 'react'
-import { ClusterMetadataItem, ClusterMetadataStore, useStore } from './clusterMetadataStore'
+import { useMemo, useState } from 'react'
+import logger from '../../../logger/logger'
+import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 
 /*
 const columns: IColumn[] = [
@@ -72,8 +73,7 @@ const columns: IColumn[] = [
 */
 
 export default observer(function ClusterInfoList() {
-  let store: ClusterMetadataStore | null = null
-  store = useStore()
+  const store = useStore()
 
   // TODO: add dyanmic column add/delete
   const columns = useMemo<IColumn[]>(() => {
@@ -101,7 +101,7 @@ export default observer(function ClusterInfoList() {
         columns={columns}
         items={store.items}
         onColumnHeaderClick={onHeaderNameClicked}
-        selection={store.selection as Selection}
+        selection={store.selectionRef as Selection}
       />
       {/* <Menu></Menu> */}
     </>
