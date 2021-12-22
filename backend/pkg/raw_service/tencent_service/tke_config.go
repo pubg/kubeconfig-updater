@@ -1,4 +1,4 @@
-package tke_helper
+package tencent_service
 
 import (
 	"io/ioutil"

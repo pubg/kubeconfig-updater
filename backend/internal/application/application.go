@@ -10,8 +10,8 @@ import (
 	"syscall"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"github.com/pubg/kubeconfig-updater/backend/controller/application_service"
-	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_service"
+	"github.com/pubg/kubeconfig-updater/backend/controller/application_controller"
+	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_controller"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/internal/common"
@@ -28,9 +28,10 @@ type ServerApplication struct {
 	CredResolverConfigStorage             *cred_resolver_config_persist.CredResolverConfigStorage
 	AggreagtedClusterMetadataCacheStorage *cluster_metadata_persist.AggregatedClusterMetadataStorage
 
-	CredService     *cred_resolver_service.CredResolverService
-	RegisterService *cluster_register_service.ClusterRegisterService
-	MetaService     *cluster_metadata_service.ClusterMetadataService
+	CredService      *cred_resolver_service.CredResolveService
+	CredStoreService *cred_resolver_service.CredResolverStoreService
+	RegisterService  *cluster_register_service.ClusterRegisterService
+	MetaService      *cluster_metadata_service.ClusterMetadataService
 
 	KubeconfigController  protos.KubeconfigServer
 	ApplicationController protos.ApplicationServer
@@ -130,22 +131,22 @@ func (s *ServerApplication) initApplicationConfig(basPath string) error {
 func (s *ServerApplication) initControllerLayer(useMockController bool) {
 	s.GrpcServer = grpc.NewServer()
 	reflection.Register(s.GrpcServer)
-	protos.RegisterApplicationServer(s.GrpcServer, application_service.NewController())
+	protos.RegisterApplicationServer(s.GrpcServer, application_controller.NewController())
 	if useMockController {
-		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_service.NewMockController())
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewMockController())
 	} else {
-		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_service.NewKubeconfigService(s.CredService, s.RegisterService, s.MetaService))
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.RegisterService, s.MetaService))
 	}
 
-	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer, grpcweb.WithOriginFunc(func(_ string) bool { return true }))
+	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-		if wrappedGrpc.IsAcceptableGrpcCorsRequest(req) || wrappedGrpc.IsGrpcWebRequest(req) {
+		if wrappedGrpc.IsGrpcWebRequest(req) {
 			wrappedGrpc.ServeHTTP(res, req)
 			return
 		}
 		fmt.Println("Web Requests")
-		// Fall back to other servers.
+		// Fallback to other servers.
 		// TODO: Add Grpc-Web Swagger
 		http.DefaultServeMux.ServeHTTP(res, req)
 	})
@@ -155,8 +156,9 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 
 func (s *ServerApplication) initServiceLayer() {
 	//Where is DI?
-	s.CredService = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
-	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
+	s.CredService = cred_resolver_service.NewCredResolveService()
+	s.CredStoreService = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
+	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
 	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService)
 }
 

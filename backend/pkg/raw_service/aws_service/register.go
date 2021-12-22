@@ -1,4 +1,4 @@
-package eks_helper
+package aws_service
 
 import (
 	"errors"

@@ -1,4 +1,4 @@
-package kubeconfig_service
+package kubeconfig_controller
 
 import (
 	"context"

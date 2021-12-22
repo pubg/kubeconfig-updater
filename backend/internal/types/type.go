@@ -8,4 +8,8 @@ const (
 	CLUSTERTAGS_ClusterRegion = "ClusterRegion"
 	CLUSTERTAGS_ClusterId     = "ClusterId"
 	CLUSTERTAGS_ResourceGroup = "ResourceGroup"
+
+	CREDRESOLVER_ATTRIBUTE_PROFILE = "profile"
+
+	VERSION = "dev-build"
 )

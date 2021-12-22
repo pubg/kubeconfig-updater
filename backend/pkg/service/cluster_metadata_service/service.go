@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
 	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
@@ -17,13 +17,14 @@ type ClusterMetadataResolver interface {
 }
 
 type ClusterMetadataService struct {
-	credService *cred_resolver_service.CredResolverService
-	cache       *cluster_metadata_persist.AggregatedClusterMetadataStorage
-	cfg         *configs.ApplicationConfig
+	credService      *cred_resolver_service.CredResolveService
+	credStoreService *cred_resolver_service.CredResolverStoreService
+	cache            *cluster_metadata_persist.AggregatedClusterMetadataStorage
+	cfg              *configs.ApplicationConfig
 }
 
-func NewClusterMetadataService(credService *cred_resolver_service.CredResolverService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage, cfg *configs.ApplicationConfig) *ClusterMetadataService {
-	return &ClusterMetadataService{credService: credService, cache: cache, cfg: cfg}
+func NewClusterMetadataService(credService *cred_resolver_service.CredResolveService, credStoreService *cred_resolver_service.CredResolverStoreService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage, cfg *configs.ApplicationConfig) *ClusterMetadataService {
+	return &ClusterMetadataService{credService: credService, credStoreService: credStoreService, cache: cache, cfg: cfg}
 }
 
 func (s *ClusterMetadataService) ListClusterMetadatas() []*protos.AggregatedClusterMetadata {
@@ -133,7 +134,7 @@ func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResol
 		metaResolvers = append(metaResolvers, resolver)
 	}
 
-	credResolvers := s.credService.ListCredResolvers()
+	credResolvers := s.credStoreService.ListCredResolvers()
 	for _, cr := range credResolvers {
 		if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_AWS) {
 			awsResolver, err := NewAwsResolver(cr, cr.AccountId, s.credService)

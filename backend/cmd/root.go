@@ -18,14 +18,14 @@ package cmd
 import (
 	"github.com/pubg/kubeconfig-updater/backend/cmd/register"
 	"github.com/pubg/kubeconfig-updater/backend/cmd/server"
-	"github.com/pubg/kubeconfig-updater/backend/internal/versions"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/spf13/cobra"
 )
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:     "kubeconfig-updater",
-	Version: versions.GetVersion(),
+	Version: types.VERSION,
 	Short:   "EKS, AKS, TKE에 대한 접속 정보를 ~/.kube/config 파일에 등록할 수 있습니다",
 	Long:    ``,
 }

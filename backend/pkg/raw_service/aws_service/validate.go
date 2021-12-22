@@ -1,7 +1,8 @@
-package eks_helper
+package aws_service
 
 import (
 	"fmt"
+
 	"github.com/pubg/kubeconfig-updater/backend/internal/common"
 	"github.com/tidwall/gjson"
 )

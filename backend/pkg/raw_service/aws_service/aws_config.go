@@ -1,10 +1,12 @@
-package eks_helper
+package aws_service
 
 import (
 	"fmt"
-	"gopkg.in/ini.v1"
 	"os"
 	"path/filepath"
+
+	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"gopkg.in/ini.v1"
 )
 
 func GetProfiles() ([]string, error) {
@@ -48,7 +50,7 @@ func GetProfiles() ([]string, error) {
 }
 
 func GetProfilesFromConfig() ([]string, error) {
-	awsDir, err := getAWSDirectoryPath()
+	awsDir, err := getAwsDirectoryPath()
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func GetProfilesFromConfig() ([]string, error) {
 }
 
 func GetProfilesFromCredentials() ([]string, error) {
-	awsDir, err := getAWSDirectoryPath()
+	awsDir, err := getAwsDirectoryPath()
 	if err != nil {
 		return nil, err
 	}
@@ -105,13 +107,6 @@ func GetProfilesFromCredentials() ([]string, error) {
 	return profileNames, nil
 }
 
-func getAWSDirectoryPath() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	configPath := filepath.Join(homeDir, ".aws")
-
-	return configPath, nil
+func getAwsDirectoryPath() (string, error) {
+	return common.ResolvePathToAbs(filepath.Join("~", ".aws"))
 }

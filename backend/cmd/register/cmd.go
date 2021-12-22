@@ -3,9 +3,9 @@ package register
 import (
 	"fmt"
 
-	"github.com/pubg/kubeconfig-updater/backend/internal/aks_helper"
-	"github.com/pubg/kubeconfig-updater/backend/internal/eks_helper"
-	"github.com/pubg/kubeconfig-updater/backend/internal/tke_helper"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/spf13/cobra"
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 )
@@ -13,8 +13,8 @@ import (
 func Cmd() *cobra.Command {
 	clusterCmd := &cobra.Command{
 		Use:   "register",
-		Short: "단일 클러스터를 등록",
-		Long:  "Short 설명을 봐주세요.",
+		Short: "Register a Single Cluster",
+		Long:  "",
 	}
 
 	clusterCmd.AddCommand(eksCommand())
@@ -27,17 +27,17 @@ func Cmd() *cobra.Command {
 func eksCommand() *cobra.Command {
 	var eksCmd = &cobra.Command{
 		Use:   "eks REGION CLUSTER-NAME",
-		Short: "단일 EKS 클러스터 등록",
-		Long:  ``,
+		Short: "Register EKS Cluster",
+		Long:  "",
 		Args:  cobra.ExactValidArgs(2),
 	}
 	var awsProfile string
-	eksCmd.Flags().StringVar(&awsProfile, "aws-profile", "", "aws profile name to use. (if empty, use default credential chain)")
+	eksCmd.Flags().StringVar(&awsProfile, "profile", "", "aws profile name to use. (if empty, use default credential chain)")
 
 	eksCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		region := args[0]
 		clusterName := args[1]
-		err := eks_helper.RegisterEksWithIamUser(clusterName, region, awsProfile)
+		err := aws_service.RegisterEksWithIamUser(clusterName, region, awsProfile)
 		if err != nil {
 			return err
 		}
@@ -50,8 +50,8 @@ func eksCommand() *cobra.Command {
 func aksCommand() *cobra.Command {
 	var aksCmd = &cobra.Command{
 		Use:   "aks RESOURCE-GROUP CLUSTER-NAME",
-		Short: "단일 AKS 클러스터 등록",
-		Long:  ``,
+		Short: "Register AKS Cluster",
+		Long:  "",
 		Args:  cobra.ExactValidArgs(2),
 	}
 
@@ -59,7 +59,7 @@ func aksCommand() *cobra.Command {
 		resourceGroup := args[0]
 		clusterName := args[1]
 		// TODO: add profile support?
-		return aks_helper.RegisterAksCluster(resourceGroup, clusterName)
+		return azure_service.RegisterAksCluster(resourceGroup, clusterName)
 	}
 
 	return aksCmd
@@ -68,17 +68,17 @@ func aksCommand() *cobra.Command {
 func tkeCommand() *cobra.Command {
 	var tkeCmd = &cobra.Command{
 		Use:   "tke REGION CLUSTER-NAME",
-		Short: "단일 TKE 클러스터 등록",
-		Long:  ``,
+		Short: "Register TKE Cluster",
+		Long:  "",
 		Args:  cobra.ExactValidArgs(2),
 	}
 	var tencentProfile string
-	tkeCmd.Flags().StringVar(&tencentProfile, "tencent-profile", "default", "tencent profile name to use.")
+	tkeCmd.Flags().StringVar(&tencentProfile, "profile", "default", "tencent profile name to use.")
 
 	tkeCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		region := args[0]
 		clusterName := args[1]
-		clusters, err := tke_helper.ListTke(region, tencentProfile)
+		clusters, err := tencent_service.ListTke(region, tencentProfile)
 		if err != nil {
 			return err
 		}
@@ -96,7 +96,7 @@ func tkeCommand() *cobra.Command {
 			return fmt.Errorf("can't find the clusterName(%s) in region(%s)", clusterName, region)
 		}
 
-		err = tke_helper.RegisterTkeCluster(region, *targetCluster.ClusterId, *targetCluster.ClusterName, tencentProfile)
+		err = tencent_service.RegisterTkeCluster(region, *targetCluster.ClusterId, *targetCluster.ClusterName, tencentProfile)
 		if err != nil {
 			return err
 		}

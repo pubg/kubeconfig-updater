@@ -2,11 +2,12 @@ package cluster_metadata_service
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
 func TestFoxResolver_GetCluster(t *testing.T) {
-	resolver, err := NewFoxResolver()
+	resolver, err := NewFoxResolver(os.Getenv("FOX_ADDR"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -24,7 +25,7 @@ func TestFoxResolver_GetCluster(t *testing.T) {
 }
 
 func TestFoxResolver_ListClusters(t *testing.T) {
-	resolver, err := NewFoxResolver()
+	resolver, err := NewFoxResolver(os.Getenv("FOX_ADDR"))
 	if err != nil {
 		t.Error(err)
 	}

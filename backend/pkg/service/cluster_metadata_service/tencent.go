@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
@@ -13,7 +13,7 @@ import (
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 )
 
-func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolverService) (*TencentResolver, error) {
+func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (*TencentResolver, error) {
 	credProvider, err := credService.GetTencentSdkConfig(credCfg)
 	if err != nil {
 		return nil, err

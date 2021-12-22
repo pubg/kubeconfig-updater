@@ -12,49 +12,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
-type CredResolverService struct {
-	store *cred_resolver_config_persist.CredResolverConfigStorage
+type CredResolveService struct {
 }
 
-func NewCredResolverService(store *cred_resolver_config_persist.CredResolverConfigStorage) *CredResolverService {
-	return &CredResolverService{store: store}
+func NewCredResolveService() *CredResolveService {
+	return &CredResolveService{}
 }
 
-func (s *CredResolverService) ListCredResolvers() []*protos.CredResolverConfig {
-	return s.store.ListConfigs()
-}
-
-func (s *CredResolverService) GetCredResolver(credResolverId string) (*protos.CredResolverConfig, bool, error) {
-	if credResolverId == "" {
-		return nil, false, fmt.Errorf("credResolverId should not be empty")
-	}
-
-	cfg, exists := s.store.GetConfig(credResolverId)
-	if !exists {
-		return nil, false, nil
-	}
-	return cfg, true, nil
-}
-
-func (s *CredResolverService) SetCredResolver(cfg *protos.CredResolverConfig) error {
-	if cfg == nil {
-		return fmt.Errorf("credResolverConfig should not be null")
-	}
-
-	return s.store.SetAndSaveConfig(cfg)
-}
-
-func (s *CredResolverService) DeleteCredResolver(credResolverId string) error {
-	return s.store.DeleteConfig(credResolverId)
-}
-
-const attribute_profile = "profile"
-
-func (s *CredResolverService) GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (*aws.Config, string, error) {
+func (s *CredResolveService) GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (*aws.Config, string, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
 		cfg, err := config.LoadDefaultConfig(ctx)
@@ -70,7 +39,7 @@ func (s *CredResolverService) GetAwsSdkConfig(ctx context.Context, credConf *pro
 		if attributes == nil {
 			return nil, "", fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[attribute_profile]
+		profile, exists := attributes[types.CREDRESOLVER_ATTRIBUTE_PROFILE]
 		if !exists {
 			return nil, "", fmt.Errorf("profile attribute should be exist")
 		}
@@ -81,8 +50,8 @@ func (s *CredResolverService) GetAwsSdkConfig(ctx context.Context, credConf *pro
 	}
 }
 
-// Azure Cli는 멀티어카운트를 지원하지 않는다
-func (s *CredResolverService) GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (autorest.Authorizer, error) {
+// GetAzureSdkConfig Azure Cli does not support multi subscription
+func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (autorest.Authorizer, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
 		return auth.NewAuthorizerFromCLI()
@@ -97,7 +66,7 @@ func (s *CredResolverService) GetAzureSdkConfig(ctx context.Context, credConf *p
 	}
 }
 
-func (s *CredResolverService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
+func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
 		return common.DefaultProviderChain(), nil
@@ -110,7 +79,7 @@ func (s *CredResolverService) GetTencentSdkConfig(credConf *protos.CredResolverC
 		if attributes == nil {
 			return nil, fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[attribute_profile]
+		profile, exists := attributes[types.CREDRESOLVER_ATTRIBUTE_PROFILE]
 		if !exists {
 			return nil, fmt.Errorf("profile attribute should be exist")
 		}
@@ -120,7 +89,7 @@ func (s *CredResolverService) GetTencentSdkConfig(credConf *protos.CredResolverC
 	}
 }
 
-// 중국 본토랑 intl이랑 credentials 포맷이 다름
+// TencentIntlProfileProvider China mainland and international cloud's credential file formats are difference
 type TencentIntlProfileProvider struct {
 	profileName string
 }

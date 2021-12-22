@@ -1,4 +1,4 @@
-package aks_helper
+package azure_service
 
 import (
 	"errors"
