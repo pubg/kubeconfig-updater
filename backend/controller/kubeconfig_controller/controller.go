@@ -1,4 +1,4 @@
-package kubeconfig_service
+package kubeconfig_controller
 
 import (
 	"context"
@@ -13,17 +13,17 @@ import (
 type kubeconfigService struct {
 	protos.UnimplementedKubeconfigServer
 
-	credService     *cred_resolver_service.CredResolverService
-	registerService *cluster_register_service.ClusterRegisterService
-	metadataService *cluster_metadata_service.ClusterMetadataService
+	credStoreService *cred_resolver_service.CredResolverStoreService
+	registerService  *cluster_register_service.ClusterRegisterService
+	metadataService  *cluster_metadata_service.ClusterMetadataService
 }
 
-func NewKubeconfigService(credService *cred_resolver_service.CredResolverService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
-	return &kubeconfigService{credService: credService, registerService: registerService, metadataService: metadataService}
+func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverStoreService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
+	return &kubeconfigService{credStoreService: credStoreService, registerService: registerService, metadataService: metadataService}
 }
 
 func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.GetCredResolversRes, error) {
-	cfgs := s.credService.ListCredResolvers()
+	cfgs := s.credStoreService.ListCredResolvers()
 
 	res := &protos.GetCredResolversRes{
 		CommonRes: &protos.CommonRes{
@@ -36,7 +36,7 @@ func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.C
 }
 
 func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.CredResolverConfig) (*protos.CommonRes, error) {
-	err := s.credService.SetCredResolver(req)
+	err := s.credStoreService.SetCredResolver(req)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.Cre
 func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.CredResolversReq) (*protos.CommonRes, error) {
 	cfgs := req.GetConfigs()
 	for _, cfg := range cfgs {
-		err := s.credService.SetCredResolver(cfg)
+		err := s.credStoreService.SetCredResolver(cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -59,7 +59,7 @@ func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.Cr
 }
 
 func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.DeleteCredResolverReq) (*protos.CommonRes, error) {
-	err := s.credService.DeleteCredResolver(cfg.AccountId)
+	err := s.credStoreService.DeleteCredResolver(cfg.AccountId)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
-	cfg, exists, err := s.credService.GetCredResolver(req.AccountId)
+	cfg, exists, err := s.credStoreService.GetCredResolver(req.AccountId)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -120,6 +120,19 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("%s cluster register success", req.ClusterName),
+	}, nil
+}
+
+func (s *kubeconfigService) DeleteCluster(ctx context.Context, req *protos.DeleteClusterReq) (*protos.CommonRes, error) {
+	if req.ClusterName == "" {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_INVALID_ARGUMENT,
+			Message: "ClusterName should not be empty",
+		}, nil
+	}
+	return &protos.CommonRes{
+		Status:  protos.ResultCode_INVALID_ARGUMENT,
+		Message: "ClusterName should not be empty",
 	}, nil
 }
 

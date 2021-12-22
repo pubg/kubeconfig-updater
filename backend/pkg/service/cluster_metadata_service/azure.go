@@ -8,11 +8,11 @@ import (
 	aks "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2021-10-01/containerservice"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAzureResolver(credCfg *protos.CredResolverConfig, tenantId string, credService *cred_resolver_service.CredResolverService) (*AzureResolver, error) {
+func NewAzureResolver(credCfg *protos.CredResolverConfig, tenantId string, credService *cred_resolver_service.CredResolveService) (*AzureResolver, error) {
 	auth, err := credService.GetAzureSdkConfig(context.Background(), credCfg)
 	if err != nil {
 		return nil, err

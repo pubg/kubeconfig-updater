@@ -2,24 +2,16 @@ package cluster_metadata_service
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/kubeconfig_service"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 func NewKubeconfigResolvers() ([]*KubeconfigResolver, error) {
-	kubeconfigPath := os.Getenv("KUBECONFIG")
-	if kubeconfigPath == "" {
-		kubeconfigPath = filepath.Join("~", ".kube", "config")
-	}
-	paths := strings.Split(kubeconfigPath, string(os.PathListSeparator))
-
 	var resolvers []*KubeconfigResolver
-	for _, path := range paths {
+	for _, path := range kubeconfig_service.GetConfigFilePaths() {
 		absPath, err := common.ResolvePathToAbs(path)
 		if err != nil {
 			return nil, fmt.Errorf("error occurred try split KUBECONFIG file paths error:%s", err.Error())

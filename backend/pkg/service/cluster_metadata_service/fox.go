@@ -7,7 +7,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/api/types"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.krafton.com/xtrm/fox/client"
 	"github.krafton.com/xtrm/fox/source/pkg/document"
 )
