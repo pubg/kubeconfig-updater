@@ -30,7 +30,7 @@ export default function App() {
           elevation={3}
           sx={{
             display: 'flex',
-            width: '320px',
+            width: '280px',
             height: '100%',
             flexShrink: 0,
             flexGrow: 0,

@@ -95,7 +95,7 @@ export default observer(function ClusterInfoList() {
       {
         key: 'status',
         name: 'Status',
-        minWidth: 256,
+        minWidth: 128,
         isResizable: true,
         onRender(item: ClusterMetadataItem) {
           switch (item.data.status) {

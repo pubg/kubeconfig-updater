@@ -121,7 +121,6 @@ export default observer(function ClusterManagement() {
               </Paper>
 
               <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
-                {clusterMetadataRequester.state === 'fetch' && <p>loading...</p>}
                 <ClusterInfoList />
               </Box>
 
