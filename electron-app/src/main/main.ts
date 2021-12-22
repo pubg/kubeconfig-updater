@@ -197,6 +197,15 @@ app
       const manager = container.resolve(BackendManager)
       manager.start()
     }
+
+    ['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
+      const sig = signal
+      console.log(`Register Listen Event ${sig}`)
+      process.on(sig, () => {
+        console.log(`Process Signal Received:${sig}`)
+        app.quit()
+      })
+    })
   })
   .catch(logger.error)
 
