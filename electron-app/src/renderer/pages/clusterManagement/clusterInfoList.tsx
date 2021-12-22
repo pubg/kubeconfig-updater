@@ -1,10 +1,11 @@
-import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
+import {DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider} from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
 import { toJS } from 'mobx'
+import { AzureThemeDark } from '@fluentui/azure-themes'
 import logger from '../../../logger/logger'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
@@ -75,6 +76,10 @@ const columns: IColumn[] = [
 ]
 */
 
+function getFluentuiTheme(): Theme {
+  
+}
+
 export default observer(function ClusterInfoList() {
   const store = useStore()
 
@@ -135,7 +140,7 @@ export default observer(function ClusterInfoList() {
   }, [])
 
   return (
-    <>
+    <ThemeProvider theme={AzureThemeDark}>
       <DetailsList
         columns={columns}
         items={items}
@@ -144,6 +149,6 @@ export default observer(function ClusterInfoList() {
         onActiveItemChanged={onActiveItemChanged}
       />
       {/* <Menu></Menu> */}
-    </>
+    </ThemeProvider>
   )
 })
