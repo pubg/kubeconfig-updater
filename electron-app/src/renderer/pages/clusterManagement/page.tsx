@@ -112,7 +112,6 @@ export default observer(function ClusterManagement() {
               <Paper
                 elevation={0}
                 sx={{
-                  width: '100%',
                   height: '128px',
                   display: 'flex',
                   borderBottom: '2px solid gray',

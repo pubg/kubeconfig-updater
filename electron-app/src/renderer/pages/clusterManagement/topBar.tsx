@@ -86,7 +86,14 @@ export default observer(function TopBar() {
   }, [requester, store])
 
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      width="100%"
+      marginLeft="32px"
+      marginRight="32px"
+    >
       <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
         <TextField
           size="small"
