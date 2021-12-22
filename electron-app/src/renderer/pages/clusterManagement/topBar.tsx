@@ -94,7 +94,7 @@ export default observer(function TopBar() {
       marginLeft="32px"
       marginRight="32px"
     >
-      <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
+      <FormGroup row sx={{ gap: '16px', alignItems: 'center', flexWrap: 'nowrap' }}>
         <TextField
           size="small"
           label="filter by name"
@@ -107,7 +107,7 @@ export default observer(function TopBar() {
           multiple
           options={store.tags}
           disableCloseOnSelect
-          style={{ width: '256px' }}
+          style={{ minWidth: '256px', maxWidth: '1024px' }}
           size="small"
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
