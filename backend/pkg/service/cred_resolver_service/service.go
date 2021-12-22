@@ -94,7 +94,8 @@ func (s *CredResolverService) GetAzureSdkConfig(ctx context.Context, credConf *p
 		return nil, fmt.Errorf("credentialType=PROFILE is not support for azure credResolver")
 	default:
 		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
-	}}
+	}
+}
 
 func (s *CredResolverService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
 	switch credConf.GetKind() {

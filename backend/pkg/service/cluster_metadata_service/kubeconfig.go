@@ -40,11 +40,11 @@ func (r *KubeconfigResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	}
 
 	var clusters []*protos.ClusterMetadata
-	for name, _ := range cfg.Contexts {
+	for name := range cfg.Contexts {
 		meta := &protos.ClusterMetadata{
-			ClusterName: name,
+			ClusterName:    name,
 			CredResolverId: "",
-			ClusterTags: map[string]string{},
+			ClusterTags:    map[string]string{},
 		}
 		clusters = append(clusters, meta)
 	}

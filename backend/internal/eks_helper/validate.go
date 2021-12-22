@@ -2,8 +2,8 @@ package eks_helper
 
 import (
 	"fmt"
-	"github.com/tidwall/gjson"
 	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/tidwall/gjson"
 )
 
 func GetAccountIdOfProfileFromAWS(profileName string) (string, error) {

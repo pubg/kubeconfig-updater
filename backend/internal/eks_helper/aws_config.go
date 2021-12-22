@@ -40,7 +40,7 @@ func GetProfiles() ([]string, error) {
 	}
 
 	var profiles []string
-	for profile, _ := range profilesMap {
+	for profile := range profilesMap {
 		profiles = append(profiles, profile)
 	}
 
