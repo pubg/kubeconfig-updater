@@ -10,7 +10,7 @@
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
-    "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
+    "lint": "cross-env NODE_ENV=development eslint src/ --cache --ext .js,.jsx,.ts,.tsx",
     "package": "pnpm run package:only:allplatform",
     "package:only": "electron-builder build --publish never",
     "package:only:allplatform": "electron-builder build -mwl --publish never",

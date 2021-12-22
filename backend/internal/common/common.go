@@ -56,7 +56,7 @@ func ResolvePathToAbs(path string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		path = strings.Replace(path,"~", home, 1)
+		path = strings.Replace(path, "~", home, 1)
 	}
 	return filepath.Abs(path)
 }

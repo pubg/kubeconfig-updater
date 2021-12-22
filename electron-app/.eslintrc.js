@@ -26,13 +26,13 @@ module.exports = {
     createDefaultProgram: true,
   },
   settings: {
-    'import/resolver': {
+    // 'import/resolver': {
       // See https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-575727774 for line below
-      node: {},
-      webpack: {
-        config: require.resolve('./.erb/configs/webpack.config.eslint.ts'),
-      },
-    },
+      // node: {},
+      // webpack: {
+        // config: require.resolve('./.erb/configs/webpack.config.eslint.ts'),
+      // },
+    // },
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },

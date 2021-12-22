@@ -137,7 +137,7 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_service.NewKubeconfigService(s.CredService, s.RegisterService, s.MetaService))
 	}
 
-	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer, grpcweb.WithOriginFunc(func (_ string) bool { return true }))
+	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer, grpcweb.WithOriginFunc(func(_ string) bool { return true }))
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsAcceptableGrpcCorsRequest(req) || wrappedGrpc.IsGrpcWebRequest(req) {

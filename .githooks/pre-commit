@@ -1,0 +1,11 @@
+#!/bin/sh
+set -euxo pipefail
+
+result=$(gofmt -s -l -w backend/ | wc -c)
+if [ $result -ne 0 ]; then
+    echo "Automatically formatted unformatted files. Please stage changes and commit again."
+    exit 1
+fi
+
+#cd electron-app
+#pnpm lint

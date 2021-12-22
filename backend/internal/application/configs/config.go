@@ -22,8 +22,8 @@ type Extension struct {
 }
 
 type FoxExtension struct {
-	Enable bool
-	Address  string
+	Enable  bool
+	Address string
 	//TODO
 	UseCache bool
 }

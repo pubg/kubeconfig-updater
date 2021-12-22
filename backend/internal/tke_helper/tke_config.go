@@ -12,7 +12,7 @@ func GetProfiles() ([]string, error) {
 	// TODO: intl 는 .tccli, china 버전은 .tencentcloud 참조함
 	profileNames := make([]string, 0)
 
-	dirPath,err := getCredentialsDirectoryPath()
+	dirPath, err := getCredentialsDirectoryPath()
 	if err != nil {
 		return nil, err
 	}
