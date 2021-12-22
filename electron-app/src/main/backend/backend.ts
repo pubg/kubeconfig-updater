@@ -38,11 +38,11 @@ export default class BackendManager {
   constructor(
     @inject(BackendExecCmd) private readonly cmd: string,
     @inject(BackendExecCwd) private readonly cwd: string,
-    @inject(BackendGrpcPort) grpcPort?: number,
-    @inject(BackendGrpcWebPort) grpcWebPort?: number
+    @inject(BackendGrpcPort) grpcPort: number,
+    @inject(BackendGrpcWebPort) grpcWebPort: number
   ) {
-    this._grpcPort = grpcPort ?? _.random(10000, 20000, false)
-    this._grpbWebPort = grpcWebPort ?? _.random(10000, 20000, false)
+    this._grpcPort = grpcPort || _.random(10000, 20000, false)
+    this._grpbWebPort = grpcWebPort || _.random(10000, 20000, false)
   }
 
   start() {

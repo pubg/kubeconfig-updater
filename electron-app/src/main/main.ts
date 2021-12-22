@@ -181,8 +181,8 @@ if (isDevelopment) {
   container.register(BackendGrpcPort, { useValue: 10980 })
   container.register(BackendGrpcWebPort, { useValue: 10981 })
 } else {
-  container.register(BackendGrpcPort, { useValue: undefined })
-  container.register(BackendGrpcWebPort, { useValue: undefined })
+  container.register(BackendGrpcPort, { useValue: 0 })
+  container.register(BackendGrpcWebPort, { useValue: 0 })
 }
 
 const manager = container.resolve(BackendManager)
