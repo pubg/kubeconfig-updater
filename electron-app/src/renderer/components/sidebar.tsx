@@ -10,27 +10,17 @@ export default function Sidebar() {
     <List>
       <ListItem>
         <ListItemButton component={Link} to="/cluster-management">
-          <ListItemIcon>
             <ManageSearchIcon />
-          </ListItemIcon>
-          <ListItemText primary="Cluster Management" />
         </ListItemButton>
       </ListItem>
-      <Divider />
       <ListItem>
         <ListItemButton>
-          <ListItemIcon>
             <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Configuration" />
         </ListItemButton>
       </ListItem>
       <ListItem>
         <ListItemButton component={Link} to="/about">
-          <ListItemIcon>
             <InfoIcon />
-          </ListItemIcon>
-          <ListItemText primary="About" />
         </ListItemButton>
       </ListItem>
     </List>

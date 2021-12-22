@@ -12,7 +12,7 @@ import logger from '../logger/logger'
 
 const theme = createTheme({
   palette: {
-    // mode: 'dark',
+    mode: 'dark',
   },
 })
 

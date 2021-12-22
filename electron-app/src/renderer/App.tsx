@@ -35,7 +35,6 @@ export default function App() {
                 elevation={3}
                 sx={{
                   display: 'flex',
-                  width: '280px',
                   height: '100%',
                   flexShrink: 0,
                   flexGrow: 0,
@@ -44,7 +43,7 @@ export default function App() {
                 <Sidebar />
               </Paper>
               <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" component={About}/>
                 <Route path="/cluster-management" component={ClusterManagement} />
                 <Route path="/about" component={About} />
               </Switch>
