@@ -14,7 +14,7 @@ func NewKubeconfigResolvers() ([]*KubeconfigResolver, error) {
 	for _, path := range kubeconfig_service.GetConfigFilePaths() {
 		absPath, err := common.ResolvePathToAbs(path)
 		if err != nil {
-			return nil, fmt.Errorf("error occurred try split KUBECONFIG file paths error:%s", err.Error())
+			return nil, fmt.Errorf("error occurred while try get absolute path of KUBECONFIG file, error:%s", err.Error())
 		}
 		resolvers = append(resolvers, &KubeconfigResolver{kubeconfigFile: absPath})
 	}
