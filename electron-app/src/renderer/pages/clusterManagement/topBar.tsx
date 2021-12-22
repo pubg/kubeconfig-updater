@@ -101,6 +101,7 @@ export default observer(function TopBar() {
           variant="outlined"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
+          autoFocus
         />
         <Autocomplete
           multiple
