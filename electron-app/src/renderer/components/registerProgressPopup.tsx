@@ -11,7 +11,7 @@ export default observer(function RegisterProgressPopup() {
   const requester = useContext()
 
   const [open, setOpen] = useState(false)
-  const [autoHideDuration, setAutoHideDuration] = useState<number | null>(null)
+  const [hideDuration, setHideDuration] = useState<number | null>(null)
   const desiredAutoHideDuration = 3000 // 3 second
 
   const description = useMemo(() => {
@@ -26,17 +26,17 @@ export default observer(function RegisterProgressPopup() {
 
   useAutorun(() => {
     if (requester.state === 'processing') {
-      setAutoHideDuration(null)
+      setHideDuration(null)
       setOpen(true)
     } else {
-      setAutoHideDuration(desiredAutoHideDuration)
+      setHideDuration(desiredAutoHideDuration)
     }
   })
 
   const onClose = useCallback<NonNullable<SnackbarProps['onClose']>>((e, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === 'timeout') {
       setOpen(false)
-      setAutoHideDuration(null)
+      setHideDuration(null)
     }
   }, [])
 
@@ -44,7 +44,7 @@ export default observer(function RegisterProgressPopup() {
     <Snackbar
       open={open}
       // open
-      autoHideDuration={autoHideDuration}
+      autoHideDuration={hideDuration}
       anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
       onClose={onClose}
     >
