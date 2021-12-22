@@ -6,7 +6,7 @@
   },
   "version": "0.0.1",
   "scripts": {
-    "build": "cross-env NODE_PATH=./node_modules concurrently \"pnpm run build:main\" \"pnpm run build:renderer\"",
+    "build": "concurrently \"pnpm run build:main\" \"pnpm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
