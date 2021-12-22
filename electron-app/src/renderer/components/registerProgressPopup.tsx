@@ -1,9 +1,8 @@
 import { ProgressIndicator } from '@fluentui/react'
-import { Paper, Snackbar, SnackbarCloseReason, SnackbarContent, SnackbarProps, Typography } from '@mui/material'
-import { autorun, reaction, when } from 'mobx'
+import { emphasize, Paper, Snackbar, SnackbarContent, SnackbarProps, styled, useTheme } from '@mui/material'
+import { snackbarContentClasses, SnackbarContentClassKey } from '@mui/material/SnackbarContent'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import logger from '../../logger/logger'
+import { useCallback, useMemo, useState } from 'react'
 import { useAutorun } from '../hooks/mobx'
 import { useContext } from './clusterRegisterRequester'
 
@@ -15,9 +14,11 @@ export default observer(function RegisterProgressPopup() {
   const desiredAutoHideDuration = 3000 // 3 second
 
   const description = useMemo(() => {
-    const msg = `[${requester.processedCount}/${requester.length}] adding cluster: ${requester.currentItem?.clusterName}`
-
-    return msg
+    if (requester.currentItem) {
+      return `[${requester.processedCount}/${requester.length}] adding cluster: ${requester.currentItem?.clusterName}`
+    } else {
+      return `registered ${requester.length} clusters.`
+    }
   }, [requester.currentItem?.clusterName, requester.length, requester.processedCount])
 
   const percentageComplete = useMemo<number>(() => {
@@ -40,15 +41,22 @@ export default observer(function RegisterProgressPopup() {
     }
   }, [])
 
+
+  // theme
+  const theme = useTheme()
+  const emphasis = theme.palette.mode === 'light' ? 0.8 : 0.98
+  const backgroundColor = emphasize(theme.palette.background.default, emphasis)
+
+  // how to use global css?
   return (
     <Snackbar
-      open={open}
-      // open
+      // open={open}
+      open
       autoHideDuration={hideDuration}
       anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
       onClose={onClose}
     >
-      <Paper elevation={4}>
+      <Paper elevation={4} sx={{ margin: '8px 16px 8px 16px', backgroundColor }}>
         <ProgressIndicator
           label="Register Clusters..."
           description={description}
