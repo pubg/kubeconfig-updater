@@ -2,8 +2,9 @@ build-backend:
 	cd ../backend && goreleaser build --rm-dist --snapshot
 
 build-frontend:
-	npm run clean:dist
-	npm run build
+	pnpm install
+	pnpm run clean:dist
+	pnpm run build
 
 copy-backend-to-package:
 	mkdir -p release/app/bin
@@ -15,19 +16,19 @@ copy-backend-to-package:
 	cp ../backend/dist/kubeconfig-updater_windows_arm64/kubeconfig-updater-backend.exe release/app/bin/kubeconfig-updater-backend-win-arm64.exe
 
 package-only:
-	npm run package:only
+	pnpm run package:only
 
 package-darwin:
-	npm run package:only:darwin
+	pnpm run package:only:darwin
 
 package-linux:
-	npm run package:only:linux
+	pnpm run package:only:linux
 
 package-windows:
-	npm run package:only:windows
+	pnpm run package:only:windows
 
 package-all: build-backend copy-backend-to-package build-frontend
-	npm run package:only:allplatform
+	pnpm run package:only:allplatform
 
 publish:
 	gh release create v0.0.2 --prerelease --repo=https://github.com/pubg/kubeconfig-updater --title=v0.0.2 ./release/build/*.zip ./release/build/*.AppImage
