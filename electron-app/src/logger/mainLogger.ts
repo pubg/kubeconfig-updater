@@ -1,5 +1,4 @@
 import pino from 'pino'
-import 'pino-pretty'
 
 const devOptions: pino.LoggerOptions = {
   name: 'main',
@@ -14,6 +13,7 @@ const devOptions: pino.LoggerOptions = {
   },
 }
 
+// TODO: add pino-pretty
 const prodOptions: pino.LoggerOptions = {
   name: 'main',
   level: 'error',
@@ -21,6 +21,7 @@ const prodOptions: pino.LoggerOptions = {
 
 const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
 
-const mainLogger = pino(isDevelopment ? devOptions : prodOptions)
+// TODO: replace hotfix destination to electron-managed logger
+const mainLogger = pino(isDevelopment ? devOptions : prodOptions, { write: () => {} })
 
 export default mainLogger
