@@ -97,7 +97,7 @@ export default observer(function TopBar() {
       <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
         <TextField
           size="small"
-          label="filter..."
+          label="filter by name"
           variant="outlined"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
