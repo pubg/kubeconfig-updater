@@ -74,22 +74,16 @@ if (app.isPackaged) {
     })
   }
 
-  if (process.platform === 'win32') {
-    container.register(BackendExecCmd, {
-      useValue: 'kubeconfig-updater-backend.exe',
-    })
-  } else {
-    container.register(BackendExecCmd, {
-      useValue: './kubeconfig-updater-backend',
-    })
-  }
+  const backendPath = process.platform === 'win32' ? 'kubeconfig-updater-backend.exe' : './kubeconfig-updater-backend'
+
+  container.register(BackendExecCmd, { useValue: `${backendPath}` })
   container.register(BackendGrpcPort, { useValue: 0 })
   container.register(BackendGrpcWebPort, { useValue: 0 })
 } else {
   container.register(BackendExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
-  container.register(BackendExecCmd, { useValue: 'go run main.go server' })
+  container.register(BackendExecCmd, { useValue: 'go run main.go' })
   container.register(BackendGrpcPort, { useValue: 10980 })
   container.register(BackendGrpcWebPort, { useValue: 10981 })
 }
