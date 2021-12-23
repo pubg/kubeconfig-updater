@@ -109,7 +109,6 @@ export default observer(function ClusterManagement() {
           sx={{
             height: '128px',
             display: 'flex',
-            borderBottom: '2px solid gray',
           }}
         >
           <TopBar />
