@@ -74,15 +74,9 @@ if (app.isPackaged) {
     })
   }
 
-  if (process.platform === 'win32') {
-    container.register(BackendExecCmd, {
-      useValue: 'kubeconfig-updater-backend.exe',
-    })
-  } else {
-    container.register(BackendExecCmd, {
-      useValue: './kubeconfig-updater-backend',
-    })
-  }
+  const backendPath = process.platform === 'win32' ? 'kubeconfig-updater-backend.exe' : './kubeconfig-updater-backend'
+
+  container.register(BackendExecCmd, { useValue: `${backendPath} server` })
   container.register(BackendGrpcPort, { useValue: 0 })
   container.register(BackendGrpcWebPort, { useValue: 0 })
 } else {
