@@ -76,7 +76,7 @@ if (app.isPackaged) {
 
   const backendPath = process.platform === 'win32' ? 'kubeconfig-updater-backend.exe' : './kubeconfig-updater-backend'
 
-  container.register(BackendExecCmd, { useValue: `${backendPath} server` })
+  container.register(BackendExecCmd, { useValue: `${backendPath}` })
   container.register(BackendGrpcPort, { useValue: 0 })
   container.register(BackendGrpcWebPort, { useValue: 0 })
 } else {
