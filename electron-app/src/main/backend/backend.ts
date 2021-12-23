@@ -103,9 +103,6 @@ export default class BackendManager {
       const err = await new Promise((resolve) => kill(currProcess.pid!, resolve))
 
       if (err) {
-        logger.error(err)
-      }
-      if (err) {
         logger.error(
           `[BackendManager] tree kill process occurred error ${typeof err === 'string' ? err : JSON.stringify(err)}`
         )
