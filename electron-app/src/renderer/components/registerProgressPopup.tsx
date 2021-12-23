@@ -15,22 +15,22 @@ import { sprintf } from 'sprintf-js'
 import { useAutorun } from '../hooks/mobx'
 import { useContext } from './clusterRegisterRequester'
 
+// reserved for future use
+/*
 function getInvertedBackgroundColor(theme: Theme) {
   const emphasis = theme.palette.mode === 'light' ? 0.8 : 0.98
   const backgroundColor = emphasize(theme.palette.background.default, emphasis)
 
   return backgroundColor
 }
+*/
 
 const RegisterProgressPopupRoot = styled(Paper, {
   name: 'RegisterProgressPopupRoot',
 })(({ theme }) => {
-  // const backgroundColor = getInvertedBackgroundColor(theme)
-
   return {
     ...theme.typography.body2,
     padding: '8px 16px 8px 16px',
-    // backgroundColor,
     width: '100%',
   }
 })
@@ -38,11 +38,7 @@ const RegisterProgressPopupRoot = styled(Paper, {
 const RegisterProgressTitle = styled(Typography, {
   name: 'RegisterProgressTitle',
 })(({ theme }) => {
-  const backgroundColor = getInvertedBackgroundColor(theme)
-
-  return {
-    // color: theme.palette.getContrastText(backgroundColor),
-  }
+  return {}
 })
 
 export default observer(function RegisterProgressPopup() {
@@ -72,7 +68,6 @@ export default observer(function RegisterProgressPopup() {
     }
   }, [])
 
-  // how to use global css?
   return (
     <Snackbar
       open={open}
