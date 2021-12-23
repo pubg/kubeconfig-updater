@@ -86,20 +86,28 @@ export default observer(function TopBar() {
   }, [requester, store])
 
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
-      <FormGroup row sx={{ gap: '16px', alignItems: 'center' }}>
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      width="100%"
+      marginLeft="32px"
+      marginRight="32px"
+    >
+      <FormGroup row sx={{ gap: '16px', alignItems: 'center', flexWrap: 'nowrap' }}>
         <TextField
           size="small"
-          label="filter..."
+          label="filter by name"
           variant="outlined"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
+          autoFocus
         />
         <Autocomplete
           multiple
           options={store.tags}
           disableCloseOnSelect
-          style={{ width: '256px' }}
+          style={{ minWidth: '256px', maxWidth: '1024px' }}
           size="small"
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading

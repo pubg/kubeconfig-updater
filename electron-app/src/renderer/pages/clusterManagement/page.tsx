@@ -1,18 +1,15 @@
 import { Box, Paper } from '@mui/material'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { ClusterMetadataRequester, ClusterMetadataRequesterContext } from '../../components/clusterMetadataRequester'
-import { ClusterRegisterRequester, ClusterRegisterRequesterContext } from '../../components/clusterRegisterRequester'
-import { ClusterMetadataItem, ClusterMetadataStore, ClusterMetadataStoreContext } from './clusterMetadataStore'
+import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import TopBar from './topBar'
 import BottomBar from './bottomBar'
 import ClusterInfoList from './clusterInfoList'
-import * as containerHooks from '../../hooks/container'
+import { useContext as useMetadataRequesterContext } from '../../components/clusterMetadataRequester'
 
 export default observer(function ClusterManagement() {
-  const clusterMetadataStore = containerHooks.useResolve(ClusterMetadataStore)
-  const clusterRegisterRequester = containerHooks.useResolve(ClusterRegisterRequester)
-  const clusterMetadataRequester = containerHooks.useResolve(ClusterMetadataRequester)
+  const clusterMetadataStore = useStore()
+  const clusterMetadataRequester = useMetadataRequesterContext()
 
   // TODO: improve this
   useEffect(() => {
@@ -94,46 +91,38 @@ export default observer(function ClusterManagement() {
 
   return (
     /** background */
-    <ClusterMetadataRequesterContext.Provider value={clusterMetadataRequester}>
-      <ClusterRegisterRequesterContext.Provider value={clusterRegisterRequester}>
-        <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
-          <Paper sx={{ width: '100%', height: '100%' }}>
-            {/* actual container */}
-            <Box
-              sx={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'stretch',
-              }}
-            >
-              {/* Header Menu Container */}
-              <Paper
-                elevation={0}
-                sx={{
-                  width: '100%',
-                  height: '128px',
-                  display: 'flex',
-                  borderBottom: '2px solid gray',
-                }}
-              >
-                <TopBar />
-              </Paper>
+    <Paper sx={{ width: '100%', height: '100%' }}>
+      {/* actual container */}
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'stretch',
+        }}
+      >
+        {/* Header Menu Container */}
+        <Paper
+          elevation={0}
+          sx={{
+            height: '128px',
+            display: 'flex',
+            borderBottom: '2px solid gray',
+          }}
+        >
+          <TopBar />
+        </Paper>
 
-              <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
-                {clusterMetadataRequester.state === 'fetch' && <p>loading...</p>}
-                <ClusterInfoList />
-              </Box>
+        <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+          <ClusterInfoList />
+        </Box>
 
-              {/* bottom sidebar container */}
-              <Box width="100%" height="64px" display="flex" alignItems="center" margin="8px" paddingLeft="16px">
-                <BottomBar />
-              </Box>
-            </Box>
-          </Paper>
-        </ClusterMetadataStoreContext.Provider>
-      </ClusterRegisterRequesterContext.Provider>
-    </ClusterMetadataRequesterContext.Provider>
+        {/* bottom sidebar container */}
+        <Box width="100%" height="64px" display="flex" alignItems="center" margin="8px" paddingLeft="16px">
+          <BottomBar />
+        </Box>
+      </Box>
+    </Paper>
   )
 })

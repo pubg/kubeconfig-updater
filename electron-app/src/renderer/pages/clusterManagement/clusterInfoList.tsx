@@ -2,8 +2,9 @@ import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
+import { toJS } from 'mobx'
 import logger from '../../../logger/logger'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
@@ -94,7 +95,7 @@ export default observer(function ClusterInfoList() {
       {
         key: 'status',
         name: 'Status',
-        minWidth: 0,
+        minWidth: 128,
         isResizable: true,
         onRender(item: ClusterMetadataItem) {
           switch (item.data.status) {
@@ -128,6 +129,11 @@ export default observer(function ClusterInfoList() {
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
 
+  const onActiveItemChanged: IDetailsListProps['onActiveItemChanged'] = useCallback((proxy) => {
+    const item = toJS<ClusterMetadataItem>(proxy)
+    logger.debug(item)
+  }, [])
+
   return (
     <>
       <DetailsList
@@ -135,6 +141,7 @@ export default observer(function ClusterInfoList() {
         items={items}
         onColumnHeaderClick={onHeaderNameClicked}
         selection={store.selectionRef as Selection}
+        onActiveItemChanged={onActiveItemChanged}
       />
       {/* <Menu></Menu> */}
     </>

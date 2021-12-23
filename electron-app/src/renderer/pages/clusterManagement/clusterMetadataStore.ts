@@ -2,7 +2,9 @@ import { action, computed, makeObservable, observable } from 'mobx'
 import React from 'react'
 import { IObjectWithKey, Selection } from '@fluentui/react'
 import _ from 'lodash'
+import LINQ from 'linq'
 import { AggregatedClusterMetadata } from '../../protos/kubeconfig_service_pb'
+import identity from '../../utils/identity'
 
 export const ClusterMetadataStoreContext = React.createContext<ClusterMetadataStore | null>(null)
 
@@ -57,9 +59,15 @@ export class ClusterMetadataStore {
   }
 
   @computed
-  // eslint-disable-next-line class-methods-use-this
-  get tags(): [string, string][] {
-    return []
+  get tags(): string[] {
+    const sortedNewTags = LINQ.from(this.items)
+      .selectMany((item) => item.data.metadata.clustertagsMap)
+      .select(([key]) => key)
+      .distinct()
+      .orderBy(identity)
+      .toArray()
+
+    return sortedNewTags
   }
 
   @observable

@@ -5,7 +5,7 @@ import logger from '../../logger/logger'
 import { ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'
 
-type RequestType = {
+type Item = {
   clusterName: string
   accountId: string
 }
@@ -24,11 +24,14 @@ export class ClusterRegisterRequester {
   @observable
   processedCount = 0
 
+  @observable
+  currentItem: Item | null = null
+
   constructor() {
     makeObservable(this)
   }
 
-  request = flow(function* (this: ClusterRegisterRequester, items: RequestType[]) {
+  request = flow(function* (this: ClusterRegisterRequester, items: Item[]) {
     logger.info(`requesting cluster register ${items.length} items`)
     this.length = items.length
     this.processedCount = 0
@@ -42,6 +45,7 @@ export class ClusterRegisterRequester {
           logger.debug(
             `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
           )
+          this.currentItem = item
           const res = await req.request(item.clusterName, item.accountId)
 
           if (res.getStatus() !== ResultCode.SUCCESS) {
@@ -55,6 +59,7 @@ export class ClusterRegisterRequester {
       this.processedCount += 1
     }
 
+    this.currentItem = null
     this.state = 'ready'
     logger.info('finished cluster register request')
   })
