@@ -75,11 +75,6 @@ jobs:
         with:
           node-version: '16'
       - run: |
-          chmod +x release/app/bin/*
-        working-directory: electron-app
-        shell: bash
-        name: Fix Executable Permission on xNix
-      - run: |
           npm install --global pnpm
           pnpm install
         working-directory: electron-app

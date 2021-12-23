@@ -14,6 +14,7 @@ copy-backend-to-package:
 	cp ../backend/dist/kubeconfig-updater_linux_arm64/kubeconfig-updater-backend release/app/bin/kubeconfig-updater-backend-linux-arm64
 	cp ../backend/dist/kubeconfig-updater_windows_amd64/kubeconfig-updater-backend.exe release/app/bin/kubeconfig-updater-backend-win-x64.exe
 	cp ../backend/dist/kubeconfig-updater_windows_arm64/kubeconfig-updater-backend.exe release/app/bin/kubeconfig-updater-backend-win-arm64.exe
+	chmod +x release/app/bin/*
 
 package-only:
 	pnpm run package:only
