@@ -78,13 +78,13 @@ const columns: IColumn[] = [
 
 function getFluentuiTheme(): Theme {
   logger.info(`Init FluentUi Theme: ${window.theme}, Default is AzureThemeLight`)
-  if (window.theme) {
-    if (window.theme === 'dark') {
-      return AzureThemeDark
-    }
-    if (window.theme === 'light') {
-      return AzureThemeLight
-    }
+  if (window.theme === undefined) {
+    return AzureThemeLight
+  }
+  if (window.theme === 'dark') {
+    return AzureThemeDark
+  }
+  if (window.theme === 'light') {
     return AzureThemeLight
   }
   return AzureThemeLight
@@ -141,6 +141,8 @@ export default observer(function ClusterInfoList() {
     return linq.toArray()
   }, [descending, store.filter, store.items])
 
+  const currentTheme = useMemo<Theme>(getFluentuiTheme, [window.theme])
+
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
 
@@ -150,7 +152,7 @@ export default observer(function ClusterInfoList() {
   }, [])
 
   return (
-    <ThemeProvider theme={getFluentuiTheme()}>
+    <ThemeProvider theme={currentTheme}>
       <DetailsList
         columns={columns}
         items={items}
