@@ -1,10 +1,11 @@
-import { DetailsList, IColumn, IDetailsListProps } from '@fluentui/react'
+import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
-import { Typography } from '@mui/material'
+import { PaletteMode, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
 import { toJS } from 'mobx'
+import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
 import logger from '../../../logger/logger'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
@@ -75,6 +76,20 @@ const columns: IColumn[] = [
 ]
 */
 
+function getFluentuiTheme(): Theme {
+  logger.info(`Init FluentUi Theme: ${window.theme}, Default is AzureThemeLight`)
+  if (window.theme === undefined) {
+    return AzureThemeLight
+  }
+  if (window.theme === 'dark') {
+    return AzureThemeDark
+  }
+  if (window.theme === 'light') {
+    return AzureThemeLight
+  }
+  return AzureThemeLight
+}
+
 export default observer(function ClusterInfoList() {
   const store = useStore()
 
@@ -126,6 +141,8 @@ export default observer(function ClusterInfoList() {
     return linq.toArray()
   }, [descending, store.filter, store.items])
 
+  const currentTheme = useMemo<Theme>(getFluentuiTheme, [window.theme])
+
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
 
@@ -135,7 +152,7 @@ export default observer(function ClusterInfoList() {
   }, [])
 
   return (
-    <>
+    <ThemeProvider theme={currentTheme}>
       <DetailsList
         columns={columns}
         items={items}
@@ -144,6 +161,6 @@ export default observer(function ClusterInfoList() {
         onActiveItemChanged={onActiveItemChanged}
       />
       {/* <Menu></Menu> */}
-    </>
+    </ThemeProvider>
   )
 })

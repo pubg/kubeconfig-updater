@@ -14,15 +14,15 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { container } from 'tsyringe'
-import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
 import logger from '../logger/logger'
+import FrontendStore from './frontendStore'
 
 export default class AppUpdater {
   constructor() {
@@ -108,6 +108,7 @@ const installExtensions = async () => {
 }
 
 const createWindow = async () => {
+  logger.info('CreateWindow')
   if (isDevelopment) {
     await installExtensions()
   }
@@ -148,8 +149,9 @@ const createWindow = async () => {
     mainWindow = null
   })
 
-  const menuBuilder = new MenuBuilder(mainWindow)
-  menuBuilder.buildMenu()
+  mainWindow.removeMenu()
+  // const menuBuilder = new MenuBuilder(mainWindow)
+  // menuBuilder.buildMenu()
 
   // Open urls in the user's browser
   mainWindow.webContents.on('new-window', (event, url) => {
@@ -197,23 +199,16 @@ app
       const manager = container.resolve(BackendManager)
       manager.start()
     }
-
-    ['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
+    ;['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
       const sig = signal
-      console.log(`Register Listen Event ${sig}`)
+      logger.debug(`Register Listen Event ${sig}`)
       process.on(sig, () => {
-        console.log(`Process Signal Received:${sig}`)
+        logger.debug(`Process Signal Received:${sig}`)
         app.quit()
       })
     })
   })
   .catch(logger.error)
-
-ipcMain.on('getGrpcWebPort', (event) => {
-  const manager = container.resolve(BackendManager)
-  logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
-  event.returnValue = manager.grpbWebPort
-})
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -221,6 +216,12 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+ipcMain.on('getGrpcWebPort', (event) => {
+  const manager = container.resolve(BackendManager)
+  logger.debug(`getGrpcWebPort: ${manager.grpbWebPort}`)
+  event.returnValue = manager.grpbWebPort
 })
 
 app.on('before-quit', async (event) => {
@@ -231,3 +232,31 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
+
+// Theme Start
+const store = container.resolve(FrontendStore)
+type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
+nativeTheme.themeSource = <ThemeSourceType>store.getPreferredTheme()
+logger.info(`Load Preferred Theme: ${store.getPreferredTheme()}`)
+
+ipcMain.on('theme:getPreferredTheme', (event) => {
+  event.returnValue = store.getPreferredTheme()
+})
+
+ipcMain.on('theme:getTheme', (event) => {
+  event.returnValue = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
+})
+
+// theme:setPreferredTheme => bool
+// Set Success or Not
+ipcMain.on('theme:setPreferredTheme', (event, args) => {
+  if (args.length !== 1 || typeof args[0] !== 'string') {
+    event.returnValue = false
+    return
+  }
+  const targetTheme = args[0] as string
+  nativeTheme.themeSource = <ThemeSourceType>targetTheme
+  store.setPreferredTheme(targetTheme)
+  event.returnValue = true
+})
+// Theme End
