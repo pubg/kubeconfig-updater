@@ -1,7 +1,7 @@
 // required by tsyringe
 import 'reflect-metadata'
 
-import {PaletteMode, ThemeProvider} from '@mui/material'
+import { PaletteMode, ThemeProvider } from '@mui/material'
 import { initializeIcons } from '@fluentui/react/lib/Icons'
 import { render } from 'react-dom'
 import { createTheme } from '@mui/material/styles'
