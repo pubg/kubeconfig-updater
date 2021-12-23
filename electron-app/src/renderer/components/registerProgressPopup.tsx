@@ -1,17 +1,17 @@
 import {
-  IButtonStyles,
-  IProgressIndicatorStyles,
-  PartialTheme,
-  ProgressIndicator,
-  ThemeProvider,
-} from '@fluentui/react'
-import { AzureThemeDark } from '@fluentui/azure-themes'
-import { emphasize, Paper, Snackbar, SnackbarContent, SnackbarProps, styled, Theme, useTheme } from '@mui/material'
-import { snackbarContentClasses, SnackbarContentClassKey } from '@mui/material/SnackbarContent'
+  Box,
+  emphasize,
+  LinearProgress,
+  Paper,
+  Snackbar,
+  SnackbarProps,
+  styled,
+  Theme,
+  Typography,
+} from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
-import { dark } from '@mui/material/styles/createPalette'
-import logger from '../../logger/logger'
+import { sprintf } from 'sprintf-js'
 import { useAutorun } from '../hooks/mobx'
 import { useContext } from './clusterRegisterRequester'
 
@@ -25,13 +25,23 @@ function getInvertedBackgroundColor(theme: Theme) {
 const RegisterProgressPopupRoot = styled(Paper, {
   name: 'RegisterProgressPopupRoot',
 })(({ theme }) => {
-  const backgroundColor = getInvertedBackgroundColor(theme)
+  // const backgroundColor = getInvertedBackgroundColor(theme)
 
   return {
     ...theme.typography.body2,
     padding: '8px 16px 8px 16px',
-    backgroundColor,
+    // backgroundColor,
     width: '100%',
+  }
+})
+
+const RegisterProgressTitle = styled(Typography, {
+  name: 'RegisterProgressTitle',
+})(({ theme }) => {
+  const backgroundColor = getInvertedBackgroundColor(theme)
+
+  return {
+    // color: theme.palette.getContrastText(backgroundColor),
   }
 })
 
@@ -40,18 +50,10 @@ export default observer(function RegisterProgressPopup() {
 
   const [open, setOpen] = useState(false)
   const [hideDuration, setHideDuration] = useState<number | null>(null)
-  const desiredAutoHideDuration = 3000 // 3 second
-
-  const description = useMemo(() => {
-    if (requester.currentItem) {
-      return `[${requester.processedCount}/${requester.length}] adding cluster: ${requester.currentItem?.clusterName}`
-    }
-
-    return `registered ${requester.length} clusters.`
-  }, [requester.currentItem, requester.length, requester.processedCount])
+  const desiredAutoHideDuration = 1000 // ms
 
   const percentComplete = useMemo<number>(() => {
-    return requester.processedCount / (requester.length || 1)
+    return (requester.processedCount / (requester.length || 1)) * 100
   }, [requester.length, requester.processedCount])
 
   useAutorun(() => {
@@ -70,48 +72,26 @@ export default observer(function RegisterProgressPopup() {
     }
   }, [])
 
-  const theme = useTheme()
-  const progressIndicatorTheme = useMemo(() => {
-    const backgroundColor = getInvertedBackgroundColor(theme)
-
-    const partialTheme: PartialTheme = {
-      components: {
-        ProgressIndicator: {
-          styles: {
-            root: {
-              backgroundColor,
-            },
-            itemName: {
-              // ...theme.typography.button,
-              color: theme.palette.getContrastText(backgroundColor),
-            },
-          } as IProgressIndicatorStyles,
-        },
-      },
-    }
-    return partialTheme
-  }, [theme])
-
-  logger.debug(typeof AzureThemeDark.components?.ProgressIndicator.styles)
-
   // how to use global css?
   return (
     <Snackbar
-      // open={open}
-      open
+      open={open}
+      // open
       autoHideDuration={hideDuration}
       anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
       onClose={onClose}
-      sx={{ width: '24vw' }}
+      sx={{ width: '24vw', minWidth: '280px' }}
     >
-      <RegisterProgressPopupRoot>
-        <ThemeProvider theme={progressIndicatorTheme}>
-          <ProgressIndicator
-            label="Register in progress..."
-            // description={description}
-            percentComplete={percentComplete}
-          />
-        </ThemeProvider>
+      <RegisterProgressPopupRoot elevation={3}>
+        <RegisterProgressTitle>Register in progress...</RegisterProgressTitle>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ width: '100%', mr: 1 }}>
+            <LinearProgress variant="determinate" value={percentComplete} />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {sprintf('%01d%%', percentComplete)}
+          </Typography>
+        </Box>
       </RegisterProgressPopupRoot>
     </Snackbar>
   )
