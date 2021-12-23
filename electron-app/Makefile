@@ -29,6 +29,3 @@ package-windows:
 
 package-all: build-backend copy-backend-to-package build-frontend
 	pnpm run package:only:allplatform
-
-publish:
-	gh release create v0.1.0 --prerelease --repo=https://github.com/pubg/kubeconfig-updater --title=v0.1.0 ./release/build/*.zip ./release/build/*.AppImage

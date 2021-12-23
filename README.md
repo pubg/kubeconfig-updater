@@ -2,19 +2,19 @@
 
 This is GUI kuberentes config file manager app. It automatically resolve your cloud profiles and suggest registable clusters.
 
-# Run Requirements
+## Run Requirements
 OS: Windows / Linux / MacOS
 
 Arch: x86-64(amd64) / Arm64 
 
-# Provided Artifact Type
+## Provided Artifact Type
 Windows: Portable Zip, Installer
 
 Linux: AppImage
 
-MacOS: App(Zip), Dmg
+MacOS: App
 
-# Config Store Path
+## Config Store Path
 Config stored under your HOME directory.
 ```
 Windows: /Users/<username>/.kubeconfig-updater-gui
@@ -22,7 +22,11 @@ Linux: /home/<username>/.kubeconfig-updater-gui
 MacOS: /Users/<username>/.kubeconfig-updater-gui
 ```
 
-# Organization Customized Feature
+## Roadmap
+|Version|Frontend|Backend|Due Date|
+|---|---|---|---|
+
+## Organization Customized Feature
 This program will support organization specific customized options.
 We are under discussion how to get policy file in organization.
 
