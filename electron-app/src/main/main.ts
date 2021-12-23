@@ -83,7 +83,7 @@ if (app.isPackaged) {
   container.register(BackendExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
-  container.register(BackendExecCmd, { useValue: 'go run main.go server' })
+  container.register(BackendExecCmd, { useValue: 'go run main.go' })
   container.register(BackendGrpcPort, { useValue: 10980 })
   container.register(BackendGrpcWebPort, { useValue: 10981 })
 }

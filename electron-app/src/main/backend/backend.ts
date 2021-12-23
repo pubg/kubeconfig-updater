@@ -45,7 +45,7 @@ export default class BackendManager {
   }
 
   start() {
-    const cmd = `${this.cmd} --port=${this._grpcPort} --web-port=${this._grpbWebPort}`
+    const cmd = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpbWebPort}`
     logger.info(`[BackendManager] CMD ${cmd}`)
     logger.info(`[BackendManager] CWD ${this.cwd}`)
     this.process = exec(cmd, { cwd: this.cwd }, (err, stdout, stderr) => {
