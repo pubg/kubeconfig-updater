@@ -9,11 +9,11 @@ export default class FrontendStore {
     this.store = new Store()
   }
 
-  getTheme(): string {
+  getPreferredTheme(): string {
     return <string>this.store.get('theme', 'dark')
   }
 
-  setTheme(theme: string) {
+  setPreferredTheme(theme: string) {
     this.store.set('theme', theme)
   }
 }

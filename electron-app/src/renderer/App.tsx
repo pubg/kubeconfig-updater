@@ -22,6 +22,7 @@ export default function App() {
         <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
           <Router>
             <Paper
+              square
               sx={{
                 width: '100vw',
                 height: '100vh',
@@ -32,6 +33,7 @@ export default function App() {
               }}
             >
               <Paper
+                square
                 elevation={3}
                 sx={{
                   display: 'flex',

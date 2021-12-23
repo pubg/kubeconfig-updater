@@ -149,8 +149,9 @@ const createWindow = async () => {
     mainWindow = null
   })
 
-  const menuBuilder = new MenuBuilder(mainWindow)
-  menuBuilder.buildMenu()
+  mainWindow.removeMenu()
+  // const menuBuilder = new MenuBuilder(mainWindow)
+  // menuBuilder.buildMenu()
 
   // Open urls in the user's browser
   mainWindow.webContents.on('new-window', (event, url) => {
@@ -235,11 +236,11 @@ app.on('before-quit', async (event) => {
 // Theme Start
 const store = container.resolve(FrontendStore)
 type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
-nativeTheme.themeSource = <ThemeSourceType>store.getTheme()
-logger.info(`Preferred Theme: ${store.getTheme()}`)
+nativeTheme.themeSource = <ThemeSourceType>store.getPreferredTheme()
+logger.info(`Preferred Theme: ${store.getPreferredTheme()}`)
 
-ipcMain.handle('theme:getPreferredfTheme', () => {
-  return store.getTheme()
+ipcMain.handle('theme:getPreferredTheme', () => {
+  return store.getPreferredTheme()
 })
 
 ipcMain.handle('theme:getTheme', () => {
@@ -248,12 +249,12 @@ ipcMain.handle('theme:getTheme', () => {
 
 // theme:changeTheme => bool
 // Change Success or Not
-ipcMain.handle('theme:setTheme', (event, args) => {
+ipcMain.handle('theme:setPreferredTheme', (event, args) => {
   if (args.length !== 1 || typeof args[0] !== 'string') {
     return false
   }
   const targetTheme = args[0] as string
   nativeTheme.themeSource = <ThemeSourceType>targetTheme
-  store.setTheme(targetTheme)
+  store.setPreferredTheme(targetTheme)
   return true
 })

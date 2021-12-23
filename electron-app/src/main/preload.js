@@ -25,5 +25,6 @@ contextBridge.exposeInMainWorld('electron', {
 
 const grpcWebPort = ipcRenderer.sendSync('getGrpcWebPort')
 contextBridge.exposeInMainWorld('grpcWebPort', grpcWebPort)
-
 logger.info(`using grpcWebPort: ${grpcWebPort}`)
+
+const theme = ipcRenderer.sendSync('theme:getTheme')
