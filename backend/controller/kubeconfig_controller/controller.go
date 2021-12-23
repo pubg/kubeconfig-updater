@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/kubeconfig_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
@@ -130,10 +131,23 @@ func (s *kubeconfigService) DeleteCluster(ctx context.Context, req *protos.Delet
 			Message: "ClusterName should not be empty",
 		}, nil
 	}
-	return &protos.CommonRes{
-		Status:  protos.ResultCode_INVALID_ARGUMENT,
-		Message: "ClusterName should not be empty",
-	}, nil
+
+	success, err := kubeconfig_service.DeleteContext(req.ClusterName, req.Cascade)
+	if err != nil {
+		return nil, err
+	}
+
+	if success {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SUCCESS,
+			Message: fmt.Sprintf("Delete Context Success Name:%s", req.ClusterName),
+		}, nil
+	} else {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_NOT_FOUND,
+			Message: fmt.Sprintf("Cannot Find Target Context Name:%s", req.ClusterName),
+		}, nil
+	}
 }
 
 func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
