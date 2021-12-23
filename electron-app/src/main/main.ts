@@ -14,14 +14,13 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, ipcMain, shell, nativeTheme } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import {app, BrowserWindow, ipcMain, nativeTheme, shell} from 'electron'
+import {autoUpdater} from 'electron-updater'
 import log from 'electron-log'
-import { container } from 'tsyringe'
-import MenuBuilder from './menu'
-import { resolveHtmlPath } from './util'
+import {container} from 'tsyringe'
+import {resolveHtmlPath} from './util'
 import BackendManager from './backend/backend'
-import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
+import {BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort} from './backend/symbols'
 import logger from '../logger/logger'
 import FrontendStore from './frontendStore'
 
@@ -58,10 +57,10 @@ if (isProduction) {
   sourceMapSupport.install()
 }
 
-logger.debug(`isPacked: ${app.isPackaged}`)
-logger.debug(`getAppPath: ${app.getAppPath()}`)
-logger.debug(`getPath('exe'): ${app.getPath('exe')}`)
-logger.debug(`env.NO_BACKEND: ${process.env.NO_BACKEND}`)
+logger.debug(`[Main] isPacked: ${app.isPackaged}`)
+logger.debug(`[Main] getAppPath: ${app.getAppPath()}`)
+logger.debug(`[Main] getPath('exe'): ${app.getPath('exe')}`)
+logger.debug(`[Main] env.NO_BACKEND: ${process.env.NO_BACKEND}`)
 
 if (app.isPackaged) {
   const parsedPath = path.parse(app.getPath('exe'))
@@ -84,15 +83,15 @@ if (app.isPackaged) {
       useValue: './kubeconfig-updater-backend',
     })
   }
-  container.register(BackendGrpcPort, { useValue: 0 })
-  container.register(BackendGrpcWebPort, { useValue: 0 })
+  container.register(BackendGrpcPort, {useValue: 0})
+  container.register(BackendGrpcWebPort, {useValue: 0})
 } else {
   container.register(BackendExecCwd, {
     useValue: path.join(process.cwd(), '../backend'),
   })
-  container.register(BackendExecCmd, { useValue: 'go run main.go server' })
-  container.register(BackendGrpcPort, { useValue: 10980 })
-  container.register(BackendGrpcWebPort, { useValue: 10981 })
+  container.register(BackendExecCmd, {useValue: 'go run main.go server'})
+  container.register(BackendGrpcPort, {useValue: 10980})
+  container.register(BackendGrpcWebPort, {useValue: 10981})
 }
 
 const installExtensions = async () => {
@@ -109,6 +108,7 @@ const installExtensions = async () => {
 }
 
 const createWindow = async () => {
+  logger.info('[Main] CreateWindow')
   if (isDevelopment) {
     await installExtensions()
   }
@@ -161,7 +161,7 @@ const createWindow = async () => {
 
   // https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-    callback({ requestHeaders: { ...details.requestHeaders, Origin: '*' } })
+    callback({requestHeaders: {...details.requestHeaders, Origin: '*'}})
   })
 
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
@@ -199,11 +199,13 @@ app
       const manager = container.resolve(BackendManager)
       manager.start()
     }
-
-    ipcMain.on('getGrpcWebPort', (event) => {
-      const manager = container.resolve(BackendManager)
-      logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
-      event.returnValue = manager.grpbWebPort
+    ['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
+      const sig = signal
+      logger.debug(`[Main] Register Listen Event ${sig}`)
+      process.on(sig, () => {
+        logger.debug(`[Main] Process Signal Received:${sig}`)
+        app.quit()
+      })
     })
   })
   .catch(logger.error)
@@ -216,6 +218,12 @@ app.on('window-all-closed', () => {
   }
 })
 
+ipcMain.on('getGrpcWebPort', (event) => {
+  const manager = container.resolve(BackendManager)
+  logger.debug(`[Main] getGrpcWebPort: ${manager.grpbWebPort}`)
+  event.returnValue = manager.grpbWebPort
+})
+
 app.on('before-quit', async (event) => {
   const manager = container.resolve(BackendManager)
   if (manager.status === 'running') {
@@ -224,37 +232,31 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
-;['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
-  const sig = signal
-  console.log(`Register Listen Event ${sig}`)
-  process.on(sig, () => {
-    console.log(`Process Signal Received:${sig}`)
-    app.quit()
-  })
-})
 
 // Theme Start
 const store = container.resolve(FrontendStore)
 type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
 nativeTheme.themeSource = <ThemeSourceType>store.getPreferredTheme()
-logger.info(`Preferred Theme: ${store.getPreferredTheme()}`)
+logger.info(`[Main] Load Preferred Theme: ${store.getPreferredTheme()}`)
 
-ipcMain.handle('theme:getPreferredTheme', () => {
-  return store.getPreferredTheme()
+ipcMain.on('theme:getPreferredTheme', (event) => {
+  event.returnValue = store.getPreferredTheme()
 })
 
-ipcMain.handle('theme:getTheme', () => {
-  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
+ipcMain.on('theme:getTheme', (event) => {
+  event.returnValue = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
 })
 
-// theme:changeTheme => bool
-// Change Success or Not
-ipcMain.handle('theme:setPreferredTheme', (event, args) => {
+// theme:setPreferredTheme => bool
+// Set Success or Not
+ipcMain.on('theme:setPreferredTheme', (event, args) => {
   if (args.length !== 1 || typeof args[0] !== 'string') {
-    return false
+    event.returnValue = false
+    return
   }
   const targetTheme = args[0] as string
   nativeTheme.themeSource = <ThemeSourceType>targetTheme
   store.setPreferredTheme(targetTheme)
-  return true
+  event.returnValue = true
 })
+// Theme End
