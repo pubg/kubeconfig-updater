@@ -12,6 +12,10 @@ declare global {
     interface ContextBridge {
       exposeInMainWorld(apiKey: IPCType, api: any): void
     }
+
+    interface IpcMain {
+      on(channel: IPCType, listener: (event: IpcMainEvent, ...args: any[]) => void): this
+    }
   }
 }
 
