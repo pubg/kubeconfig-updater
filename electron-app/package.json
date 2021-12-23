@@ -164,6 +164,7 @@
     "dayjs": "^1.10.7",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.1",
+    "electron-store": "^8.0.1",
     "electron-updater": "^4.6.1",
     "google-protobuf": "^3.19.1",
     "grpc-web": "^1.3.0",

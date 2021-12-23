@@ -14,7 +14,7 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, shell, nativeTheme } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { container } from 'tsyringe'
@@ -23,6 +23,7 @@ import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
 import logger from '../logger/logger'
+import FrontendStore from './frontendStore'
 
 export default class AppUpdater {
   constructor() {
@@ -198,22 +199,13 @@ app
       manager.start()
     }
 
-    ['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
-      const sig = signal
-      console.log(`Register Listen Event ${sig}`)
-      process.on(sig, () => {
-        console.log(`Process Signal Received:${sig}`)
-        app.quit()
-      })
+    ipcMain.on('getGrpcWebPort', (event) => {
+      const manager = container.resolve(BackendManager)
+      logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
+      event.returnValue = manager.grpbWebPort
     })
   })
   .catch(logger.error)
-
-ipcMain.on('getGrpcWebPort', (event) => {
-  const manager = container.resolve(BackendManager)
-  logger.info(`Request Get Grpc Web Port ${manager.grpbWebPort}`)
-  event.returnValue = manager.grpbWebPort
-})
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -230,4 +222,38 @@ app.on('before-quit', async (event) => {
     await manager.end()
     app.quit()
   }
+})
+;['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
+  const sig = signal
+  console.log(`Register Listen Event ${sig}`)
+  process.on(sig, () => {
+    console.log(`Process Signal Received:${sig}`)
+    app.quit()
+  })
+})
+
+// Theme Start
+const store = container.resolve(FrontendStore)
+type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
+nativeTheme.themeSource = <ThemeSourceType>store.getTheme()
+logger.info(`Preferred Theme: ${store.getTheme()}`)
+
+ipcMain.handle('theme:getPreferredfTheme', () => {
+  return store.getTheme()
+})
+
+ipcMain.handle('theme:getTheme', () => {
+  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
+})
+
+// theme:changeTheme => bool
+// Change Success or Not
+ipcMain.handle('theme:setTheme', (event, args) => {
+  if (args.length !== 1 || typeof args[0] !== 'string') {
+    return false
+  }
+  const targetTheme = args[0] as string
+  nativeTheme.themeSource = <ThemeSourceType>targetTheme
+  store.setTheme(targetTheme)
+  return true
 })
