@@ -14,8 +14,8 @@ export default function Sidebar() {
         </ListItemButton>
       </ListItem>
       <ListItem>
-        <ListItemButton>
-            <SettingsIcon />
+        <ListItemButton component={Link} to="/configuration">
+            <SettingsIcon/>
         </ListItemButton>
       </ListItem>
       <ListItem>

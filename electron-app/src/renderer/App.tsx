@@ -10,6 +10,7 @@ import * as containerHooks from './hooks/container'
 import { ClusterMetadataRequester, ClusterMetadataRequesterContext } from './components/clusterMetadataRequester'
 import { ClusterRegisterRequester, ClusterRegisterRequesterContext } from './components/clusterRegisterRequester'
 import { ClusterMetadataStore, ClusterMetadataStoreContext } from './pages/clusterManagement/clusterMetadataStore'
+import Configuration from "./pages/configuration/configuration";
 
 export default function App() {
   const clusterMetadataStore = containerHooks.useResolve(ClusterMetadataStore)
@@ -47,6 +48,7 @@ export default function App() {
               <Switch>
                 <Route exact path="/" component={About}/>
                 <Route path="/cluster-management" component={ClusterManagement} />
+                <Route path="/configuration" component={Configuration} />
                 <Route path="/about" component={About} />
               </Switch>
               <RegisterProgressSnackbar />
