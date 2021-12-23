@@ -91,7 +91,7 @@ export default observer(function ClusterManagement() {
 
   return (
     /** background */
-    <Paper sx={{ width: '100%', height: '100%' }}>
+    <Paper sx={{ width: '100%', height: '100%' }} square>
       {/* actual container */}
       <Box
         sx={{
@@ -104,6 +104,7 @@ export default observer(function ClusterManagement() {
       >
         {/* Header Menu Container */}
         <Paper
+          square
           elevation={0}
           sx={{
             height: '128px',
