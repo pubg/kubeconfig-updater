@@ -1,4 +1,4 @@
-import { DetailsList, IColumn, IDetailsListProps, ThemeProvider } from '@fluentui/react'
+import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
@@ -78,6 +78,15 @@ const columns: IColumn[] = [
 ]
 */
 
+function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, ClusterMetadataItem[]][] {
+  const groupedItems = LINQ.from(data)
+    .groupBy((item) => item.tags.get(tag) ?? null)
+    .select((e) => [e.key(), e.toArray()])
+    .toArray() as [string | null, ClusterMetadataItem[]][]
+
+  return groupedItems
+}
+
 export default observer(function ClusterInfoList() {
   const store = useStore()
 
@@ -134,6 +143,9 @@ export default observer(function ClusterInfoList() {
   useAutorun(() => {
     setTheme(themeStore.getFluentUiTheme())
   })
+  const groupedItems = useMemo(() => {
+    return groupByTag(items, '')
+  }, [items])
 
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}

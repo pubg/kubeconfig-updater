@@ -24,14 +24,18 @@ export type ClusterMetadata = AggregatedClusterMetadata.AsObject & {
 
 export interface ClusterMetadataItem extends IObjectWithKey {
   data: ClusterMetadata
+  tags: Map<string, string>
 }
 
 export namespace ClusterMetadataItem {
   export function fromObject(metadata: AggregatedClusterMetadata): ClusterMetadataItem {
     const data = metadata.toObject() as ClusterMetadata
+    const tags = new Map<string, string>(data.metadata.clustertagsMap)
+
     return {
       key: data.metadata.clustername,
       data,
+      tags,
     }
   }
 }
