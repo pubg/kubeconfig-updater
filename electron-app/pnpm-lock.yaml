@@ -78,6 +78,7 @@ specifiers:
   opencollective-postinstall: ^2.0.3
   pino: ^7.5.1
   pino-pretty: ^7.3.0
+  pino-webpack-plugin: ^1.1.0
   prettier: ^2.4.1
   react: ^17.0.2
   react-dom: ^17.0.2
@@ -199,6 +200,7 @@ devDependencies:
   lint-staged: 11.2.6
   mini-css-extract-plugin: 2.4.5_webpack@5.65.0
   opencollective-postinstall: 2.0.3
+  pino-webpack-plugin: 1.1.0_webpack-cli@4.9.1
   prettier: 2.5.1
   react-refresh: 0.10.0
   react-refresh-typescript: 2.0.3_df5a705c8e70a569263a6b8d76f3e17a
@@ -8953,6 +8955,18 @@ packages:
   /pino-std-serializers/4.0.0:
     resolution: {integrity: sha512-cK0pekc1Kjy5w9V2/n+8MkZwusa6EyyxfeQCB799CQRhRt/CqYKiWs5adeu8Shve2ZNffvfC/7J64A2PJo1W/Q==}
     dev: false
+
+  /pino-webpack-plugin/1.1.0_webpack-cli@4.9.1:
+    resolution: {integrity: sha512-UOrh+LvYX1oASYKIc4/lhOxQZSVP8oEx/ZunfdgcvEm5XeJlZ6co8H/ZZotnaLNarZbHBF3Ez05zNYl4Ed5d7A==}
+    engines: {node: '>= 12.13.0'}
+    dependencies:
+      webpack: 5.65.0_webpack-cli@4.9.1
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
+      - webpack-cli
+    dev: true
 
   /pino/7.6.0:
     resolution: {integrity: sha512-CCCdryvM/chT0CDt9jQ1//z62RpSXPrzUFUpY4b8eKCVq3T2T3UF6DomoczkPze9d6VFiTyVF6Y8A6F9iAyAxg==}

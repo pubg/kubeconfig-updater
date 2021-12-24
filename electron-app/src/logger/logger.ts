@@ -9,6 +9,6 @@ function loggerFactory(): pino.Logger {
   return require('./browserLogger')
 }
 
-const logger = loggerFactory().default
+const logger = loggerFactory().default as pino.Logger
 
 export default logger
