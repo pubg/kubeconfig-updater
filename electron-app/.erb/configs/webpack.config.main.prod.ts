@@ -11,6 +11,7 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
+import { PinoWebpackPlugin } from 'pino-webpack-plugin'
 
 checkNodeEnv('production');
 deleteSourceMaps();
@@ -48,6 +49,7 @@ export default merge(baseConfig, {
   },
 
   plugins: [
+    new PinoWebpackPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
     }),
@@ -65,6 +67,7 @@ export default merge(baseConfig, {
       NODE_ENV: 'production',
       DEBUG_PROD: false,
       START_MINIMIZED: false,
+      BUILD_TYPE: 'main',
     }),
   ],
 

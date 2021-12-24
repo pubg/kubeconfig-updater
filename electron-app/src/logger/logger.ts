@@ -1,14 +1,14 @@
-import browserLogger from './browserLogger'
-import mainLogger from './mainLogger'
+/* eslint-disable global-require */
+import pino from 'pino'
 
-function runtimeType(): 'main' | 'browser' {
-  if (typeof process === 'object') {
-    return 'main'
+function loggerFactory(): pino.Logger {
+  if (process.env.BUILD_TYPE === 'main') {
+    return require('./mainLogger')
   }
 
-  return 'browser'
+  return require('./browserLogger')
 }
 
-const logger = runtimeType() === 'main' ? mainLogger : browserLogger
+const logger = loggerFactory().default as pino.Logger
 
 export default logger
