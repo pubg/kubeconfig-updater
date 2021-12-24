@@ -7,7 +7,7 @@ const devOptions: pino.LoggerOptions = {
 
   // deprecated but still working
   prettyPrint: {
-    colorize: false,
+    colorize: true,
     ignore: 'pid,hostname',
     translateTime: true,
   },
