@@ -116,7 +116,9 @@ export default merge(baseConfig, {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
+      BUILD_TYPE: 'renderer',
     }),
+
 
     new webpack.LoaderOptionsPlugin({
       debug: true,
