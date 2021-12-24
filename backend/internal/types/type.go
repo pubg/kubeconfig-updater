@@ -12,4 +12,7 @@ const (
 	CREDRESOLVER_ATTRIBUTE_PROFILE = "profile"
 
 	VERSION = "dev-build"
+
+	AWS_DEFAULT_REGION     = "us-east-1"
+	TENCENT_DEFAULT_REGION = "ap-guangzhou"
 )

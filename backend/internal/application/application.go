@@ -156,8 +156,8 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 
 func (s *ServerApplication) initServiceLayer() {
 	//Where is DI?
-	s.CredService = cred_resolver_service.NewCredResolveService()
 	s.CredStoreService = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
+	s.CredService = cred_resolver_service.NewCredResolveService(s.CredStoreService)
 	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
 	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService)
 }

@@ -54,7 +54,8 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		fmt.Printf("Resolver Status: %s\n", resolver.GetResolverDescription())
 	}
 
-	aggrMetaMap := map[string]*protos.AggregatedClusterMetadata{}
+	regedMetaMap := map[string]bool{}
+	availMetaMap := map[string]*protos.AggregatedClusterMetadata{}
 	for _, resolver := range resolvers {
 		metadatas, err := resolver.ListClusters()
 		if err != nil {
@@ -63,11 +64,11 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		}
 		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters\n", resolver.GetResolverDescription(), len(metadatas))
 		for _, metadata := range metadatas {
-			if aggrMeta, exists := aggrMetaMap[metadata.ClusterName]; exists {
+			if aggrMeta, exists := availMetaMap[metadata.ClusterName]; exists {
 				aggrMeta.Metadata = mergeMetadata(aggrMeta.Metadata, metadata)
 				aggrMeta.DataResolvers = append(aggrMeta.DataResolvers, resolver.GetResolverDescription())
 			} else {
-				aggrMetaMap[metadata.ClusterName] = &protos.AggregatedClusterMetadata{
+				availMetaMap[metadata.ClusterName] = &protos.AggregatedClusterMetadata{
 					Metadata:      metadata,
 					DataResolvers: []string{resolver.GetResolverDescription()},
 					Status:        protos.ClusterInformationStatus_SUGGESTION_OK,
@@ -75,13 +76,34 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 			}
 
 			if _, ok := resolver.(*KubeconfigResolver); ok {
-				aggrMetaMap[metadata.ClusterName].Status = protos.ClusterInformationStatus_REGISTERED_OK
+				regedMetaMap[metadata.ClusterName] = true
+			}
+		}
+	}
+
+	for _, meta := range availMetaMap {
+		status := getClusterInfoStatus(s.credStoreService, meta.Metadata.CredResolverId)
+		if _, exists := regedMetaMap[meta.Metadata.ClusterName]; exists {
+			if status == "not_exists" {
+				meta.Status = protos.ClusterInformationStatus_REGISTERED_NOTOK_NO_CRED_RESOLVER
+			} else if status == "not_ok" {
+				meta.Status = protos.ClusterInformationStatus_REGISTERED_NOTOK_CRED_RES_NOTOK
+			} else if status == "ok" {
+				meta.Status = protos.ClusterInformationStatus_REGISTERED_OK
+			}
+		} else {
+			if status == "not_exists" {
+				meta.Status = protos.ClusterInformationStatus_SUGGESTION_NOTOK_NO_CRED_RESOLVER
+			} else if status == "not_ok" {
+				meta.Status = protos.ClusterInformationStatus_SUGGESTION_NOTOK_CRED_RES_NOTOK
+			} else if status == "ok" {
+				meta.Status = protos.ClusterInformationStatus_SUGGESTION_OK
 			}
 		}
 	}
 
 	var metas []*protos.AggregatedClusterMetadata
-	for _, meta := range aggrMetaMap {
+	for _, meta := range availMetaMap {
 		metas = append(metas, meta)
 	}
 	s.cache.ClearAndSet(metas)
@@ -90,6 +112,23 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		return err
 	}
 	return nil
+}
+
+func getClusterInfoStatus(credStoreService *cred_resolver_service.CredResolverStoreService, credResolverId string) string {
+	if credResolverId == "" {
+		return "not_exists"
+	}
+	credResolver, exists, err := credStoreService.GetCredResolver(credResolverId)
+	if err != nil {
+		return "not_ok"
+	}
+	if !exists {
+		return "not_exists"
+	}
+	if credResolver.Status == protos.CredentialResolverStatus_CRED_REGISTERED_OK {
+		return "ok"
+	}
+	return "not_ok"
 }
 
 func mergeMetadata(a *protos.ClusterMetadata, b *protos.ClusterMetadata) *protos.ClusterMetadata {
