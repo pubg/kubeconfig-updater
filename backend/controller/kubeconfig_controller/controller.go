@@ -84,7 +84,7 @@ func (s *kubeconfigService) SyncAvailableCredResolver(context.Context, *protos.C
 	}, nil
 }
 
-func (s *kubeconfigService) GetProfiles(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+func (s *kubeconfigService) GetRegisteredProfiles(context.Context, *protos.GetRegisteredProfilesReq) (*protos.GetRegisteredProfilesRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProfiles not implemented")
 }
 

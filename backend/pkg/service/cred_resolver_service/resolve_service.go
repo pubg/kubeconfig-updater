@@ -116,6 +116,8 @@ func (s *CredResolveService) SyncCredResolversStatus() error {
 	return nil
 }
 
+//고수준 함수만 남겨두고 싶은데
+//raw_service로 이전해야 하는지
 func isRegisteredStatus(status protos.CredentialResolverStatus) bool {
 	return status == protos.CredentialResolverStatus_CRED_REGISTERED_OK || status == protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK
 }
