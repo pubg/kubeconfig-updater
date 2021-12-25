@@ -23,8 +23,7 @@ MacOS: /Users/<username>/.kubeconfig-updater-gui
 ```
 
 ## Roadmap
-|Version|Frontend|Backend|Due Date|
-|---|---|---|---|
+[Here](./Roadmap-Detail.md)
 
 ## Organization Customized Feature
 This program will support organization specific customized options.
