@@ -11,6 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.6.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.25.0
 	github.com/aws/aws-sdk-go-v2/service/eks v1.15.1
+	github.com/aws/aws-sdk-go-v2/service/sts v1.6.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/mitchellh/mapstructure v1.4.3
@@ -18,8 +19,8 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.228
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.313
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.228
-	github.com/tidwall/gjson v1.9.1
 	github.krafton.com/xtrm/fox v1.1.1
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	google.golang.org/grpc v1.38.0
@@ -44,7 +45,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.3.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.6.1 // indirect
 	github.com/aws/smithy-go v1.9.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -73,7 +73,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319 // indirect
+	github.com/tidwall/gjson v1.9.1 // indirect
 	github.com/tidwall/match v1.0.3 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tidwall/sjson v1.2.2 // indirect

@@ -135,7 +135,7 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 	if useMockController {
 		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewMockController())
 	} else {
-		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.RegisterService, s.MetaService))
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.CredService, s.RegisterService, s.MetaService))
 	}
 
 	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer, grpcweb.WithOriginFunc(func(_ string) bool { return true }))

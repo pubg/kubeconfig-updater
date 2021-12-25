@@ -51,7 +51,7 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		return err
 	}
 	for _, resolver := range resolvers {
-		fmt.Printf("Resolver Status: %s\n", resolver.GetResolverDescription())
+		fmt.Printf("Resolver Description: %s\n", resolver.GetResolverDescription())
 	}
 
 	regedMetaMap := map[string]bool{}

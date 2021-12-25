@@ -53,7 +53,7 @@ func getCredentialsDirectoryPath() (string, error) {
 }
 
 // GetConfigInfo returns: AccountId, CredIsNotValid, error
-// CredIsNotValid => config is not valid aws credential
+// CredIsNotValid => config is not valid tencent credential
 func GetConfigInfo(credProvider tcCommon.Provider) (string, bool, error) {
 	cred, err := credProvider.GetCredential()
 	if err != nil {
@@ -63,7 +63,7 @@ func GetConfigInfo(credProvider tcCommon.Provider) (string, bool, error) {
 	if err != nil {
 		return "", false, err
 	}
-	res, err := stsClient.GetCallerIdentity(&sts.GetCallerIdentityRequest{})
+	res, err := stsClient.GetCallerIdentity(sts.NewGetCallerIdentityRequest())
 	if err != nil {
 		return "", false, err
 	}
