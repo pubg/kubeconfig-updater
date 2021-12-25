@@ -22,6 +22,8 @@ type KubeconfigClient interface {
 	SetCredResolver(ctx context.Context, in *CredResolverConfig, opts ...grpc.CallOption) (*CommonRes, error)
 	SetCredResolvers(ctx context.Context, in *CredResolversReq, opts ...grpc.CallOption) (*CommonRes, error)
 	DeleteCredResolver(ctx context.Context, in *DeleteCredResolverReq, opts ...grpc.CallOption) (*CommonRes, error)
+	SyncAvailableCredResolver(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+	GetProfiles(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 	GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error)
 	RegisterCluster(ctx context.Context, in *RegisterClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
 	DeleteCluster(ctx context.Context, in *DeleteClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
@@ -72,6 +74,24 @@ func (c *kubeconfigClient) DeleteCredResolver(ctx context.Context, in *DeleteCre
 	return out, nil
 }
 
+func (c *kubeconfigClient) SyncAvailableCredResolver(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/SyncAvailableCredResolver", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kubeconfigClient) GetProfiles(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/GetProfiles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *kubeconfigClient) GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error) {
 	out := new(GetAvailableClustersRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/GetAvailableClusters", in, out, opts...)
@@ -116,6 +136,8 @@ type KubeconfigServer interface {
 	SetCredResolver(context.Context, *CredResolverConfig) (*CommonRes, error)
 	SetCredResolvers(context.Context, *CredResolversReq) (*CommonRes, error)
 	DeleteCredResolver(context.Context, *DeleteCredResolverReq) (*CommonRes, error)
+	SyncAvailableCredResolver(context.Context, *CommonReq) (*CommonRes, error)
+	GetProfiles(context.Context, *CommonReq) (*CommonRes, error)
 	GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error)
 	RegisterCluster(context.Context, *RegisterClusterReq) (*CommonRes, error)
 	DeleteCluster(context.Context, *DeleteClusterReq) (*CommonRes, error)
@@ -138,6 +160,12 @@ func (UnimplementedKubeconfigServer) SetCredResolvers(context.Context, *CredReso
 }
 func (UnimplementedKubeconfigServer) DeleteCredResolver(context.Context, *DeleteCredResolverReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCredResolver not implemented")
+}
+func (UnimplementedKubeconfigServer) SyncAvailableCredResolver(context.Context, *CommonReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncAvailableCredResolver not implemented")
+}
+func (UnimplementedKubeconfigServer) GetProfiles(context.Context, *CommonReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfiles not implemented")
 }
 func (UnimplementedKubeconfigServer) GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableClusters not implemented")
@@ -236,6 +264,42 @@ func _Kubeconfig_DeleteCredResolver_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Kubeconfig_SyncAvailableCredResolver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KubeconfigServer).SyncAvailableCredResolver(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Kubeconfig/SyncAvailableCredResolver",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KubeconfigServer).SyncAvailableCredResolver(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Kubeconfig_GetProfiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KubeconfigServer).GetProfiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Kubeconfig/GetProfiles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KubeconfigServer).GetProfiles(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Kubeconfig_GetAvailableClusters_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CommonReq)
 	if err := dec(in); err != nil {
@@ -330,6 +394,14 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCredResolver",
 			Handler:    _Kubeconfig_DeleteCredResolver_Handler,
+		},
+		{
+			MethodName: "SyncAvailableCredResolver",
+			Handler:    _Kubeconfig_SyncAvailableCredResolver_Handler,
+		},
+		{
+			MethodName: "GetProfiles",
+			Handler:    _Kubeconfig_GetProfiles_Handler,
 		},
 		{
 			MethodName: "GetAvailableClusters",

@@ -101,7 +101,7 @@ func (s *CredResolveService) SyncCredResolversStatus() error {
 			status = protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK
 		}
 		credResolver.Status = status
-		credResolver.StatusMessage = invalidReason
+		credResolver.StatusDetail = invalidReason
 		err = s.credStoreService.SetCredResolver(credResolver)
 		if err != nil {
 			return err
