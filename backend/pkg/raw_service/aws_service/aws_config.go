@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"os"
@@ -120,6 +121,9 @@ func getAwsDirectoryPath() (string, error) {
 func GetConfigInfo(cfg *aws.Config) (string, bool, error) {
 	copiedCfg := cfg.Copy()
 	copiedCfg.Region = types.AWS_DEFAULT_REGION
+	copiedCfg.Retryer = func() aws.Retryer {
+		return retry.AddWithMaxAttempts(retry.NewStandard(), 1)
+	}
 	client := sts.NewFromConfig(copiedCfg)
 	out, err := client.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
 	if err != nil {
