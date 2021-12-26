@@ -50,3 +50,10 @@ enum ResultCode {
   SERVER_DB_UPDATE_FAILED = 100012;
   SERVER_INVALID_GAME_SESSION = 100013;
 }
+
+enum InfraVendor {
+  VendorUnknown = 0;
+  AWS = 1;
+  Azure = 2;
+  Tencent = 3;
+}
