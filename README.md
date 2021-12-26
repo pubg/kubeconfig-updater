@@ -22,8 +22,9 @@ Linux: /home/<username>/.kubeconfig-updater-gui
 MacOS: /Users/<username>/.kubeconfig-updater-gui
 ```
 
-## Roadmap
-[Here](./Roadmap-Detail.md)
+## Other Documents
+[Update History](./Update-history.md)
+[Roadmap](./Roadmap.md)
 
 ## Organization Customized Feature
 This program will support organization specific customized options.
