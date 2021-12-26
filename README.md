@@ -2,17 +2,12 @@
 
 This is GUI kuberentes config file manager app. It automatically resolve your cloud profiles and suggest registable clusters.
 
-## Run Requirements
-OS: Windows / Linux / MacOS
-
-Arch: x86-64(amd64) / Arm64 
-
-## Provided Artifact Type
-Windows: Portable Zip, Installer
-
-Linux: AppImage
-
-MacOS: App
+## Support Platforms
+|OS|Architecture|Package Type|
+|---|---|---|
+|Windows|x86-64 / Arm64|Portable Zip, Installer|
+|Linux|x86-64 / Arm64|AppImage|
+|MacOS|x86-64 / Arm64|App|
 
 ## Config Store Path
 Config stored under your HOME directory.
