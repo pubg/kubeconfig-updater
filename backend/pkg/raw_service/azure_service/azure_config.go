@@ -2,15 +2,18 @@ package azure_service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
-	cli "github.com/Azure/go-autorest/autorest/azure/cli"
 	"os"
 	"os/exec"
 	"regexp"
 	"runtime"
+
+	"github.com/Azure/azure-sdk-for-go/services/subscription/mgmt/2020-09-01/subscription"
+	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
+	cli "github.com/Azure/go-autorest/autorest/azure/cli"
 )
 
 func NewEnvAuthConfig() (*EnvAuthConfig, error) {
@@ -139,4 +142,22 @@ func GetAzureCliRunner() *exec.Cmd {
 		cliCmd.Env = append(cliCmd.Env, fmt.Sprintf("PATH=%s:%s", os.Getenv(azureCLIPath), azureCLIDefaultPath))
 	}
 	return cliCmd
+}
+
+// GetConfigInfo returns: Subscription Displayname, error
+func GetConfigInfo(authConfig auth.AuthorizerConfig, subscriptionId string) (string, error) {
+	authorizer, err := authConfig.Authorizer()
+	if err != nil {
+		return "", err
+	}
+
+	client := subscription.NewSubscriptionsClient()
+	client.Authorizer = authorizer
+
+	model, err := client.Get(context.Background(), subscriptionId)
+	if err != nil {
+		return "", err
+	}
+
+	return *model.DisplayName, nil
 }
