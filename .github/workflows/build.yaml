@@ -117,6 +117,6 @@ jobs:
           path: ./packages
       - run: |
           ls -al packages
-          gh release create v0.1.1 --repo=https://github.com/pubg/kubeconfig-updater --title=v0.1.1 ./packages/*
+          gh release create v0.1.1-logger --repo=https://github.com/pubg/kubeconfig-updater --title=v0.1.1-logger ./packages/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
