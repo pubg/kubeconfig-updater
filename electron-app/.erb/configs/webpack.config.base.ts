@@ -47,5 +47,9 @@ export default {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
     }),
+
+    new webpack.DefinePlugin({
+      'WebpackInjected.BUILD_VERSION': JSON.stringify(require('../../package.json').version)
+    })
   ],
 };
