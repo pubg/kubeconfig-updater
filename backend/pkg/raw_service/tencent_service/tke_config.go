@@ -2,15 +2,16 @@ package tencent_service
 
 import (
 	"encoding/json"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
-	sts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts/v20180813"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	sts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts/v20180813"
+
 	tcCommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 

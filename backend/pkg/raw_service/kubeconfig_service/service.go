@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"k8s.io/client-go/tools/clientcmd"
 )
 

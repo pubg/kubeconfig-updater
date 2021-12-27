@@ -6,9 +6,9 @@ import (
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
 type ClusterMetadataResolver interface {
@@ -175,19 +175,19 @@ func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResol
 
 	credResolvers := s.credStoreService.ListCredResolvers()
 	for _, cr := range credResolvers {
-		if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_AWS) {
+		if strings.EqualFold(cr.InfraVendor, types.InfraVendor_AWS.String()) {
 			awsResolver, err := NewAwsResolver(cr, cr.AccountId, s.credService)
 			if err != nil {
 				return nil, err
 			}
 			metaResolvers = append(metaResolvers, awsResolver)
-		} else if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_Azure) {
+		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_Azure.String()) {
 			authorizer, err := NewAzureResolver(cr, cr.AccountId, s.credService)
 			if err != nil {
 				return nil, err
 			}
 			metaResolvers = append(metaResolvers, authorizer)
-		} else if strings.EqualFold(cr.InfraVendor, types.INFRAVENDOR_Tencent) {
+		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_Tencent.String()) {
 			tcResolver, err := NewTencentResolver(cr, cr.AccountId, s.credService)
 			if err != nil {
 				return nil, err

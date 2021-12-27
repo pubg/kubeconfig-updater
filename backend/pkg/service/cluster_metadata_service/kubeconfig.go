@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/kubeconfig_service"
 	"k8s.io/client-go/tools/clientcmd"
 )

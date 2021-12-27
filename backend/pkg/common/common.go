@@ -60,3 +60,13 @@ func ResolvePathToAbs(path string) (string, error) {
 	}
 	return filepath.Abs(path)
 }
+
+func GetItemOrError(m map[string]string, key string) (string, error) {
+	if m == nil {
+		return "", fmt.Errorf("map should not be null, key:%s", key)
+	}
+	if value, exists := m[key]; exists {
+		return value, nil
+	}
+	return "", fmt.Errorf("map doesn't have key, key:%s", key)
+}

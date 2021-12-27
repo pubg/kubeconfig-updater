@@ -3,14 +3,16 @@ package aws_service
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
+
 	"os"
 	"path/filepath"
 
-	"github.com/pubg/kubeconfig-updater/backend/internal/common"
 	"gopkg.in/ini.v1"
 )
 

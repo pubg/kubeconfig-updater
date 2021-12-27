@@ -3,7 +3,8 @@ package cluster_metadata_service
 import (
 	"context"
 	"fmt"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
+
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 )
 
 func RegisterEksWithIamUser(clusterName, clusterRegion, profile string) error {

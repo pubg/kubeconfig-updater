@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
 type applicationService struct {

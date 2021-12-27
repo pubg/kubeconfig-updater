@@ -14,7 +14,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_controller"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
-	"github.com/pubg/kubeconfig-updater/backend/internal/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"

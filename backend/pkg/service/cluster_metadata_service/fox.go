@@ -7,7 +7,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"github.krafton.com/xtrm/fox/client"
 	"github.krafton.com/xtrm/fox/source/pkg/document"
 )
@@ -97,7 +97,7 @@ func parseDoc(doc *document.Document) (*protos.ClusterMetadata, error) {
 	}
 	targetMetadata.ClusterName = foxMetadata.ClusterName
 	targetMetadata.CredResolverId = foxMetadata.InfraAccountId
-	targetMetadata.ClusterTags[types.CLUSTERTAGS_ClusterRegion] = foxMetadata.ClusterRegion
+	targetMetadata.ClusterTags[types.KnownClusterTags_ClusterRegion.String()] = foxMetadata.ClusterRegion
 	targetMetadata.ClusterTags["InfraAccountId"] = foxMetadata.InfraAccountId
 	targetMetadata.ClusterTags["ClusterEngine"] = foxMetadata.ClusterEngine
 	targetMetadata.ClusterTags["InfraVendor"] = foxMetadata.InfraVendor

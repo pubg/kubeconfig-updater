@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
 type ClusterRegisterService struct {
@@ -30,28 +31,36 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 	}
 
 	vendor := credConf.GetInfraVendor()
-	if strings.EqualFold(vendor, types.INFRAVENDOR_AWS) {
-		_, profile, err := s.credService.GetAwsSdkConfig(ctx, credConf)
+	if strings.EqualFold(vendor, types.InfraVendor_AWS.String()) {
+		_, profileOrEmpty, err := s.credService.GetAwsSdkConfig(ctx, credConf)
 		if err != nil {
 			return err
 		}
-		//임시적으로 허용
-		//if profile == "" {
-		//	return fmt.Errorf("cred kind(%s) is not acceptable to register EKS", credConf.GetKind())
-		//}
-		return aws_service.RegisterEksWithIamUser(clusterName, meta.Metadata.ClusterTags[types.CLUSTERTAGS_ClusterRegion], profile)
-	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Azure) {
-		return azure_service.RegisterAksCluster(meta.Metadata.ClusterTags[types.CLUSTERTAGS_ResourceGroup], clusterName)
-	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Tencent) {
+		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ClusterRegion.String())
+		if err != nil {
+			return fmt.Errorf("clusterMetadata should have ClusterRegion tag, but not exists")
+		}
+		return aws_service.RegisterEksWithIamUser(clusterName, clusterRegion, profileOrEmpty)
+	} else if strings.EqualFold(vendor, types.InfraVendor_Azure.String()) {
+		resourceGroup, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ResourceGroup.String())
+		if err != nil {
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTags_ResourceGroup.String())
+		}
+		return azure_service.RegisterAksCluster(resourceGroup, clusterName)
+	} else if strings.EqualFold(vendor, types.InfraVendor_Tencent.String()) {
 		credProvider, err := s.credService.GetTencentSdkConfig(credConf)
 		if err != nil {
 			return err
 		}
-		return tencent_service.RegisterTkeCluster0(meta.Metadata.ClusterTags[types.CLUSTERTAGS_ClusterRegion], meta.Metadata.ClusterTags[types.CLUSTERTAGS_ClusterId], clusterName, credProvider)
+		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ClusterRegion.String())
+		if err != nil {
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTags_ClusterRegion.String())
+		}
+		clusterId, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ClusterId.String())
+		if err != nil {
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTags_ClusterId.String())
+		}
+		return tencent_service.RegisterTkeCluster0(clusterRegion, clusterId, clusterName, credProvider)
 	}
 	return fmt.Errorf("not supported infraVendor value %s", credConf.GetInfraVendor())
-}
-
-func (s ClusterRegisterService) DeleteCluster(ctx context.Context, clusterName string) error {
-	return nil
 }

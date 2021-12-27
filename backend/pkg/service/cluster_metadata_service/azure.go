@@ -3,12 +3,13 @@ package cluster_metadata_service
 import (
 	"context"
 	"fmt"
+
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	aks "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2021-10-01/containerservice"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
@@ -63,7 +64,7 @@ func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error occurred when trying parse ResourceId id:%s error:%s", *cluster.ID, err.Error())
 		}
-		meta.ClusterTags[types.CLUSTERTAGS_ResourceGroup] = resource.ResourceGroupName
+		meta.ClusterTags[types.KnownClusterTags_ResourceGroup.String()] = resource.ResourceGroupName
 		for key, value := range cluster.Tags {
 			meta.ClusterTags[key] = *value
 		}

@@ -18,7 +18,7 @@ package cmd
 import (
 	"github.com/pubg/kubeconfig-updater/backend/cmd/register"
 	"github.com/pubg/kubeconfig-updater/backend/cmd/server"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"github.com/spf13/cobra"
 )
 

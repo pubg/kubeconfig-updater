@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
@@ -110,7 +110,7 @@ func (r *TencentResolver) listTke(region string) ([]*protos.ClusterMetadata, err
 			CredResolverId: r.tcAccountId,
 			ClusterTags:    map[string]string{},
 		}
-		meta.ClusterTags[types.CLUSTERTAGS_ClusterId] = *cluster.ClusterId
+		meta.ClusterTags[types.KnownClusterTags_ClusterId.String()] = *cluster.ClusterId
 		for _, tagSpec := range cluster.TagSpecification {
 			for _, tag := range tagSpec.Tags {
 				meta.ClusterTags[*tag.Key] = *tag.Value

@@ -8,12 +8,12 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
@@ -41,7 +41,7 @@ func (s *CredResolveService) GetAwsSdkConfig(ctx context.Context, credConf *prot
 		if attributes == nil {
 			return nil, "", fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[types.CREDRESOLVER_ATTRIBUTE_PROFILE]
+		profile, exists := attributes[types.KnownCredAttributes_profile.String()]
 		if !exists {
 			return nil, "", fmt.Errorf("profile attribute should be exist")
 		}
@@ -66,7 +66,7 @@ func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *pr
 		if attributes == nil {
 			return nil, fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[types.CREDRESOLVER_ATTRIBUTE_PROFILE]
+		profile, exists := attributes[types.KnownCredAttributes_profile.String()]
 		if !exists {
 			return nil, fmt.Errorf("profile attribute should be exist")
 		}
@@ -89,7 +89,7 @@ func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverCo
 		if attributes == nil {
 			return nil, fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[types.CREDRESOLVER_ATTRIBUTE_PROFILE]
+		profile, exists := attributes[types.KnownCredAttributes_profile.String()]
 		if !exists {
 			return nil, fmt.Errorf("profile attribute should be exist")
 		}
@@ -127,7 +127,7 @@ func isRegisteredStatus(status protos.CredentialResolverStatus) bool {
 func (s *CredResolveService) getCredResolverStatus(credConf *protos.CredResolverConfig) (protos.CredentialResolverStatus, string, error) {
 	ctx := context.Background()
 	vendor := credConf.GetInfraVendor()
-	if strings.EqualFold(vendor, types.INFRAVENDOR_AWS) {
+	if strings.EqualFold(vendor, types.InfraVendor_AWS.String()) {
 		cfg, _, err := s.GetAwsSdkConfig(ctx, credConf)
 		if err != nil {
 			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
@@ -141,7 +141,7 @@ func (s *CredResolveService) getCredResolverStatus(credConf *protos.CredResolver
 			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, reason, nil
 		}
 		return protos.CredentialResolverStatus_CRED_REGISTERED_OK, "", nil
-	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Azure) {
+	} else if strings.EqualFold(vendor, types.InfraVendor_Azure.String()) {
 		authConfig, err := s.GetAzureSdkConfig(ctx, credConf)
 		if err != nil {
 			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
@@ -151,7 +151,7 @@ func (s *CredResolveService) getCredResolverStatus(credConf *protos.CredResolver
 			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
 		}
 		return protos.CredentialResolverStatus_CRED_REGISTERED_OK, "", nil
-	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Tencent) {
+	} else if strings.EqualFold(vendor, types.InfraVendor_Tencent.String()) {
 		credProvider, err := s.GetTencentSdkConfig(credConf)
 		if err != nil {
 			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
@@ -170,7 +170,7 @@ func (s *CredResolveService) getCredResolverStatus(credConf *protos.CredResolver
 }
 
 func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Profile, error) {
-	if strings.EqualFold(infraVendor, types.INFRAVENDOR_AWS) {
+	if strings.EqualFold(infraVendor, types.InfraVendor_AWS.String()) {
 		profileNames, err := aws_service.GetProfiles()
 		if err != nil {
 			return nil, err
@@ -185,11 +185,11 @@ func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Pro
 			profiles = append(profiles, &protos.Profile{
 				ProfileName: profileName,
 				AccountId:   accountIdOrEmpty,
-				InfraVendor: types.INFRAVENDOR_AWS,
+				InfraVendor: types.InfraVendor_AWS.String(),
 			})
 		}
 		return profiles, nil
-	} else if strings.EqualFold(infraVendor, types.INFRAVENDOR_Azure) {
+	} else if strings.EqualFold(infraVendor, types.InfraVendor_Azure.String()) {
 		subscriptions, err := azure_service.GetSubscriptions()
 		if err != nil {
 			return nil, err
@@ -199,11 +199,11 @@ func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Pro
 			profiles = append(profiles, &protos.Profile{
 				ProfileName: subscription,
 				AccountId:   subscription,
-				InfraVendor: types.INFRAVENDOR_Azure,
+				InfraVendor: types.InfraVendor_Azure.String(),
 			})
 		}
 		return profiles, nil
-	} else if strings.EqualFold(infraVendor, types.INFRAVENDOR_Tencent) {
+	} else if strings.EqualFold(infraVendor, types.InfraVendor_Tencent.String()) {
 		profileNames, err := tencent_service.GetProfiles()
 		if err != nil {
 			return nil, err
@@ -215,7 +215,7 @@ func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Pro
 			profiles = append(profiles, &protos.Profile{
 				ProfileName: profileName,
 				AccountId:   accountIdOrEmpty,
-				InfraVendor: types.INFRAVENDOR_Tencent,
+				InfraVendor: types.InfraVendor_Tencent.String(),
 			})
 		}
 		return profiles, nil
