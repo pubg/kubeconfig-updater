@@ -35,9 +35,10 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 		if err != nil {
 			return err
 		}
-		if profile == "" {
-			return fmt.Errorf("cred kind(%s) is not acceptable to register EKS", credConf.GetKind())
-		}
+		//임시적으로 허용
+		//if profile == "" {
+		//	return fmt.Errorf("cred kind(%s) is not acceptable to register EKS", credConf.GetKind())
+		//}
 		return aws_service.RegisterEksWithIamUser(clusterName, meta.Metadata.ClusterTags[types.CLUSTERTAGS_ClusterRegion], profile)
 	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Azure) {
 		return azure_service.RegisterAksCluster(meta.Metadata.ClusterTags[types.CLUSTERTAGS_ResourceGroup], clusterName)

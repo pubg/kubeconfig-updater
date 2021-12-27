@@ -3,9 +3,6 @@ package kubeconfig_controller
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/kubeconfig_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
@@ -84,8 +81,32 @@ func (s *kubeconfigService) SyncAvailableCredResolver(context.Context, *protos.C
 	}, nil
 }
 
-func (s *kubeconfigService) GetRegisteredProfiles(context.Context, *protos.GetRegisteredProfilesReq) (*protos.GetRegisteredProfilesRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProfiles not implemented")
+func (s *kubeconfigService) GetRegisteredProfiles(ctx context.Context, req *protos.GetRegisteredProfilesReq) (*protos.GetRegisteredProfilesRes, error) {
+	if req.InfraVendor == "" {
+		return &protos.GetRegisteredProfilesRes{
+			CommonRes: &protos.CommonRes{
+				Status:  protos.ResultCode_INVALID_ARGUMENT,
+				Message: "InfraVendor should not be empty",
+			},
+		}, nil
+	}
+
+	profiles, err := s.credResolverService.GetLocalProfiles(req.InfraVendor)
+	if err != nil {
+		return &protos.GetRegisteredProfilesRes{
+			CommonRes: &protos.CommonRes{
+				Status:  protos.ResultCode_SERVER_INTERNAL,
+				Message: err.Error(),
+			},
+		}, nil
+	}
+
+	return &protos.GetRegisteredProfilesRes{
+		CommonRes: &protos.CommonRes{
+			Message: "get registered profiles success",
+		},
+		Profiles: profiles,
+	}, nil
 }
 
 func (s *kubeconfigService) GetAvailableClusters(context.Context, *protos.CommonReq) (*protos.GetAvailableClustersRes, error) {

@@ -167,3 +167,57 @@ func (s *CredResolveService) getCredResolverStatus(credConf *protos.CredResolver
 	}
 	return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, "", fmt.Errorf("not supported infraVendor value %s", credConf.GetInfraVendor())
 }
+
+func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Profile, error) {
+	if strings.EqualFold(infraVendor, types.INFRAVENDOR_AWS) {
+		profileNames, err := aws_service.GetProfiles()
+		if err != nil {
+			return nil, err
+		}
+		var profiles []*protos.Profile
+		for _, profileName := range profileNames {
+			cfg, err := config.LoadDefaultConfig(context.Background(), config.WithSharedConfigProfile(profileName))
+			if err != nil {
+				return nil, err
+			}
+			accountIdOrEmpty, _, _ := aws_service.GetConfigInfo(&cfg)
+			profiles = append(profiles, &protos.Profile{
+				ProfileName: profileName,
+				AccountId:   accountIdOrEmpty,
+				InfraVendor: types.INFRAVENDOR_AWS,
+			})
+		}
+		return profiles, nil
+	} else if strings.EqualFold(infraVendor, types.INFRAVENDOR_Azure) {
+		subscriptions, err := azure_service.GetSubscriptions()
+		if err != nil {
+			return nil, err
+		}
+		var profiles []*protos.Profile
+		for _, subscription := range subscriptions {
+			profiles = append(profiles, &protos.Profile{
+				ProfileName: subscription,
+				AccountId:   subscription,
+				InfraVendor: types.INFRAVENDOR_Azure,
+			})
+		}
+		return profiles, nil
+	} else if strings.EqualFold(infraVendor, types.INFRAVENDOR_Tencent) {
+		profileNames, err := tencent_service.GetProfiles()
+		if err != nil {
+			return nil, err
+		}
+		var profiles []*protos.Profile
+		for _, profileName := range profileNames {
+			provider := tencent_service.NewTencentIntlProfileProvider(profileName)
+			accountIdOrEmpty, _, _ := tencent_service.GetConfigInfo(provider)
+			profiles = append(profiles, &protos.Profile{
+				ProfileName: profileName,
+				AccountId:   accountIdOrEmpty,
+				InfraVendor: types.INFRAVENDOR_Tencent,
+			})
+		}
+		return profiles, nil
+	}
+	return nil, nil
+}
