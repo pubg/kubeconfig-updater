@@ -1,4 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron')
+const electronLogger = require('electron-log').create('renderer')
+
+contextBridge.exposeInMainWorld('electronLogger', electronLogger.functions)
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
@@ -24,8 +27,8 @@ contextBridge.exposeInMainWorld('electron', {
 
 const grpcWebPort = ipcRenderer.sendSync('getGrpcWebPort')
 contextBridge.exposeInMainWorld('grpcWebPort', grpcWebPort)
-console.log(`[Preload] getGrpcWebPort: ${grpcWebPort}`)
+electronLogger.info(`[Preload] getGrpcWebPort: ${grpcWebPort}`)
 
 const theme = ipcRenderer.sendSync('theme:getTheme')
-console.log(`[Preload] getTheme: ${theme}`)
+electronLogger.info(`[Preload] getTheme: ${theme}`)
 contextBridge.exposeInMainWorld('theme', theme)

@@ -1,10 +1,7 @@
-import pino from 'pino'
+declare namespace window {
+  const electronLogger: typeof import('electron-log')['functions']
+}
 
-const browserLogger = pino({
-  name: 'renderer',
-  // TODO: make this configurable based on dev/prod
-  level: 'debug',
-  browser: {},
-})
+const { electronLogger: browserLogger } = window
 
 export default browserLogger
