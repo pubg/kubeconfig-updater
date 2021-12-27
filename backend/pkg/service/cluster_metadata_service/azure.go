@@ -64,7 +64,7 @@ func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error occurred when trying parse ResourceId id:%s error:%s", *cluster.ID, err.Error())
 		}
-		meta.ClusterTags[types.KnownClusterTags_ResourceGroup.String()] = resource.ResourceGroupName
+		meta.ClusterTags[types.KnownClusterTag_ResourceGroup.String()] = resource.ResourceGroupName
 		for key, value := range cluster.Tags {
 			meta.ClusterTags[key] = *value
 		}

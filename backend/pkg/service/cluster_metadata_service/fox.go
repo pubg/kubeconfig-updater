@@ -97,7 +97,7 @@ func parseDoc(doc *document.Document) (*protos.ClusterMetadata, error) {
 	}
 	targetMetadata.ClusterName = foxMetadata.ClusterName
 	targetMetadata.CredResolverId = foxMetadata.InfraAccountId
-	targetMetadata.ClusterTags[types.KnownClusterTags_ClusterRegion.String()] = foxMetadata.ClusterRegion
+	targetMetadata.ClusterTags[types.KnownClusterTag_ClusterRegion.String()] = foxMetadata.ClusterRegion
 	targetMetadata.ClusterTags["InfraAccountId"] = foxMetadata.InfraAccountId
 	targetMetadata.ClusterTags["ClusterEngine"] = foxMetadata.ClusterEngine
 	targetMetadata.ClusterTags["InfraVendor"] = foxMetadata.InfraVendor
