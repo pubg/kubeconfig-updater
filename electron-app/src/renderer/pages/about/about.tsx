@@ -18,7 +18,7 @@ export default function About() {
         </Box>
         <Box textAlign="center">
           <Typography variant="body2" component="div" gutterBottom>
-            Version 0.1.0
+            Version {WebpackInjected.BUILD_VERSION}
           </Typography>
         </Box>
         <Box textAlign="center">
