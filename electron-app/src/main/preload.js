@@ -1,7 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron')
 const electronLogger = require('electron-log').create('renderer')
 
-electronLogger.transports.console.format = '[{level}] {text}'
+electronLogger.transports.console.format = '[{level}]{scope} {text}'
 
 if (process.env.DEBUG_PROD !== 'true' && process.env.NODE_ENV === 'production') {
   electronLogger.transports.console.level = 'info'
