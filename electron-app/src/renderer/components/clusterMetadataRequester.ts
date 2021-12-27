@@ -77,6 +77,7 @@ export class ClusterMetadataRequester {
       browserLogger.error(e)
     }
 
+    browserLogger.debug('fetch cluster metadata done.')
     this.state = 'ready'
   })
 
