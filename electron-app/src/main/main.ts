@@ -23,6 +23,7 @@ import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
 import mainLogger from './logger/mainLogger'
 import FrontendStore from './frontendStore'
+import MenuBuilder from './menu'
 
 export default class AppUpdater {
   constructor() {
@@ -144,8 +145,8 @@ const createWindow = async () => {
   })
 
   mainWindow.removeMenu()
-  // const menuBuilder = new MenuBuilder(mainWindow)
-  // menuBuilder.buildMenu()
+  const menuBuilder = new MenuBuilder(mainWindow)
+  menuBuilder.buildMenu()
 
   // Open urls in the user's browser
   mainWindow.webContents.on('new-window', (event, url) => {
