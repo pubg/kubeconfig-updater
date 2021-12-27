@@ -47,20 +47,15 @@ export default class BackendManager {
   }
 
   start() {
-    const cmd = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`
-    this.backendLogger.info(`CMD ${cmd}`)
-    this.backendLogger.info(`CWD ${this.cwd}`)
-    this.process = execFile(
-      this.cmd,
-      ['server', `--port=${this._grpcPort}`, `--web-port=${this._grpcWebPort}`],
-      { cwd: this.cwd },
-      (err) => {
-        // if backend tree-killed, it returns exit code 1 which is expected and normal.
-        if (err && this.status !== 'on-exit') {
-          this.backendLogger.error(err)
-        }
+    const cmdArr = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`.split(' ')
+    this.backendLogger.info(`CommandLine: ${cmdArr}`)
+    this.backendLogger.info(`WorkingDir: ${this.cwd}`)
+    this.process = execFile(cmdArr[0], cmdArr.slice(1), { cwd: this.cwd }, (err) => {
+      // if backend tree-killed, it returns exit code 1 which is expected and normal.
+      if (err && this.status !== 'on-exit') {
+        this.backendLogger.error(err)
       }
-    )
+    })
 
     this.process.stdout?.on('data', (data: string) => {
       data.split('\n').forEach((line) => {
