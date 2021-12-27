@@ -10,6 +10,8 @@ import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
 
+browserLogger.debug('browser debug mode enabled')
+
 declare global {
   interface Window {
     grpcWebPort?: number
