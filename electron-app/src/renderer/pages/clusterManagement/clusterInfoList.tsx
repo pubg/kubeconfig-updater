@@ -6,9 +6,9 @@ import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
 import { toJS } from 'mobx'
 import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
-import logger from '../../../logger/logger'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
+import browserLogger from '../../logger/browserLogger'
 
 /*
 const columns: IColumn[] = [
@@ -77,7 +77,7 @@ const columns: IColumn[] = [
 */
 
 function getFluentuiTheme(): Theme {
-  logger.info(`Init FluentUi Theme: ${window.theme}, Default is AzureThemeLight`)
+  browserLogger.info(`Init FluentUi Theme: ${window.theme}, Default is AzureThemeLight`)
   if (window.theme === undefined) {
     return AzureThemeLight
   }
@@ -148,7 +148,7 @@ export default observer(function ClusterInfoList() {
 
   const onActiveItemChanged: IDetailsListProps['onActiveItemChanged'] = useCallback((proxy) => {
     const item = toJS<ClusterMetadataItem>(proxy)
-    logger.debug(item)
+    browserLogger.debug(item)
   }, [])
 
   return (

@@ -5,7 +5,7 @@ import { inject, injectable, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './symbols'
-import logger from '../../logger/logger'
+import mainLogger from '../logger/mainLogger'
 
 /**
  * BackendManager manages lifetime of kubeconfig-updater go core program
@@ -46,19 +46,19 @@ export default class BackendManager {
 
   start() {
     const cmd = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpbWebPort}`
-    logger.info(`[BackendManager] CMD ${cmd}`)
-    logger.info(`[BackendManager] CWD ${this.cwd}`)
+    mainLogger.info(`[BackendManager] CMD ${cmd}`)
+    mainLogger.info(`[BackendManager] CWD ${this.cwd}`)
     this.process = exec(cmd, { cwd: this.cwd }, (err, stdout, stderr) => {
       // if backend tree-killed, it returns exit code 1 which is expected and normal.
       if (err && this.status !== 'on-exit') {
-        logger.error(err)
+        mainLogger.error(err)
       }
     })
 
     this.process.stdout?.on('data', (data: string) => {
       data.split('\n').forEach((line) => {
         if (line.trim() !== '') {
-          logger.info(`[BackendManager] StdOut: ${line}`)
+          mainLogger.info(`[BackendManager] StdOut: ${line}`)
         }
       })
     })
@@ -66,46 +66,46 @@ export default class BackendManager {
     this.process.stderr?.on('data', (data: string) => {
       data.split('\n').forEach((line) => {
         if (line.trim() !== '') {
-          logger.error(`[BackendManager] StdErr: ${line}`)
+          mainLogger.error(`[BackendManager] StdErr: ${line}`)
         }
       })
     })
 
     this.process.on('error', (e) => {})
     this.process.on('exit', async (e) => {
-      logger.info(`[BackendManager] recerived childprocess exit event, status:${this._status}`)
+      mainLogger.info(`[BackendManager] recerived childprocess exit event, status:${this._status}`)
       if (this._status === 'running') {
         this.errorCount += 1
         if (this.errorCount >= 10) {
-          logger.error(
+          mainLogger.error(
             await dialog.showMessageBox({
               message: 'Cannot Connect to Logic Controller Process',
             })
           )
           process.exit(1)
         }
-        logger.warn('[BackendManager] kubeconfig-updater-backend died, try restart')
+        mainLogger.warn('[BackendManager] kubeconfig-updater-backend died, try restart')
         this.start()
       }
     })
   }
 
   async end() {
-    logger.info('[BackendManager] change backendmanager status to exited')
+    mainLogger.info('[BackendManager] change backendmanager status to exited')
     this._status = 'on-exit'
 
     const currProcess = this.process
 
     if (currProcess) {
-      logger.info(`[BackendManager] tree kill backend process pid:${currProcess.pid}`)
+      mainLogger.info(`[BackendManager] tree kill backend process pid:${currProcess.pid}`)
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const err = await new Promise((resolve) => kill(currProcess.pid!, resolve))
 
       if (err) {
-        logger.error(`[BackendManager] tree kill process occurred error ${err}`)
+        mainLogger.error(`[BackendManager] tree kill process occurred error ${err}`)
       }
-      logger.info('[BackendManager] kill process finished')
+      mainLogger.info('[BackendManager] kill process finished')
       this.process = null
     }
 

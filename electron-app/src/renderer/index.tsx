@@ -8,7 +8,7 @@ import { createTheme } from '@mui/material/styles'
 import { container } from 'tsyringe'
 import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
-import logger from '../logger/logger'
+import browserLogger from './logger/browserLogger'
 
 declare global {
   interface Window {
@@ -18,7 +18,7 @@ declare global {
 }
 
 function getMuiTheme(): PaletteMode {
-  logger.info(`Init Theme: ${window.theme}, Default is light`)
+  browserLogger.info(`Init Theme: ${window.theme}, Default is light`)
   return (window.theme as PaletteMode) ?? 'light'
 }
 
@@ -34,7 +34,7 @@ initializeIcons()
 // TODO: make this customizable
 
 function getHostName() {
-  logger.info(`Grpc Web Port in Browser ${window.grpcWebPort}, Default is 10981`)
+  browserLogger.info(`Grpc Web Port in Browser ${window.grpcWebPort}, Default is 10981`)
   return `http://localhost:${window.grpcWebPort ?? 10981}`
 }
 

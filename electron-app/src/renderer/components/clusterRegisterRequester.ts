@@ -1,7 +1,7 @@
 import { flow, makeObservable, observable } from 'mobx'
 import React from 'react'
 import { container, injectable } from 'tsyringe'
-import logger from '../../logger/logger'
+import browserLogger from '../logger/browserLogger'
 import { ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'
 
@@ -32,7 +32,7 @@ export class ClusterRegisterRequester {
   }
 
   request = flow(function* (this: ClusterRegisterRequester, items: Item[]) {
-    logger.info(`requesting cluster register ${items.length} items`)
+    browserLogger.info(`requesting cluster register ${items.length} items`)
     this.length = items.length
     this.processedCount = 0
 
@@ -42,7 +42,7 @@ export class ClusterRegisterRequester {
       try {
         yield (async () => {
           const req = container.resolve(RegisterClusterService)
-          logger.debug(
+          browserLogger.debug(
             `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
           )
           this.currentItem = item
@@ -53,7 +53,7 @@ export class ClusterRegisterRequester {
           }
         })()
       } catch (err) {
-        logger.error(err)
+        browserLogger.error(err)
       }
 
       this.processedCount += 1
@@ -61,7 +61,7 @@ export class ClusterRegisterRequester {
 
     this.currentItem = null
     this.state = 'ready'
-    logger.info('finished cluster register request')
+    browserLogger.info('finished cluster register request')
   })
 }
 

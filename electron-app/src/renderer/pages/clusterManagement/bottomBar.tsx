@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import * as clusterMetadataStore from './clusterMetadataStore'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
 import * as ClusterRegisterRequester from '../../components/clusterRegisterRequester'
-import logger from '../../../logger/logger'
+import browserLogger from '../../logger/browserLogger'
 
 export default observer(function BottomBar() {
   const store = clusterMetadataStore.useStore()

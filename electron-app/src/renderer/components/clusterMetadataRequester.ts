@@ -6,7 +6,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import GetAvailableClusterService from '../services/getAvailableClusters'
 import SyncAvailableClustersService from '../services/syncAvailableClusters'
-import logger from '../../logger/logger'
+import browserLogger from '../logger/browserLogger'
 
 /**
  * manages cluster metadata requesting
@@ -57,24 +57,24 @@ export class ClusterMetadataRequester {
     this.items = []
 
     if (resync || this.shouldResync) {
-      logger.debug('request backend cluster metadata sync')
+      browserLogger.debug('request backend cluster metadata sync')
       this.state = 'in-sync'
 
       try {
         yield ClusterMetadataRequester.sync()
       } catch (e) {
-        logger.error(e)
+        browserLogger.error(e)
       }
     }
 
-    logger.debug('request backend cluster metadata fetch')
+    browserLogger.debug('request backend cluster metadata fetch')
     this.state = 'fetch'
 
     try {
       this.items = yield ClusterMetadataRequester.fetch()
     } catch (e) {
       // TODO: replace this to winston logger
-      logger.error(e)
+      browserLogger.error(e)
     }
 
     this.state = 'ready'
