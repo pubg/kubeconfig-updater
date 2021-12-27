@@ -21,8 +21,9 @@ import { container } from 'tsyringe'
 import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
-import logger from '../logger/logger'
+import mainLogger from './logger/mainLogger'
 import FrontendStore from './frontendStore'
+import MenuBuilder from './menu'
 
 export default class AppUpdater {
   constructor() {
@@ -36,7 +37,7 @@ let mainWindow: BrowserWindow | null = null
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`
-  logger.info(msgTemplate(arg))
+  mainLogger.info(msgTemplate(arg))
   event.reply('ipc-example', msgTemplate('pong'))
 })
 
@@ -57,10 +58,10 @@ if (isProduction) {
   sourceMapSupport.install()
 }
 
-logger.debug(`isPacked: ${app.isPackaged}`)
-logger.debug(`getAppPath: ${app.getAppPath()}`)
-logger.debug(`getPath('exe'): ${app.getPath('exe')}`)
-logger.debug(`env.NO_BACKEND: ${process.env.NO_BACKEND}`)
+mainLogger.debug(`isPacked: ${app.isPackaged}`)
+mainLogger.debug(`getAppPath: ${app.getAppPath()}`)
+mainLogger.debug(`getPath('exe'): ${app.getPath('exe')}`)
+mainLogger.debug(`env.NO_BACKEND: ${process.env.NO_BACKEND}`)
 
 if (app.isPackaged) {
   const parsedPath = path.parse(app.getPath('exe'))
@@ -102,7 +103,7 @@ const installExtensions = async () => {
 }
 
 const createWindow = async () => {
-  logger.info('CreateWindow')
+  mainLogger.info('CreateWindow')
   if (isDevelopment) {
     await installExtensions()
   }
@@ -144,8 +145,8 @@ const createWindow = async () => {
   })
 
   mainWindow.removeMenu()
-  // const menuBuilder = new MenuBuilder(mainWindow)
-  // menuBuilder.buildMenu()
+  const menuBuilder = new MenuBuilder(mainWindow)
+  menuBuilder.buildMenu()
 
   // Open urls in the user's browser
   mainWindow.webContents.on('new-window', (event, url) => {
@@ -188,21 +189,21 @@ app
     })
 
     if (process.env.NO_BACKEND) {
-      logger.warn('starting without backend...')
+      mainLogger.warn('starting without backend...')
     } else {
       const manager = container.resolve(BackendManager)
       manager.start()
     }
     ;['SIGINT', 'SIGHUP', 'SIGTERM', 'SIGBREAK', 'SIGKILL'].forEach((signal) => {
       const sig = signal
-      logger.debug(`Register Listen Event ${sig}`)
+      mainLogger.debug(`Register Listen Event ${sig}`)
       process.on(sig, () => {
-        logger.debug(`Process Signal Received:${sig}`)
+        mainLogger.debug(`Process Signal Received:${sig}`)
         app.quit()
       })
     })
   })
-  .catch(logger.error)
+  .catch(mainLogger.error)
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -214,7 +215,7 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('getGrpcWebPort', (event) => {
   const manager = container.resolve(BackendManager)
-  logger.debug(`getGrpcWebPort: ${manager.grpbWebPort}`)
+  mainLogger.debug(`getGrpcWebPort: ${manager.grpbWebPort}`)
   event.returnValue = manager.grpbWebPort
 })
 
@@ -231,7 +232,7 @@ app.on('before-quit', async (event) => {
 const store = container.resolve(FrontendStore)
 type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
 nativeTheme.themeSource = <ThemeSourceType>store.getPreferredTheme()
-logger.info(`Load Preferred Theme: ${store.getPreferredTheme()}`)
+mainLogger.info(`Load Preferred Theme: ${store.getPreferredTheme()}`)
 
 ipcMain.on('theme:getPreferredTheme', (event) => {
   event.returnValue = store.getPreferredTheme()
