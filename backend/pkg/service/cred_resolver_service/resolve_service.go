@@ -2,12 +2,12 @@ package cred_resolver_service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
+	"strings"
 
-	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -17,10 +17,11 @@ import (
 )
 
 type CredResolveService struct {
+	credStoreService *CredResolverStoreService
 }
 
-func NewCredResolveService() *CredResolveService {
-	return &CredResolveService{}
+func NewCredResolveService(credStoreService *CredResolverStoreService) *CredResolveService {
+	return &CredResolveService{credStoreService: credStoreService}
 }
 
 func (s *CredResolveService) GetAwsSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (*aws.Config, string, error) {
@@ -51,16 +52,24 @@ func (s *CredResolveService) GetAwsSdkConfig(ctx context.Context, credConf *prot
 }
 
 // GetAzureSdkConfig Azure Cli does not support multi subscription
-func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (autorest.Authorizer, error) {
+func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (auth.AuthorizerConfig, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
-		return auth.NewAuthorizerFromCLI()
+		return azure_service.NewCliAuthConfig("")
 	case protos.CredentialResolverKind_ENV:
-		return auth.NewAuthorizerFromEnvironment()
+		return azure_service.NewEnvAuthConfig()
 	case protos.CredentialResolverKind_IMDS:
-		return auth.NewMSIConfig().Authorizer()
+		return auth.NewMSIConfig(), nil
 	case protos.CredentialResolverKind_PROFILE:
-		return nil, fmt.Errorf("credentialType=PROFILE is not support for azure credResolver")
+		attributes := credConf.GetResolverAttributes()
+		if attributes == nil {
+			return nil, fmt.Errorf("attribute should not null")
+		}
+		profile, exists := attributes[types.CREDRESOLVER_ATTRIBUTE_PROFILE]
+		if !exists {
+			return nil, fmt.Errorf("profile attribute should be exist")
+		}
+		return azure_service.NewCliAuthConfig(profile)
 	default:
 		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
 	}
@@ -83,38 +92,78 @@ func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverCo
 		if !exists {
 			return nil, fmt.Errorf("profile attribute should be exist")
 		}
-		return &TencentIntlProfileProvider{profileName: profile}, nil
+		return tencent_service.NewTencentIntlProfileProvider(profile), nil
 	default:
 		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
 	}
 }
 
-// TencentIntlProfileProvider China mainland and international cloud's credential file formats are difference
-type TencentIntlProfileProvider struct {
-	profileName string
+func (s *CredResolveService) SyncCredResolversStatus() error {
+	credResolvers := s.credStoreService.ListCredResolvers()
+	for _, credResolver := range credResolvers {
+		if !isRegisteredStatus(credResolver.Status) {
+			continue
+		}
+		status, invalidReason, err := s.getCredResolverStatus(credResolver)
+		fmt.Printf("status:%+v,resion:%+v,err:%+v\n", status, invalidReason, err)
+		credResolver.Status = status
+		credResolver.StatusDetail = invalidReason
+		err = s.credStoreService.SetCredResolver(credResolver)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (t *TencentIntlProfileProvider) GetCredential() (common.CredentialIface, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
+//고수준 함수만 남겨두고 싶은데
+//raw_service로 이전해야 하는지
+func isRegisteredStatus(status protos.CredentialResolverStatus) bool {
+	return status == protos.CredentialResolverStatus_CRED_REGISTERED_OK || status == protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK
+}
+
+// returns: status, invalidReason, error
+func (s *CredResolveService) getCredResolverStatus(credConf *protos.CredResolverConfig) (protos.CredentialResolverStatus, string, error) {
+	ctx := context.Background()
+	vendor := credConf.GetInfraVendor()
+	if strings.EqualFold(vendor, types.INFRAVENDOR_AWS) {
+		cfg, _, err := s.GetAwsSdkConfig(ctx, credConf)
+		if err != nil {
+			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
+		}
+		_, valid, invalidErr := aws_service.GetConfigInfo(cfg)
+		if !valid {
+			var reason string
+			if invalidErr != nil {
+				reason = invalidErr.Error()
+			}
+			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, reason, nil
+		}
+		return protos.CredentialResolverStatus_CRED_REGISTERED_OK, "", nil
+	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Azure) {
+		authConfig, err := s.GetAzureSdkConfig(ctx, credConf)
+		if err != nil {
+			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
+		}
+		_, err = authConfig.Authorizer()
+		if err != nil {
+			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
+		}
+		return protos.CredentialResolverStatus_CRED_REGISTERED_OK, "", nil
+	} else if strings.EqualFold(vendor, types.INFRAVENDOR_Tencent) {
+		credProvider, err := s.GetTencentSdkConfig(credConf)
+		if err != nil {
+			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err.Error(), nil
+		}
+		_, valid, invalidErr := tencent_service.GetConfigInfo(credProvider)
+		if !valid {
+			var reason string
+			if invalidErr != nil {
+				reason = invalidErr.Error()
+			}
+			return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, reason, nil
+		}
+		return protos.CredentialResolverStatus_CRED_REGISTERED_OK, "", nil
 	}
-
-	credentialFilePath := filepath.Join(home, ".tccli", t.profileName+".credential")
-
-	buf, err := os.ReadFile(credentialFilePath)
-	if err != nil {
-		return nil, err
-	}
-
-	rawCred := map[string]interface{}{}
-	err = json.Unmarshal(buf, &rawCred)
-	if err != nil {
-		return nil, err
-	}
-
-	return &common.Credential{
-		SecretId:  rawCred["secretId"].(string),
-		SecretKey: rawCred["secretKey"].(string),
-	}, nil
+	return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, "", fmt.Errorf("not supported infraVendor value %s", credConf.GetInfraVendor())
 }

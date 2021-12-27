@@ -3,6 +3,8 @@ package kubeconfig_controller
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/kubeconfig_service"
@@ -14,13 +16,14 @@ import (
 type kubeconfigService struct {
 	protos.UnimplementedKubeconfigServer
 
-	credStoreService *cred_resolver_service.CredResolverStoreService
-	registerService  *cluster_register_service.ClusterRegisterService
-	metadataService  *cluster_metadata_service.ClusterMetadataService
+	credStoreService    *cred_resolver_service.CredResolverStoreService
+	credResolverService *cred_resolver_service.CredResolveService
+	registerService     *cluster_register_service.ClusterRegisterService
+	metadataService     *cluster_metadata_service.ClusterMetadataService
 }
 
-func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverStoreService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
-	return &kubeconfigService{credStoreService: credStoreService, registerService: registerService, metadataService: metadataService}
+func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverStoreService, credResolverService *cred_resolver_service.CredResolveService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
+	return &kubeconfigService{credStoreService: credStoreService, credResolverService: credResolverService, registerService: registerService, metadataService: metadataService}
 }
 
 func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.GetCredResolversRes, error) {
@@ -67,6 +70,22 @@ func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.
 	return &protos.CommonRes{
 		Message: "delete resolver success",
 	}, nil
+}
+
+func (s *kubeconfigService) SyncAvailableCredResolver(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+	fmt.Printf("Start SyncAvailableCredResolver\n")
+	err := s.credResolverService.SyncCredResolversStatus()
+	fmt.Printf("Success SyncAvailableCredResolver\n")
+	if err != nil {
+		return nil, err
+	}
+	return &protos.CommonRes{
+		Message: fmt.Sprintf("sync success"),
+	}, nil
+}
+
+func (s *kubeconfigService) GetRegisteredProfiles(context.Context, *protos.GetRegisteredProfilesReq) (*protos.GetRegisteredProfilesRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfiles not implemented")
 }
 
 func (s *kubeconfigService) GetAvailableClusters(context.Context, *protos.CommonReq) (*protos.GetAvailableClustersRes, error) {

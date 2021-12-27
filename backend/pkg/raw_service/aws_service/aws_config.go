@@ -1,7 +1,11 @@
 package aws_service
 
 import (
+	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"os"
 	"path/filepath"
 
@@ -109,4 +113,17 @@ func GetProfilesFromCredentials() ([]string, error) {
 
 func getAwsDirectoryPath() (string, error) {
 	return common.ResolvePathToAbs(filepath.Join("~", ".aws"))
+}
+
+// GetConfigInfo returns: AccountId, CredIsNotValid, error
+// CredIsNotValid => config is not valid aws credential
+func GetConfigInfo(cfg *aws.Config) (string, bool, error) {
+	copiedCfg := cfg.Copy()
+	copiedCfg.Region = types.AWS_DEFAULT_REGION
+	client := sts.NewFromConfig(copiedCfg)
+	out, err := client.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
+	if err != nil {
+		return "", false, err
+	}
+	return *out.Account, true, err
 }

@@ -38,7 +38,7 @@ func (r *TencentResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	if err != nil {
 		return nil, err
 	}
-	cvmClient, err := cvm.NewClient(cred, "ap-guangzhou", profile.NewClientProfile())
+	cvmClient, err := cvm.NewClient(cred, types.TENCENT_DEFAULT_REGION, profile.NewClientProfile())
 	if err != nil {
 		return nil, err
 	}

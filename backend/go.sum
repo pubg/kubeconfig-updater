@@ -571,6 +571,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.228 h1:MmCK
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.228/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.313 h1:TfYhO6LOTUFh4FyJDdI9xgRMwgUvXzfqqyl4CeQx+js=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.313/go.mod h1:AqyM/ZZMD7q5mHBqNY9YImbSpEpoEe7E/vrTbUWX+po=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319 h1:js9OiurNr23MFNwOARc0SfHeo9keJ/7xhYLU6HgnNFw=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319/go.mod h1:3LRL4bjS4JieTruoWSqnMA/rPOxd2TXsstNBKtN+2qQ=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.228 h1:XRfXTeGa94a9icGlor8kzqf/7HImWhpJBaLfbXB1+so=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.228/go.mod h1:ij3CHdPvqI2aSMcl7+jdI0yCO7oOiywKTAa55qmO2iI=
 github.com/tidwall/gjson v1.9.1 h1:wrrRk7TyL7MmKanNRck/Mcr3VU1sdMvJHvJXzqBIUNo=

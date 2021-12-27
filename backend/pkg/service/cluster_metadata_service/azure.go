@@ -3,46 +3,52 @@ package cluster_metadata_service
 import (
 	"context"
 	"fmt"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	aks "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2021-10-01/containerservice"
-	"github.com/Azure/go-autorest/autorest"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/types"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAzureResolver(credCfg *protos.CredResolverConfig, tenantId string, credService *cred_resolver_service.CredResolveService) (*AzureResolver, error) {
-	auth, err := credService.GetAzureSdkConfig(context.Background(), credCfg)
+func NewAzureResolver(credCfg *protos.CredResolverConfig, subscriptionId string, credService *cred_resolver_service.CredResolveService) (*AzureResolver, error) {
+	authConfig, err := credService.GetAzureSdkConfig(context.Background(), credCfg)
 	if err != nil {
 		return nil, err
 	}
 	return &AzureResolver{
-		auth:     auth,
-		tenantId: tenantId,
+		authConfig:     authConfig,
+		subscriptionId: subscriptionId,
 	}, nil
 }
 
 type AzureResolver struct {
-	auth     autorest.Authorizer
-	tenantId string
+	authConfig     auth.AuthorizerConfig
+	subscriptionId string
 }
 
 func (r *AzureResolver) GetResolverDescription() string {
-	return fmt.Sprintf("Azure/%s", r.tenantId)
+	return fmt.Sprintf("Azure/%s", r.subscriptionId)
 }
 
 func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
-	client := aks.NewManagedClustersClient(r.tenantId)
-	client.Authorizer = r.auth
+	authorizer, err := r.authConfig.Authorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	client := aks.NewManagedClustersClient(r.subscriptionId)
+	client.Authorizer = authorizer
+
 	result, err := client.List(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("error occurred when trying AKS/List/ManagedCluster tenantId:%s error:%s", r.tenantId, err.Error())
+		return nil, fmt.Errorf("error occurred when trying AKS/List/ManagedCluster subscriptionId:%s error:%s", r.subscriptionId, err.Error())
 	}
 	for !result.NotDone() {
 		err = result.Next()
 		if err != nil {
-			return nil, fmt.Errorf("error occurred when trying AKS/List/ManagedCluster tenantId:%s error:%s", r.tenantId, err.Error())
+			return nil, fmt.Errorf("error occurred when trying AKS/List/ManagedCluster subscriptionId:%s error:%s", r.subscriptionId, err.Error())
 		}
 	}
 
@@ -50,7 +56,7 @@ func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	for _, cluster := range result.Values() {
 		meta := &protos.ClusterMetadata{
 			ClusterName:    *cluster.Name,
-			CredResolverId: r.tenantId,
+			CredResolverId: r.subscriptionId,
 			ClusterTags:    map[string]string{},
 		}
 		resource, err := arm.ParseResourceID(*cluster.ID)
