@@ -48,7 +48,6 @@ export default merge(baseConfig, {
   },
 
   plugins: [
-    new PinoWebpackPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
     }),
