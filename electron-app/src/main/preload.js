@@ -3,7 +3,7 @@ const electronLogger = require('electron-log').create('renderer')
 
 electronLogger.transports.console.format = '[{level}] {text}'
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.DEBUG_PROD !== 'true' && process.env.NODE_ENV === 'production') {
   electronLogger.transports.console.level = 'info'
   electronLogger.transports.file.level = 'info'
 }
