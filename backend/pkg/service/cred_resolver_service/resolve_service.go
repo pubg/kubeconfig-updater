@@ -3,10 +3,11 @@ package cred_resolver_service
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
-	"strings"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -219,5 +220,5 @@ func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Pro
 		}
 		return profiles, nil
 	}
-	return nil, nil
+	return nil, fmt.Errorf("unknown kind value infraVendor:%s", infraVendor)
 }

@@ -13,7 +13,7 @@ import (
 	"runtime"
 )
 
-func NewEnvAuthConfig() (*EnvAuthConfig,error) {
+func NewEnvAuthConfig() (*EnvAuthConfig, error) {
 	envInstance, err := auth.GetSettingsFromEnvironment()
 	if err != nil {
 		return nil, err
