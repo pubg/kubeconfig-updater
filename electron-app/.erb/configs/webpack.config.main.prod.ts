@@ -63,7 +63,6 @@ export default merge(baseConfig, {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
-      DEBUG_PROD: false,
       START_MINIMIZED: false,
       BUILD_TYPE: 'main',
     }),
