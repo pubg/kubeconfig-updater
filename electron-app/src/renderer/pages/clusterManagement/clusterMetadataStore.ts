@@ -75,6 +75,14 @@ export class ClusterMetadataStore {
   }
 
   @observable
+  selectedGroupTag: string | null = null
+
+  @action
+  setGroupTag(tag: string | null) {
+    this.selectedGroupTag = tag
+  }
+
+  @observable
   filter: ClusterMetadataItemFilter | null = null
 
   @action

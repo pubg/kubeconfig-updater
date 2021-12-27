@@ -10,15 +10,18 @@ import {
   CheckboxProps,
   SwitchProps,
   Switch,
+  AutocompleteProps,
+  UseAutocompleteProps,
 } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
-import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter, ClusterMetadata } from './clusterMetadataStore'
+import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './clusterMetadataStore'
 import { longestCommonSequence } from '../../utils/strings/lcs'
+import logger from '../../../logger/logger'
 
-function filterFactory(name: string, selectedTags: Set<string>, showRegistered: boolean): ClusterMetadataItemFilter {
+function filterFactory(name: string, showRegistered: boolean): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
     // fuzzy search
     const clusterName = data.metadata.clustername
@@ -48,26 +51,17 @@ export default observer(function TopBar() {
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
-  const [selectedTags, setSelectedTags] = useState(new Set<string>())
   const [showRegistered, setShowRegistered] = useState(false)
 
   // update store's filter when filter variables are changed
   useEffect(() => {
-    store.setFilter(filterFactory(nameFilter, selectedTags, showRegistered))
-  }, [store, nameFilter, selectedTags, showRegistered])
+    store.setFilter(filterFactory(nameFilter, showRegistered))
+  }, [store, nameFilter, showRegistered])
 
   // define handlers
-  const onGroupTagsChanged: CheckboxProps['onChange'] = (e, checked) => {
-    const newSet = new Set(selectedTags)
-    const tag = e.target.value
-
-    if (checked) {
-      newSet.add(tag)
-    } else {
-      newSet.delete(tag)
-    }
-
-    setSelectedTags(newSet)
+  const onTagSelectChanged: UseAutocompleteProps<string, false, false, false>['onChange'] = (e, value) => {
+    logger.debug(`selected tag: ${value}`)
+    store.setGroupTag(value)
   }
 
   const onShowRegisteredToggled: SwitchProps['onChange'] = (_, checked) => {
@@ -77,12 +71,7 @@ export default observer(function TopBar() {
   // TODO: refactor this hard-coded requester binding to parent?
   const onReloadClick = useCallback(async () => {
     await requester.fetchMetadata()
-    store.setItems(
-      requester.items.map((item) => {
-        const obj = item.toObject() as ClusterMetadata
-        return { key: obj.metadata?.clustername, data: obj }
-      })
-    )
+    store.setItems(requester.items.map((item) => ClusterMetadataItem.fromObject(item)))
   }, [requester, store])
 
   return (
@@ -104,21 +93,14 @@ export default observer(function TopBar() {
           autoFocus
         />
         <Autocomplete
-          multiple
           options={store.tags}
           disableCloseOnSelect
           style={{ minWidth: '256px', maxWidth: '1024px' }}
           size="small"
+          onChange={onTagSelectChanged}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
             <TextField {...params} label="Group with Tag" />
-          )}
-          renderOption={(props, option, { selected }) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <li {...props}>
-              <Checkbox checked={selected} onChange={onGroupTagsChanged} />
-              {option}
-            </li>
           )}
         />
         <FormControlLabel control={<Switch onChange={onShowRegisteredToggled} />} label="Show Registered" />

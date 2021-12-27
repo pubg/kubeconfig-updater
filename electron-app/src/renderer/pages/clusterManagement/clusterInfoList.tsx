@@ -1,5 +1,5 @@
-import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider } from '@fluentui/react'
-import { Selection } from '@fluentui/react/lib/DetailsList'
+import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, GroupedList } from '@fluentui/react'
+import { IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
@@ -128,6 +128,8 @@ export default observer(function ClusterInfoList() {
     ]
   }, [])
 
+  const isGrouped = store.selectedGroupTag !== null
+
   const items = useMemo<ClusterMetadataItem[]>(() => {
     let linq = LINQ.from(store.items).where(store.filter ?? (() => true))
 
@@ -144,8 +146,8 @@ export default observer(function ClusterInfoList() {
     setTheme(themeStore.getFluentUiTheme())
   })
   const groupedItems = useMemo(() => {
-    return groupByTag(items, '')
-  }, [items])
+    return store.selectedGroupTag ? groupByTag(items, store.selectedGroupTag) : []
+  }, [items, store.selectedGroupTag])
 
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
@@ -155,15 +157,22 @@ export default observer(function ClusterInfoList() {
     browserLogger.debug(item)
   }, [])
 
+  const onRenderCell: IGroupedListProps['onRenderCell'] = (depthLevel, item, index) => {}
+
+  // TODO: split GroupedList to another component
   return (
-    <ThemeProvider theme={theme}>
-      <DetailsList
-        columns={columns}
-        items={items}
-        onColumnHeaderClick={onHeaderNameClicked}
-        selection={store.selectionRef as Selection}
-        onActiveItemChanged={onActiveItemChanged}
-      />
+    <ThemeProvider theme={currentTheme}>
+      {isGrouped ? (
+        <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
+      ) : (
+        <DetailsList
+          columns={columns}
+          items={items}
+          onColumnHeaderClick={onHeaderNameClicked}
+          selection={store.selectionRef as Selection}
+          onActiveItemChanged={onActiveItemChanged}
+        />
+      )}
       {/* <Menu></Menu> */}
     </ThemeProvider>
   )
