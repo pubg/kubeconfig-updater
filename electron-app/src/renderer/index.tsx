@@ -42,3 +42,5 @@ if (window.managedFromElectron === undefined) {
 }
 
 render(<App />, document.getElementById('root'))
+
+browserLogger.debug(module)

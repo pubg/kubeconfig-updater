@@ -1,6 +1,6 @@
-import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, IGroup } from '@fluentui/react'
-import { Selection } from '@fluentui/react/lib/DetailsList'
-import { PaletteMode, Typography } from '@mui/material'
+import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, GroupedList } from '@fluentui/react'
+import { IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
+import { Typography, Box } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
@@ -87,15 +87,6 @@ function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, C
   return groupedItems
 }
 
-function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, ClusterMetadataItem[]][] {
-  const groupedItems = LINQ.from(data)
-    .groupBy((item) => item.tags.get(tag) ?? null)
-    .select((e) => [e.key(), e.toArray()])
-    .toArray() as [string | null, ClusterMetadataItem[]][]
-
-  return groupedItems
-}
-
 export default observer(function ClusterInfoList() {
   const store = useStore()
 
@@ -150,19 +141,14 @@ export default observer(function ClusterInfoList() {
   }, [descending, store.filter, store.items])
 
   const groupedItems = useMemo(() => {
-    return groupByTag(items, '')
-  }, [items])
+    return store.selectedGroupTag ? groupByTag(items, store.selectedGroupTag) : []
+  }, [items, store.selectedGroupTag])
 
-  const currentTheme = useMemo<Theme>(getFluentuiTheme, [window.theme])
   const themeStore = container.resolve(ThemeStore)
   const [theme, setTheme] = useState(themeStore.getFluentUiTheme())
   useAutorun(() => {
     setTheme(themeStore.getFluentUiTheme())
   })
-
-  const groupedItems = useMemo(() => {
-    return store.selectedGroupTag ? groupByTag(items, store.selectedGroupTag) : []
-  }, [items, store.selectedGroupTag])
 
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
