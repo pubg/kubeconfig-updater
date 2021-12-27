@@ -3,6 +3,8 @@ package kubeconfig_controller
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/kubeconfig_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
@@ -69,10 +71,12 @@ func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.
 	}, nil
 }
 
-func (s *kubeconfigService) SyncAvailableCredResolver(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
+func (s *kubeconfigService) SyncAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
 	fmt.Printf("Start SyncAvailableCredResolver\n")
+	start := time.Now()
 	err := s.credResolverService.SyncCredResolversStatus()
-	fmt.Printf("Success SyncAvailableCredResolver\n")
+	delta := time.Since(start)
+	fmt.Printf("Success SyncAvailableCredResolver duration: %fs\n", delta.Seconds())
 	if err != nil {
 		return nil, err
 	}
@@ -192,8 +196,10 @@ func (s *kubeconfigService) DeleteCluster(ctx context.Context, req *protos.Delet
 
 func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
 	fmt.Printf("Start SyncAvailableClusters\n")
+	start := time.Now()
 	err := s.metadataService.SyncAvailableClusters()
-	fmt.Printf("Success SyncAvailableClusters\n")
+	delta := time.Since(start)
+	fmt.Printf("Success SyncAvailableClusters duration: %fs\n", delta.Seconds())
 	if err != nil {
 		return nil, err
 	}
