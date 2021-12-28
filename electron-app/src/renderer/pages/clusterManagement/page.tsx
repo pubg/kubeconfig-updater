@@ -114,7 +114,7 @@ export default observer(function ClusterManagement() {
           <TopBar />
         </Paper>
 
-        <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+        <Box height="100%" overflow="hidden">
           <ClusterInfoList />
         </Box>
 

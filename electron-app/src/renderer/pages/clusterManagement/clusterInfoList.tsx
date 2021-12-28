@@ -1,6 +1,6 @@
 import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, GroupedList } from '@fluentui/react'
 import { IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
-import { Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
@@ -9,8 +9,7 @@ import { container } from 'tsyringe'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
-import { ThemeStore } from '../../components/themeStore'
-import { useAutorun } from '../../hooks/mobx'
+import * as MetadataRequester from '../../components/clusterMetadataRequester'
 
 /*
 const columns: IColumn[] = [
@@ -89,8 +88,11 @@ function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, C
 
 export default observer(function ClusterInfoList() {
   const store = useStore()
+  const metadataRequester = MetadataRequester.useContext()
 
   const [descending, setDescending] = useState(false)
+  const showLoading = metadataRequester.state !== 'ready'
+  browserLogger.info(showLoading)
 
   // TODO: add dyanmic column add/delete
   const columns = useMemo<IColumn[]>(() => {
@@ -161,19 +163,23 @@ export default observer(function ClusterInfoList() {
 
   // TODO: split GroupedList to another component
   return (
-    <ThemeProvider theme={currentTheme}>
-      {isGrouped ? (
-        <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
-      ) : (
-        <DetailsList
-          columns={columns}
-          items={items}
-          onColumnHeaderClick={onHeaderNameClicked}
-          selection={store.selectionRef as Selection}
-          onActiveItemChanged={onActiveItemChanged}
-        />
-      )}
-      {/* <Menu></Menu> */}
-    </ThemeProvider>
+    <Box height="100%">
+      <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+        <ThemeProvider theme={currentTheme}>
+          {isGrouped ? (
+            <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
+          ) : (
+            <DetailsList
+              columns={columns}
+              items={items}
+              onColumnHeaderClick={onHeaderNameClicked}
+              selection={store.selectionRef as Selection}
+              onActiveItemChanged={onActiveItemChanged}
+            />
+          )}
+          {/* <Menu></Menu> */}
+        </ThemeProvider>
+      </Box>
+    </Box>
   )
 })
