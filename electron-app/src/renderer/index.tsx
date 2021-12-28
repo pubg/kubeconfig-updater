@@ -36,6 +36,6 @@ const client = new KubeconfigClient(getHostName())
 container.register(KubeconfigClient, { useValue: client })
 
 const themeStorageType: ThemeStorageType = window.managedFromElectron === undefined ? 'browser' : 'electron'
-container.register('ThemeStorageType', { useValue: themeStorageType })
+container.register(ThemeStore, { useValue: new ThemeStore(themeStorageType) })
 
 render(<App />, document.getElementById('root'))

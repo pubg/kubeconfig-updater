@@ -21,23 +21,9 @@ import {Theme} from "@mui/material/styles/createTheme";
 
 export default function App() {
   const themeStore = container.resolve(ThemeStore)
-  const getMuiTheme = (): PaletteMode => {
-    browserLogger.info(`Init Theme: ${themeStore.theme}`)
-    return themeStore.theme as PaletteMode
-  }
-
-  const getMuiTheme0 = (): Theme => {
-    return createTheme({
-      palette: {
-        mode: getMuiTheme()
-      }
-    })
-  }
-
-  const [theme, setTheme] = useState(getMuiTheme0())
+  const [theme, setTheme] = useState(themeStore.getMuiTheme())
   useAutorun(() => {
-    browserLogger.info('autorun called, value: ', themeStore.theme)
-    setTheme(getMuiTheme0())
+    setTheme(themeStore.getMuiTheme())
   })
 
   const clusterMetadataStore = containerHooks.useResolve(ClusterMetadataStore)
@@ -74,7 +60,7 @@ export default function App() {
                   <Sidebar/>
                 </Paper>
                 <Switch>
-                  <Route exact path="/" component={About}/>
+                  <Route exact path="/" component={ClusterManagement}/>
                   <Route path="/cluster-management" component={ClusterManagement}/>
                   <Route path="/configuration" component={Configuration}/>
                   <Route path="/about" component={About}/>

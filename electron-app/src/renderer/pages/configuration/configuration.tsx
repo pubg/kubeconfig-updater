@@ -14,9 +14,7 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Configuration() {
   const themeStore = useResolve(ThemeStore)
   const OnChangeTheme = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    browserLogger.info(`InputValue: ${value}`)
     themeStore.setPreferredTheme(value as ThemeType)
-    browserLogger.info(`ThemeValue: ${themeStore.theme}`)
   }
 
   return (
@@ -27,20 +25,20 @@ export default function Configuration() {
         </Stack>
         <Stack direction="column">
           <Typography variant="h6">Theme</Typography>
-          <RadioGroup row aria-label="theme" defaultValue="system" name="theme-radio-groups" onChange={OnChangeTheme}>
-            <FormControlLabel value="system" control={<Radio />} label="System" />
+          <RadioGroup row aria-label="theme" defaultValue='system' name="theme-radio-groups" onChange={OnChangeTheme}>
+            <FormControlLabel value="system" control={<Radio />} label="System"/>
             <FormControlLabel value="light" control={<Radio />} label="Light" />
             <FormControlLabel value="dark" control={<Radio />} label="Dark" />
           </RadioGroup>
         </Stack>
-        <Divider variant="middle" />
-        <Stack direction="row">
-          <Button variant="contained">Item 1</Button>
-        </Stack>
-        <Button variant="contained">Item 1</Button>
-        <Button variant="contained">Item 2</Button>
-        <Item>Item 3</Item>
-        <Item>Item 4</Item>
+        {/*<Divider variant="middle" />*/}
+        {/*<Stack direction="row">*/}
+        {/*  <Button variant="contained">Item 1</Button>*/}
+        {/*</Stack>*/}
+        {/*<Button variant="contained">Item 1</Button>*/}
+        {/*<Button variant="contained">Item 2</Button>*/}
+        {/*<Item>Item 3</Item>*/}
+        {/*<Item>Item 4</Item>*/}
       </Stack>
     </div>
   )

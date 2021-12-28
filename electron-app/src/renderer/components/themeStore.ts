@@ -1,6 +1,10 @@
 // eslint-disable-next-line max-classes-per-file
-import {inject, injectable, singleton} from 'tsyringe'
 import { action, makeObservable, observable } from 'mobx'
+import { Theme as FluentUiTheme } from '@fluentui/react'
+import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
+import { Theme as MuiTheme } from '@mui/material/styles/createTheme'
+import { createTheme } from '@mui/material/styles'
+import { PaletteMode } from '@mui/material'
 
 export type ThemeType = 'dark' | 'light' | 'system'
 export type ThemeStorageType = 'browser' | 'electron'
@@ -65,24 +69,22 @@ class ElectronThemeStorage implements ThemeStorage {
   }
 }
 
-@singleton()
 export class ThemeStore {
   /** @readonly */
   @observable
-  theme: ThemeType
+  theme: ThemeType = 'light'
 
   storage: ThemeStorage
 
-  // constructor(@inject('ThemeStorageType') storageType: ThemeStorageType) {
-    constructor() {
-    makeObservable(this)
+  constructor(storageType: ThemeStorageType) {
     console.log('New ThemeStore Instance')
-    if ('browser' === 'browser') {
+    if (storageType === 'browser') {
       this.storage = new BrowserThemeStorage('system')
     } else {
       this.storage = new ElectronThemeStorage()
     }
     this.theme = this.storage.getTheme()
+    makeObservable(this)
   }
 
   @action
@@ -93,5 +95,20 @@ export class ThemeStore {
 
   getPreferredTheme(): ThemeType {
     return this.storage.getPreferredTheme()
+  }
+
+  getFluentUiTheme(): FluentUiTheme {
+    if (this.theme === 'dark') {
+      return AzureThemeDark
+    }
+    return AzureThemeLight
+  }
+
+  getMuiTheme(): MuiTheme {
+    return createTheme({
+      palette: {
+        mode: this.theme as PaletteMode,
+      },
+    })
   }
 }
