@@ -1,18 +1,45 @@
-import { Paper } from '@mui/material'
-import { MemoryRouter as Router, Switch, Route } from 'react-router-dom'
+import {PaletteMode, Paper, ThemeProvider} from '@mui/material'
+import {MemoryRouter as Router, Route, Switch} from 'react-router-dom'
 import './App.css'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
-import Home from './pages/home/home'
 import About from './pages/about/about'
 import RegisterProgressSnackbar from './components/registerProgressPopup'
 import * as containerHooks from './hooks/container'
-import { ClusterMetadataRequester, ClusterMetadataRequesterContext } from './components/clusterMetadataRequester'
-import { ClusterRegisterRequester, ClusterRegisterRequesterContext } from './components/clusterRegisterRequester'
-import { ClusterMetadataStore, ClusterMetadataStoreContext } from './pages/clusterManagement/clusterMetadataStore'
-import Configuration from "./pages/configuration/configuration";
+import {ClusterMetadataRequester, ClusterMetadataRequesterContext} from './components/clusterMetadataRequester'
+import {ClusterRegisterRequester, ClusterRegisterRequesterContext} from './components/clusterRegisterRequester'
+import {ClusterMetadataStore, ClusterMetadataStoreContext} from './pages/clusterManagement/clusterMetadataStore'
+import Configuration from './pages/configuration/configuration'
+import {container} from "tsyringe";
+import {ThemeStore} from "./components/themeStore";
+import browserLogger from "./logger/browserLogger";
+import {createTheme} from "@mui/material/styles";
+import {autorun} from "mobx";
+import {useState} from "react";
+import {useAutorun} from "./hooks/mobx";
+import {Theme} from "@mui/material/styles/createTheme";
 
 export default function App() {
+  const themeStore = container.resolve(ThemeStore)
+  const getMuiTheme = (): PaletteMode => {
+    browserLogger.info(`Init Theme: ${themeStore.theme}`)
+    return themeStore.theme as PaletteMode
+  }
+
+  const getMuiTheme0 = (): Theme => {
+    return createTheme({
+      palette: {
+        mode: getMuiTheme()
+      }
+    })
+  }
+
+  const [theme, setTheme] = useState(getMuiTheme0())
+  useAutorun(() => {
+    browserLogger.info('autorun called, value: ', themeStore.theme)
+    setTheme(getMuiTheme0())
+  })
+
   const clusterMetadataStore = containerHooks.useResolve(ClusterMetadataStore)
   const clusterRegisterRequester = containerHooks.useResolve(ClusterRegisterRequester)
   const clusterMetadataRequester = containerHooks.useResolve(ClusterMetadataRequester)
@@ -21,39 +48,41 @@ export default function App() {
     <ClusterMetadataRequesterContext.Provider value={clusterMetadataRequester}>
       <ClusterRegisterRequesterContext.Provider value={clusterRegisterRequester}>
         <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
-          <Router>
-            <Paper
-              square
-              sx={{
-                width: '100vw',
-                height: '100vh',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'stretch',
-                alignItems: 'stretch',
-              }}
-            >
+          <ThemeProvider theme={theme}>
+            <Router>
               <Paper
                 square
-                elevation={18}
                 sx={{
+                  width: '100vw',
+                  height: '100vh',
                   display: 'flex',
-                  height: '100%',
-                  flexShrink: 0,
-                  flexGrow: 0,
+                  flexDirection: 'row',
+                  justifyContent: 'stretch',
+                  alignItems: 'stretch',
                 }}
               >
-                <Sidebar />
+                <Paper
+                  square
+                  elevation={18}
+                  sx={{
+                    display: 'flex',
+                    height: '100%',
+                    flexShrink: 0,
+                    flexGrow: 0,
+                  }}
+                >
+                  <Sidebar/>
+                </Paper>
+                <Switch>
+                  <Route exact path="/" component={About}/>
+                  <Route path="/cluster-management" component={ClusterManagement}/>
+                  <Route path="/configuration" component={Configuration}/>
+                  <Route path="/about" component={About}/>
+                </Switch>
+                <RegisterProgressSnackbar/>
               </Paper>
-              <Switch>
-                <Route exact path="/" component={About}/>
-                <Route path="/cluster-management" component={ClusterManagement} />
-                <Route path="/configuration" component={Configuration} />
-                <Route path="/about" component={About} />
-              </Switch>
-              <RegisterProgressSnackbar />
-            </Paper>
-          </Router>
+            </Router>
+          </ThemeProvider>
         </ClusterMetadataStoreContext.Provider>
       </ClusterRegisterRequesterContext.Provider>
     </ClusterMetadataRequesterContext.Provider>

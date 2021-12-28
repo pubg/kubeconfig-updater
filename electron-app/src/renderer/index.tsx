@@ -9,6 +9,8 @@ import { container } from 'tsyringe'
 import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
+import { ThemeStore } from './components/themeStore'
+import {autorun} from "mobx";
 
 browserLogger.debug('browser debug mode enabled')
 
@@ -16,19 +18,10 @@ declare global {
   interface Window {
     grpcWebPort?: number
     theme?: string
+    themeGetTheme?: () => string
+    themeGetPreferredTheme?: () => string
   }
 }
-
-function getMuiTheme(): PaletteMode {
-  browserLogger.info(`Init Theme: ${window.theme}, Default is light`)
-  return (window.theme as PaletteMode) ?? 'light'
-}
-
-const theme = createTheme({
-  palette: {
-    mode: getMuiTheme(),
-  },
-})
 
 initializeIcons()
 
@@ -44,8 +37,6 @@ const client = new KubeconfigClient(getHostName())
 container.register(KubeconfigClient, { useValue: client })
 
 render(
-  <ThemeProvider theme={theme}>
-    <App />
-  </ThemeProvider>,
+    <App />,
   document.getElementById('root')
 )
