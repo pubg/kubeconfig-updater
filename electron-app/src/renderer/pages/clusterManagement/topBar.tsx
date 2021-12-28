@@ -19,13 +19,13 @@ import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
 import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './clusterMetadataStore'
 import { longestCommonSequence } from '../../utils/strings/lcs'
-import logger from '../../../logger/logger'
+import browserLogger from '../../logger/browserLogger'
 
 function filterFactory(name: string, showRegistered: boolean): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
     // fuzzy search
     const clusterName = data.metadata.clustername
-    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === name.length)) {
+    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === neme.length)) {
       return false
     }
 
@@ -60,7 +60,7 @@ export default observer(function TopBar() {
 
   // define handlers
   const onTagSelectChanged: UseAutocompleteProps<string, false, false, false>['onChange'] = (e, value) => {
-    logger.debug(`selected tag: ${value}`)
+    browserLogger.debug(`selected tag: ${value}`)
     store.setGroupTag(value)
   }
 
