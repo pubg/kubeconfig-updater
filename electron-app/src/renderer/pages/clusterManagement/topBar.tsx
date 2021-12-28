@@ -1,20 +1,26 @@
-import { Refresh } from '@mui/icons-material'
+import { Refresh, ArrowDropDownOutlined } from '@mui/icons-material'
 import {
   Stack,
   FormGroup,
   TextField,
   Autocomplete,
-  Checkbox,
   FormControlLabel,
   Button,
-  CheckboxProps,
   SwitchProps,
   Switch,
-  AutocompleteProps,
   UseAutocompleteProps,
+  ButtonGroup,
+  Popper,
+  Paper,
+  ClickAwayListener,
+  MenuList,
+  MenuItem,
+  Grow,
+  useTheme,
+  MenuItemProps,
 } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
 import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './clusterMetadataStore'
@@ -52,6 +58,8 @@ export default observer(function TopBar() {
   // define variables
   const [nameFilter, setNameFilter] = useState('')
   const [showRegistered, setShowRegistered] = useState(false)
+  const [showReloadDropdown, setShowReloadDropdown] = useState(false)
+  const reloadDropdownRef = useRef(null)
 
   // update store's filter when filter variables are changed
   useEffect(() => {
@@ -71,8 +79,13 @@ export default observer(function TopBar() {
   // TODO: refactor this hard-coded requester binding to parent?
   const onReloadClick = useCallback(async () => {
     await requester.fetchMetadata()
+    // NOTE: can this belongs to here?
     store.setItems(requester.items.map((item) => ClusterMetadataItem.fromObject(item)))
   }, [requester, store])
+
+  const onHardReloadClick = useCallback(async () => {}, [])
+
+  const theme = useTheme()
 
   return (
     <Stack
@@ -82,6 +95,7 @@ export default observer(function TopBar() {
       width="100%"
       marginLeft="32px"
       marginRight="32px"
+      zIndex={theme.zIndex.appBar}
     >
       <FormGroup row sx={{ gap: '16px', alignItems: 'center', flexWrap: 'nowrap' }}>
         <TextField
@@ -106,9 +120,32 @@ export default observer(function TopBar() {
         <FormControlLabel control={<Switch onChange={onShowRegisteredToggled} />} label="Show Registered" />
       </FormGroup>
       <Stack>
-        <Button variant="outlined" startIcon={<Refresh />} onClick={onReloadClick}>
-          Reload
-        </Button>
+        <ButtonGroup variant="outlined" ref={reloadDropdownRef}>
+          <Button variant="outlined" startIcon={<Refresh />} onClick={onReloadClick}>
+            Reload
+          </Button>
+          <Button variant="outlined" size="small" onClick={() => setShowReloadDropdown(!showReloadDropdown)}>
+            <ArrowDropDownOutlined />
+          </Button>
+        </ButtonGroup>
+        {/* TODO: make this Popper width same as parent */}
+        {/* read: https://github.com/floating-ui/floating-ui/issues/794 */}
+        <Popper open={showReloadDropdown} anchorEl={reloadDropdownRef.current} transition disablePortal>
+          {({ TransitionProps, placement }) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <Grow {...TransitionProps}>
+              <Paper elevation={8}>
+                <ClickAwayListener onClickAway={() => setShowReloadDropdown(false)}>
+                  <MenuList>
+                    <MenuItem key="force-reload" onClick={onHardReloadClick}>
+                      Hard Reload
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
       </Stack>
     </Stack>
   )
