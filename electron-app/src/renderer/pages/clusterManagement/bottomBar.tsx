@@ -47,7 +47,7 @@ export default observer(function BottomBar() {
   }, [metadataRequester.state, registerRequester.state])
 
   return (
-    <Stack direction="row" width="100%" alignItems="center" gap="16px">
+    <Stack direction="row" width="100%" alignItems="center" gap="16px" marginLeft="32px">
       <Button variant="outlined" disabled={isProcessing} onClick={onRegisterAllClicked}>
         Register ALL
       </Button>

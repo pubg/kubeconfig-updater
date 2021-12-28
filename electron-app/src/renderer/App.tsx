@@ -34,7 +34,7 @@ export default function App() {
             >
               <Paper
                 square
-                elevation={3}
+                elevation={18}
                 sx={{
                   display: 'flex',
                   height: '100%',

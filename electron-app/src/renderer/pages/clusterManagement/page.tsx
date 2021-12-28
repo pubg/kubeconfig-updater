@@ -105,7 +105,7 @@ export default observer(function ClusterManagement() {
         {/* Header Menu Container */}
         <Paper
           square
-          elevation={0}
+          elevation={6}
           sx={{
             height: '128px',
             display: 'flex',
@@ -119,9 +119,18 @@ export default observer(function ClusterManagement() {
         </Box>
 
         {/* bottom sidebar container */}
-        <Box width="100%" height="64px" display="flex" alignItems="center" margin="8px" paddingLeft="16px">
+        <Paper
+          square
+          elevation={6}
+          sx={{
+            width: '100%',
+            height: '80px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           <BottomBar />
-        </Box>
+        </Paper>
       </Box>
     </Paper>
   )
