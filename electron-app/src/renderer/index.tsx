@@ -1,16 +1,13 @@
 // required by tsyringe
 import 'reflect-metadata'
 
-import { PaletteMode, ThemeProvider } from '@mui/material'
 import { initializeIcons } from '@fluentui/react/lib/Icons'
 import { render } from 'react-dom'
-import { createTheme } from '@mui/material/styles'
 import { container } from 'tsyringe'
 import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
-import { ThemeStore } from './components/themeStore'
-import {autorun} from "mobx";
+import { ThemeStorageType, ThemeStore } from './components/themeStore'
 
 browserLogger.debug('browser debug mode enabled')
 
@@ -20,6 +17,8 @@ declare global {
     theme?: string
     themeGetTheme?: () => string
     themeGetPreferredTheme?: () => string
+    themeSetPreferredTheme?: (preferredTheme: string) => void
+    managedFromElectron?: boolean
   }
 }
 
@@ -36,7 +35,7 @@ function getHostName() {
 const client = new KubeconfigClient(getHostName())
 container.register(KubeconfigClient, { useValue: client })
 
-render(
-    <App />,
-  document.getElementById('root')
-)
+const themeStorageType: ThemeStorageType = window.managedFromElectron === undefined ? 'browser' : 'electron'
+container.register('ThemeStorageType', { useValue: themeStorageType })
+
+render(<App />, document.getElementById('root'))

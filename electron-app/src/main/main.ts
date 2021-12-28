@@ -24,6 +24,7 @@ import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } f
 import mainLogger from './logger/mainLogger'
 import FrontendStore from './frontendStore'
 import MenuBuilder from './menu'
+import browserLogger from "../renderer/logger/browserLogger";
 
 export default class AppUpdater {
   constructor() {
@@ -244,7 +245,7 @@ ipcMain.on('theme:getTheme', (event) => {
 
 // theme:setPreferredTheme => bool
 // Set Success or Not
-ipcMain.on('theme:setPreferredTheme', (event, args) => {
+ipcMain.on('theme:setPreferredTheme', (event, ...args) => {
   if (args.length !== 1 || typeof args[0] !== 'string') {
     event.returnValue = false
     return

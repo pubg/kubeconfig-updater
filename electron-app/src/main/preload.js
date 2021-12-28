@@ -51,3 +51,10 @@ contextBridge.exposeInMainWorld('themeGetPreferredTheme', () => {
   electronLogger.info(`[themeFunc] getPreferredTheme: ${preferredTheme}`)
   return preferredTheme
 })
+
+contextBridge.exposeInMainWorld('themeSetPreferredTheme', (preferredTheme) => {
+  ipcRenderer.sendSync('theme:setPreferredTheme', preferredTheme)
+  electronLogger.info(`[themeFunc] setPreferredTheme: ${preferredTheme}`)
+})
+
+contextBridge.exposeInMainWorld('managedFromElectron', true)
