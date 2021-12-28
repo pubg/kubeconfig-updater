@@ -83,7 +83,10 @@ export default observer(function TopBar() {
     store.setItems(requester.items.map((item) => ClusterMetadataItem.fromObject(item)))
   }, [requester, store])
 
-  const onHardReloadClick = useCallback(async () => {}, [])
+  const onHardReloadClick = useCallback(async () => {
+    setShowReloadDropdown(false)
+    requester.fetchMetadata(true)
+  }, [requester])
 
   const theme = useTheme()
 
