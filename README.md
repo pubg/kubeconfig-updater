@@ -7,7 +7,7 @@ This is GUI kuberentes config file manager app. It automatically resolve your cl
 |---|---|---|
 |Windows|x86-64 / Arm64|Portable Zip, Installer|
 |Linux|x86-64 / Arm64|AppImage|
-|MacOS|x86-64 / Arm64|App|
+|MacOS|x86-64 / Arm64 / Universal|App, Dmg|
 
 ## Config Store Path
 Config stored under your HOME directory.
