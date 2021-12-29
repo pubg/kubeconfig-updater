@@ -163,23 +163,21 @@ export default observer(function ClusterInfoList() {
 
   // TODO: split GroupedList to another component
   return (
-    <Box height="100%">
-      <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
-        <ThemeProvider theme={currentTheme}>
-          {isGrouped ? (
-            <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
-          ) : (
-            <DetailsList
-              columns={columns}
-              items={items}
-              onColumnHeaderClick={onHeaderNameClicked}
-              selection={store.selectionRef as Selection}
-              onActiveItemChanged={onActiveItemChanged}
-            />
-          )}
-          {/* <Menu></Menu> */}
-        </ThemeProvider>
-      </Box>
+    <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+      <ThemeProvider theme={currentTheme}>
+        {isGrouped ? (
+          <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
+        ) : (
+          <DetailsList
+            columns={columns}
+            items={items}
+            onColumnHeaderClick={onHeaderNameClicked}
+            selection={store.selectionRef as Selection}
+            onActiveItemChanged={onActiveItemChanged}
+          />
+        )}
+        {/* <Menu></Menu> */}
+      </ThemeProvider>
     </Box>
   )
 })
