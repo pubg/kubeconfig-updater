@@ -20,17 +20,18 @@ const StyledProgress = styled(LinearProgress)(({ theme }) => {
 
 export interface ProgressProps {
   title: string
+  open: boolean
   sx?: SxProps
-  containerStyles?: BoxProps
-  props?: LinearProgressProps
+  progressProps?: LinearProgressProps
 }
 
 // TODO: fix progress bar square shape
-export default observer(function Progress({ title, sx, props }: ProgressProps) {
+export default observer(function Progress({ open, title, sx, progressProps: props }: ProgressProps) {
   const theme = useTheme()
 
   return (
     <Box
+      display={open ? 'initial' : 'none'}
       position="relative"
       width="256px"
       height="32px"
@@ -49,7 +50,9 @@ export default observer(function Progress({ title, sx, props }: ProgressProps) {
         justifyContent="center"
         zIndex={1}
       >
-        <Typography display="block">{title}</Typography>
+        <Typography display="block" variant="h6">
+          {title}
+        </Typography>
       </Box>
       <StyledProgress {...props} />
     </Box>
