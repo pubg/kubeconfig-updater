@@ -7,6 +7,7 @@ import BottomBar from './bottomBar'
 import ClusterInfoList from './clusterInfoList'
 import { useContext as useMetadataRequesterContext } from '../../components/clusterMetadataRequester'
 import ProgressSnackbar from './progressSnackbar'
+import RegisterErrorToNoti from '../../components/registerErrorToNoti'
 
 export default observer(function ClusterManagement() {
   const clusterMetadataStore = useStore()
@@ -31,6 +32,8 @@ export default observer(function ClusterManagement() {
   return (
     /** background */
     <Paper sx={{ width: '100%', height: '100%' }} square>
+      <RegisterErrorToNoti />
+
       {/* actual container */}
       <Box
         sx={{
