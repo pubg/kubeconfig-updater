@@ -14,7 +14,7 @@
     "package": "pnpm run package:only:allplatform",
     "package:only": "electron-builder build --publish never",
     "package:only:allplatform": "electron-builder build -mwl --publish never",
-    "package:only:darwin": "electron-builder build --macos --publish --universal never",
+    "package:only:darwin": "electron-builder build --macos --universal --publish never",
     "package:only:linux": "electron-builder build --linux --publish never",
     "package:only:windows": "electron-builder build --windows --publish never",
     "clean:dist": "ts-node ./.erb/scripts/clean.js dist",
