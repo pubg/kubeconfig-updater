@@ -15,6 +15,11 @@ func ResolveConfig(absPath string) (*ApplicationConfig, error) {
 		return loadConfig(absPath)
 	}
 
+	err := os.MkdirAll(filepath.Dir(absPath), 0766)
+	if err != nil {
+		return nil, err
+	}
+
 	resolveSuccess, err := resolveFromFilePath(absPath, filepath.Join("~", "Downloads", "application-config.yaml"))
 	if err != nil {
 		return nil, err
@@ -122,6 +127,7 @@ func resolveFromInMemory(targetAbsPath string) error {
 	if err != nil {
 		return err
 	}
+
 	err = ioutil.WriteFile(targetAbsPath, buf, 0644)
 	if err != nil {
 		return err
