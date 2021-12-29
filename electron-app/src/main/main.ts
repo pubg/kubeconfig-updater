@@ -24,7 +24,6 @@ import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } f
 import mainLogger from './logger/mainLogger'
 import FrontendStore from './frontendStore'
 import MenuBuilder from './menu'
-import browserLogger from "../renderer/logger/browserLogger";
 
 export default class AppUpdater {
   constructor() {
