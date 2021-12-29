@@ -3,6 +3,8 @@ package cluster_metadata_service
 import (
 	"fmt"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
@@ -50,20 +52,42 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 	if err != nil {
 		return err
 	}
+
+	wg := sync.WaitGroup{}
+	returnChan := make(chan listClustersOut, len(resolvers))
+	defer close(returnChan)
 	for _, resolver := range resolvers {
-		fmt.Printf("Resolver Description: %s\n", resolver.GetResolverDescription())
+		fmt.Printf("MetadataResolver Description: %s\n", resolver.GetResolverDescription())
+
+		wg.Add(1)
+		newRefResolver := resolver
+		go func() {
+			start := time.Now()
+			metadatas, err := newRefResolver.ListClusters()
+			duration := time.Since(start)
+			returnChan <- listClustersOut{
+				resolver:  newRefResolver,
+				metadatas: metadatas,
+				err:       err,
+				duration:  duration,
+			}
+			wg.Done()
+		}()
 	}
+	wg.Wait()
 
 	regedMetaMap := map[string]bool{}
 	availMetaMap := map[string]*protos.AggregatedClusterMetadata{}
-	for _, resolver := range resolvers {
-		metadatas, err := resolver.ListClusters()
-		if err != nil {
-			fmt.Printf("List cluster metadata occurred error, resolver desc:%s, err:%s\n", resolver.GetResolverDescription(), err.Error())
+	for i := 0; i < len(resolvers); i++ {
+		listClusterReturn := <-returnChan
+		resolver := listClusterReturn.resolver
+		if listClusterReturn.err != nil {
+			fmt.Printf("List cluster metadata occurred error, resolver desc:%s, err:%s\n", resolver.GetResolverDescription(), listClusterReturn.err.Error())
 			continue
 		}
-		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters\n", resolver.GetResolverDescription(), len(metadatas))
-		for _, metadata := range metadatas {
+
+		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters, duration: %.2fs\n", resolver.GetResolverDescription(), len(listClusterReturn.metadatas), listClusterReturn.duration.Seconds())
+		for _, metadata := range listClusterReturn.metadatas {
 			if aggrMeta, exists := availMetaMap[metadata.ClusterName]; exists {
 				aggrMeta.Metadata = mergeMetadata(aggrMeta.Metadata, metadata)
 				aggrMeta.DataResolvers = append(aggrMeta.DataResolvers, resolver.GetResolverDescription())
@@ -112,6 +136,13 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		return err
 	}
 	return nil
+}
+
+type listClustersOut struct {
+	resolver  ClusterMetadataResolver
+	metadatas []*protos.ClusterMetadata
+	err       error
+	duration  time.Duration
 }
 
 func getClusterInfoStatus(credStoreService *cred_resolver_service.CredResolverStoreService, credResolverId string) string {

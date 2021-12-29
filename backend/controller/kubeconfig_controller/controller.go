@@ -99,7 +99,7 @@ func (s *kubeconfigService) SyncAvailableCredResolvers(context.Context, *protos.
 	start := time.Now()
 	err := s.credResolverService.SyncCredResolversStatus()
 	delta := time.Since(start)
-	fmt.Printf("Success SyncAvailableCredResolver duration: %fs\n", delta.Seconds())
+	fmt.Printf("Success SyncAvailableCredResolver duration: %.2fs\n", delta.Seconds())
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -108,7 +108,7 @@ func (s *kubeconfigService) SyncAvailableCredResolvers(context.Context, *protos.
 	}
 
 	return &protos.CommonRes{
-		Message: fmt.Sprintf("sync success"),
+		Message: fmt.Sprintf("Sync success"),
 	}, nil
 }
 
@@ -227,7 +227,7 @@ func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.Commo
 	start := time.Now()
 	err := s.metadataService.SyncAvailableClusters()
 	delta := time.Since(start)
-	fmt.Printf("Success SyncAvailableClusters duration: %fs\n", delta.Seconds())
+	fmt.Printf("Success SyncAvailableClusters duration: %.2fs\n", delta.Seconds())
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
