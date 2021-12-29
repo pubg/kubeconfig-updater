@@ -20,9 +20,15 @@ jobs:
         with:
           version: latest
           install-only: true
+
       - run: |
           go mod download
         working-directory: backend
+
+      - run: |
+          make build-backend
+        working-directory: electron-app
+        name: Build-Backend
 
       - uses: actions/upload-artifact@v2
         with:
@@ -45,11 +51,6 @@ jobs:
           npm install --global pnpm
           pnpm install
         working-directory: electron-app
-
-      - run: |
-          make build-backend
-        working-directory: electron-app
-        name: Build-Backend
 
       - run: |
           make build-frontend
