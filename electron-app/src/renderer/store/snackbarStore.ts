@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from 'mobx'
 import { OptionsObject, SnackbarMessage } from 'notistack'
-import { injectable, singleton } from 'tsyringe'
+import { singleton } from 'tsyringe'
 
 type Item = {
   key: string

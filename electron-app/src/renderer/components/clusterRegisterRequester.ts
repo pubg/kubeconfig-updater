@@ -4,6 +4,7 @@ import { container, injectable } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
 import { ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'
+import EventStore from '../store/eventStore'
 
 type Item = {
   clusterName: string
@@ -26,6 +27,8 @@ export class ClusterRegisterRequester {
 
   @observable
   currentItem: Item | null = null
+
+  requestErrorEvent = new EventStore<Error>()
 
   constructor() {
     makeObservable(this)
@@ -52,8 +55,9 @@ export class ClusterRegisterRequester {
             throw new Error(res.getMessage())
           }
         })()
-      } catch (err) {
+      } catch (err: unknown) {
         browserLogger.error(err)
+        this.requestErrorEvent.emit(err as Error)
       }
 
       this.processedCount += 1
