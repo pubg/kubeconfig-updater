@@ -118,6 +118,6 @@ jobs:
       - run: |
           ls -al packages
           VERSION=$(jq -r -c '.version' ./electron-app/package.json)
-          gh release create $VERSION --repo=https://github.com/pubg/kubeconfig-updater --title=$VERSION ./packages/*
+          gh release create v$VERSION --repo=https://github.com/pubg/kubeconfig-updater --title=v$VERSION ./packages/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,7 +4,7 @@
   "author": {
     "name": "PUBG"
   },
-  "version": "0.1.2",
+  "version": "0.1.3",
   "scripts": {
     "build": "concurrently \"pnpm run build:main\" \"pnpm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -14,7 +14,7 @@
     "package": "pnpm run package:only:allplatform",
     "package:only": "electron-builder build --publish never",
     "package:only:allplatform": "electron-builder build -mwl --publish never",
-    "package:only:darwin": "electron-builder build --macos --publish never",
+    "package:only:darwin": "electron-builder build --macos --publish --universal never",
     "package:only:linux": "electron-builder build --linux --publish never",
     "package:only:windows": "electron-builder build --windows --publish never",
     "clean:dist": "ts-node ./.erb/scripts/clean.js dist",
