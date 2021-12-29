@@ -13,10 +13,10 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/application_controller"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_controller"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
@@ -99,7 +99,7 @@ func (s *ServerApplication) CloseApplication() {
 func (s *ServerApplication) InitApplication(option *ServerApplicationOption) error {
 	s.GrpcPort = option.GrpcPort
 	s.GrpcWebPort = option.GrpcWebPort
-	err := s.initApplicationConfig(option.ConfigPath)
+	err := s.initApplicationConfig(option.AbsConfigPath)
 	if err != nil {
 		return err
 	}
@@ -115,16 +115,12 @@ func (s *ServerApplication) InitApplication(option *ServerApplicationOption) err
 type ServerApplicationOption struct {
 	GrpcPort          int
 	GrpcWebPort       int
-	ConfigPath        string
+	AbsConfigPath     string
 	UseMockController bool
 }
 
-func (s *ServerApplication) initApplicationConfig(basPath string) error {
-	err := configs.CheckExistsOrCreateDefault(basPath)
-	if err != nil {
-		return err
-	}
-	cfg, err := configs.LoadConfig(basPath)
+func (s *ServerApplication) initApplicationConfig(absPath string) error {
+	cfg, err := configs.ResolveConfig(absPath)
 	if err != nil {
 		return err
 	}
@@ -200,85 +196,6 @@ func (s *ServerApplication) initPersistLayer(credResolverConfig *configs.DataSto
 	if err != nil {
 		return err
 	}
-
-	//if firstLoad {
-	//	err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
-	//		AccountId:          "548322143865",
-	//		InfraVendor:        "AWS",
-	//		AccountAlias:       "pubg-xtrm",
-	//		Kind:               protos.CredentialResolverKind_PROFILE,
-	//		ResolverAttributes: map[string]string{"profile": "mfa"},
-	//		Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
-	//		AccountId:          "418047124903",
-	//		InfraVendor:        "AWS",
-	//		AccountAlias:       "xtrm-newstate",
-	//		Kind:               protos.CredentialResolverKind_PROFILE,
-	//		ResolverAttributes: map[string]string{"profile": "mfan"},
-	//		Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
-	//		AccountId:          "350993443303",
-	//		InfraVendor:        "AWS",
-	//		AccountAlias:       "xtrm-playground",
-	//		Kind:               protos.CredentialResolverKind_PROFILE,
-	//		ResolverAttributes: map[string]string{"profile": "mfap"},
-	//		Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
-	//		AccountId:          "200019689895",
-	//		InfraVendor:        "Tencent",
-	//		AccountAlias:       "xtrm-newstate",
-	//		Kind:               protos.CredentialResolverKind_PROFILE,
-	//		ResolverAttributes: map[string]string{"profile": "default"},
-	//		Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
-	//		AccountId:          "200022166252",
-	//		InfraVendor:        "Tencent",
-	//		AccountAlias:       "xtrm-playground",
-	//		Kind:               protos.CredentialResolverKind_PROFILE,
-	//		ResolverAttributes: map[string]string{"profile": "dev"},
-	//		Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	err = s.CredResolverConfigStorage.SetConfig(&protos.CredResolverConfig{
-	//		AccountId:          "f073f292-7255-416f-adaf-34b476e050be",
-	//		InfraVendor:        "Azure",
-	//		AccountAlias:       "xtrm-newstate",
-	//		Kind:               protos.CredentialResolverKind_DEFAULT,
-	//		ResolverAttributes: map[string]string{},
-	//		Status:             protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	err = s.CredResolverConfigStorage.SaveStorage()
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
 
 	return nil
 }
