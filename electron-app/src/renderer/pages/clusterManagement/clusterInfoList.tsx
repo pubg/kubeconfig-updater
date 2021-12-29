@@ -1,4 +1,4 @@
-import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, GroupedList } from '@fluentui/react'
+import { DetailsList, IColumn, IDetailsListProps, ThemeProvider, GroupedList } from '@fluentui/react'
 import { IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
 import { Box, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
@@ -10,6 +10,8 @@ import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
 import * as MetadataRequester from '../../components/clusterMetadataRequester'
+import { useAutorun } from '../../hooks/mobx'
+import { ThemeStore } from '../../components/themeStore'
 
 /*
 const columns: IColumn[] = [
@@ -88,11 +90,8 @@ function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, C
 
 export default observer(function ClusterInfoList() {
   const store = useStore()
-  const metadataRequester = MetadataRequester.useContext()
 
   const [descending, setDescending] = useState(false)
-  const showLoading = metadataRequester.state !== 'ready'
-  browserLogger.info(showLoading)
 
   // TODO: add dyanmic column add/delete
   const columns = useMemo<IColumn[]>(() => {
@@ -147,6 +146,7 @@ export default observer(function ClusterInfoList() {
   useAutorun(() => {
     setTheme(themeStore.getFluentUiTheme())
   })
+
   const groupedItems = useMemo(() => {
     return store.selectedGroupTag ? groupByTag(items, store.selectedGroupTag) : []
   }, [items, store.selectedGroupTag])
@@ -164,7 +164,7 @@ export default observer(function ClusterInfoList() {
   // TODO: split GroupedList to another component
   return (
     <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
-      <ThemeProvider theme={currentTheme}>
+      <ThemeProvider theme={theme}>
         {isGrouped ? (
           <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
         ) : (
