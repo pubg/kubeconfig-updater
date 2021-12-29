@@ -1,28 +1,37 @@
-import { Refresh } from '@mui/icons-material'
+import { Refresh, ArrowDropDownOutlined } from '@mui/icons-material'
 import {
   Stack,
   FormGroup,
   TextField,
   Autocomplete,
-  Checkbox,
   FormControlLabel,
   Button,
-  CheckboxProps,
   SwitchProps,
   Switch,
+  UseAutocompleteProps,
+  ButtonGroup,
+  Popper,
+  Paper,
+  ClickAwayListener,
+  MenuList,
+  MenuItem,
+  Grow,
+  useTheme,
+  MenuItemProps,
 } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
-import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter, ClusterMetadata } from './clusterMetadataStore'
+import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './clusterMetadataStore'
 import { longestCommonSequence } from '../../utils/strings/lcs'
+import browserLogger from '../../logger/browserLogger'
 
-function filterFactory(name: string, selectedTags: Set<string>, showRegistered: boolean): ClusterMetadataItemFilter {
+function filterFactory(name: string, showRegistered: boolean): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
     // fuzzy search
     const clusterName = data.metadata.clustername
-    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === name.length)) {
+    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === neme.length)) {
       return false
     }
 
@@ -48,26 +57,19 @@ export default observer(function TopBar() {
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
-  const [selectedTags, setSelectedTags] = useState(new Set<string>())
   const [showRegistered, setShowRegistered] = useState(false)
+  const [showReloadDropdown, setShowReloadDropdown] = useState(false)
+  const reloadDropdownRef = useRef(null)
 
   // update store's filter when filter variables are changed
   useEffect(() => {
-    store.setFilter(filterFactory(nameFilter, selectedTags, showRegistered))
-  }, [store, nameFilter, selectedTags, showRegistered])
+    store.setFilter(filterFactory(nameFilter, showRegistered))
+  }, [store, nameFilter, showRegistered])
 
   // define handlers
-  const onGroupTagsChanged: CheckboxProps['onChange'] = (e, checked) => {
-    const newSet = new Set(selectedTags)
-    const tag = e.target.value
-
-    if (checked) {
-      newSet.add(tag)
-    } else {
-      newSet.delete(tag)
-    }
-
-    setSelectedTags(newSet)
+  const onTagSelectChanged: UseAutocompleteProps<string, false, false, false>['onChange'] = (e, value) => {
+    browserLogger.debug(`selected tag: ${value}`)
+    store.setGroupTag(value)
   }
 
   const onShowRegisteredToggled: SwitchProps['onChange'] = (_, checked) => {
@@ -77,13 +79,16 @@ export default observer(function TopBar() {
   // TODO: refactor this hard-coded requester binding to parent?
   const onReloadClick = useCallback(async () => {
     await requester.fetchMetadata()
-    store.setItems(
-      requester.items.map((item) => {
-        const obj = item.toObject() as ClusterMetadata
-        return { key: obj.metadata?.clustername, data: obj }
-      })
-    )
+    // NOTE: can this belongs to here?
+    store.setItems(requester.items.map((item) => ClusterMetadataItem.fromObject(item)))
   }, [requester, store])
+
+  const onHardReloadClick = useCallback(async () => {
+    setShowReloadDropdown(false)
+    requester.fetchMetadata(true)
+  }, [requester])
+
+  const theme = useTheme()
 
   return (
     <Stack
@@ -93,6 +98,7 @@ export default observer(function TopBar() {
       width="100%"
       marginLeft="32px"
       marginRight="32px"
+      zIndex={theme.zIndex.appBar}
     >
       <FormGroup row sx={{ gap: '16px', alignItems: 'center', flexWrap: 'nowrap' }}>
         <TextField
@@ -104,29 +110,45 @@ export default observer(function TopBar() {
           autoFocus
         />
         <Autocomplete
-          multiple
           options={store.tags}
           disableCloseOnSelect
           style={{ minWidth: '256px', maxWidth: '1024px' }}
           size="small"
+          onChange={onTagSelectChanged}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
             <TextField {...params} label="Group with Tag" />
-          )}
-          renderOption={(props, option, { selected }) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <li {...props}>
-              <Checkbox checked={selected} onChange={onGroupTagsChanged} />
-              {option}
-            </li>
           )}
         />
         <FormControlLabel control={<Switch onChange={onShowRegisteredToggled} />} label="Show Registered" />
       </FormGroup>
       <Stack>
-        <Button variant="outlined" startIcon={<Refresh />} onClick={onReloadClick}>
-          Reload
-        </Button>
+        <ButtonGroup variant="outlined" ref={reloadDropdownRef}>
+          <Button variant="outlined" startIcon={<Refresh />} onClick={onReloadClick}>
+            Reload
+          </Button>
+          <Button variant="outlined" size="small" onClick={() => setShowReloadDropdown(!showReloadDropdown)}>
+            <ArrowDropDownOutlined />
+          </Button>
+        </ButtonGroup>
+        {/* TODO: make this Popper width same as parent */}
+        {/* read: https://github.com/floating-ui/floating-ui/issues/794 */}
+        <Popper open={showReloadDropdown} anchorEl={reloadDropdownRef.current} transition disablePortal>
+          {({ TransitionProps, placement }) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <Grow {...TransitionProps}>
+              <Paper elevation={8}>
+                <ClickAwayListener onClickAway={() => setShowReloadDropdown(false)}>
+                  <MenuList>
+                    <MenuItem key="force-reload" onClick={onHardReloadClick}>
+                      Hard Reload
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
       </Stack>
     </Stack>
   )
