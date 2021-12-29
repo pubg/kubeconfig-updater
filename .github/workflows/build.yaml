@@ -1,7 +1,7 @@
 name: build
 on: workflow_dispatch
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,9 +20,29 @@ jobs:
         with:
           version: latest
           install-only: true
+
       - run: |
           go mod download
         working-directory: backend
+
+      - run: |
+          make build-backend
+        working-directory: electron-app
+        name: Build-Backend
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact-backend
+          path: |
+            backend/dist/**
+          if-no-files-found: error
+          retention-days: 1
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - uses: actions/setup-node@v2
         with:
@@ -33,27 +53,22 @@ jobs:
         working-directory: electron-app
 
       - run: |
-          make build-backend
-        working-directory: electron-app
-        name: Build-Backend
-
-      - run: |
           make build-frontend
         working-directory: electron-app
         name: Build-Frontend
 
       - uses: actions/upload-artifact@v2
         with:
-          name: build-artifact
+          name: build-artifact-frontend
           path: |
-            backend/dist/**
             electron-app/release/**
           if-no-files-found: error
           retention-days: 1
 
   package:
     needs:
-      - build
+      - build-backend
+      - build-frontend
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -70,7 +85,12 @@ jobs:
         uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: build-artifact
+          name: build-artifact-backend
+          path: backend/dist/
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-artifact-frontend
+          path: electron-app/release/
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -118,6 +138,6 @@ jobs:
       - run: |
           ls -al packages
           VERSION=$(jq -r -c '.version' ./electron-app/package.json)
-          gh release create $VERSION --repo=https://github.com/pubg/kubeconfig-updater --title=$VERSION ./packages/*
+          gh release create v$VERSION --repo=https://github.com/pubg/kubeconfig-updater --title=v$VERSION ./packages/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

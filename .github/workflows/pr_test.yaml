@@ -22,6 +22,12 @@ jobs:
           args: build --rm-dist --snapshot --single-target
           workdir: backend
 
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -29,6 +35,7 @@ jobs:
           npm install --global pnpm
           pnpm install
         working-directory: electron-app
+        name: Init Typescript Env
 
       - run: |
           make build-frontend
