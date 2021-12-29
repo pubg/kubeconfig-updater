@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -9,6 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/pubg/kubeconfig-updater/backend/controller/application_controller"
 	"github.com/pubg/kubeconfig-updater/backend/controller/kubeconfig_controller"
@@ -20,6 +23,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -129,8 +133,18 @@ func (s *ServerApplication) initApplicationConfig(basPath string) error {
 }
 
 func (s *ServerApplication) initControllerLayer(useMockController bool) {
-	s.GrpcServer = grpc.NewServer()
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+
+	grpcOption := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+		grpc_zap.PayloadUnaryServerInterceptor(logger, func(ctx context.Context, fullMethodName string, servingObject interface{}) bool {
+			return true
+		}),
+		grpc_zap.UnaryServerInterceptor(logger),
+	))
+	s.GrpcServer = grpc.NewServer(grpcOption)
 	reflection.Register(s.GrpcServer)
+
 	protos.RegisterApplicationServer(s.GrpcServer, application_controller.NewController())
 	if useMockController {
 		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewMockController())
