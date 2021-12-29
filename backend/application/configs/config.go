@@ -1,9 +1,10 @@
 package configs
 
 type ApplicationConfig struct {
-	DataStores *DataStores
-	AutoUpdate bool
-	Extensions *Extension
+	DataStores                *DataStores
+	AutoUpdate                bool
+	Extensions                *Extension
+	DefaultCredResolverConfig string
 }
 
 type DataStores struct {

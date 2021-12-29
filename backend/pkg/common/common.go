@@ -2,6 +2,7 @@ package common
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -69,4 +70,9 @@ func GetItemOrError(m map[string]string, key string) (string, error) {
 		return value, nil
 	}
 	return "", fmt.Errorf("map doesn't have key, key:%s", key)
+}
+
+func ExistsFile(absPath string) bool {
+	_, err := os.Stat(absPath)
+	return !errors.Is(err, os.ErrNotExist)
 }

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/internal/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"

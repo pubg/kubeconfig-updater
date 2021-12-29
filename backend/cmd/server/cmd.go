@@ -2,8 +2,9 @@ package server
 
 import (
 	"fmt"
+	"path/filepath"
 
-	"github.com/pubg/kubeconfig-updater/backend/internal/application"
+	"github.com/pubg/kubeconfig-updater/backend/application"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,7 @@ func Cmd() *cobra.Command {
 	flags.IntVar(&grpcPort, "port", 10980, "Grpc Listen Port")
 	flags.IntVar(&grpcWebPort, "web-port", 10981, "Grpc-Web Listen Port")
 	flags.BoolVar(&useMock, "mock", false, "Use Mock Controller")
-	flags.StringVar(&configPath, "config", "~/.kubeconfig-updater-gui/config.yaml", "Application config path (yaml and json support)")
+	flags.StringVar(&configPath, "config", filepath.Join("~", ".kubeconfig-updater-gui", "application-config.yaml"), "Application config path (yaml and json support)")
 
 	serverCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		absConfigPath, err := common.ResolvePathToAbs(configPath)
@@ -37,7 +38,7 @@ func Cmd() *cobra.Command {
 		err = app.InitApplication(&application.ServerApplicationOption{
 			GrpcPort:          grpcPort,
 			GrpcWebPort:       grpcWebPort,
-			ConfigPath:        absConfigPath,
+			AbsConfigPath:     absConfigPath,
 			UseMockController: useMock,
 		})
 		if err != nil {
