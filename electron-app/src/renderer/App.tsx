@@ -1,8 +1,10 @@
-import { PaletteMode, Paper, ThemeProvider } from '@mui/material'
+import { Paper, ThemeProvider } from '@mui/material'
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom'
 import './App.css'
 import { container } from 'tsyringe'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { SnackbarProvider } from 'notistack'
+import dayjs from 'dayjs'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
 import About from './pages/about/about'
@@ -14,6 +16,8 @@ import { ClusterMetadataStore, ClusterMetadataStoreContext } from './pages/clust
 import Configuration from './pages/configuration/configuration'
 import { ThemeStore } from './components/themeStore'
 import { useAutorun } from './hooks/mobx'
+import NotiSnackbar from './components/notiSnackbar'
+import SnackbarStore from './store/snackbarStore'
 
 export default function App() {
   const themeStore = container.resolve(ThemeStore)
@@ -26,44 +30,49 @@ export default function App() {
   const clusterRegisterRequester = containerHooks.useResolve(ClusterRegisterRequester)
   const clusterMetadataRequester = containerHooks.useResolve(ClusterMetadataRequester)
 
+  const snackbarStore = containerHooks.useResolve(SnackbarStore)
+
   return (
     <ClusterMetadataRequesterContext.Provider value={clusterMetadataRequester}>
       <ClusterRegisterRequesterContext.Provider value={clusterRegisterRequester}>
         <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
           <ThemeProvider theme={theme}>
-            <Router>
-              <Paper
-                square
-                sx={{
-                  width: '100vw',
-                  height: '100vh',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'stretch',
-                  alignItems: 'stretch',
-                }}
-              >
+            <SnackbarProvider>
+              <NotiSnackbar />
+              <Router>
                 <Paper
                   square
-                  elevation={18}
                   sx={{
+                    width: '100vw',
+                    height: '100vh',
                     display: 'flex',
-                    height: '100%',
-                    flexShrink: 0,
-                    flexGrow: 0,
+                    flexDirection: 'row',
+                    justifyContent: 'stretch',
+                    alignItems: 'stretch',
                   }}
                 >
-                  <Sidebar />
+                  <Paper
+                    square
+                    elevation={18}
+                    sx={{
+                      display: 'flex',
+                      height: '100%',
+                      flexShrink: 0,
+                      flexGrow: 0,
+                    }}
+                  >
+                    <Sidebar />
+                  </Paper>
+                  <Switch>
+                    <Route exact path="/" component={ClusterManagement} />
+                    <Route path="/cluster-management" component={ClusterManagement} />
+                    <Route path="/configuration" component={Configuration} />
+                    <Route path="/about" component={About} />
+                  </Switch>
+                  <RegisterProgressSnackbar />
                 </Paper>
-                <Switch>
-                  <Route exact path="/" component={ClusterManagement} />
-                  <Route path="/cluster-management" component={ClusterManagement} />
-                  <Route path="/configuration" component={Configuration} />
-                  <Route path="/about" component={About} />
-                </Switch>
-                <RegisterProgressSnackbar />
-              </Paper>
-            </Router>
+              </Router>
+            </SnackbarProvider>
           </ThemeProvider>
         </ClusterMetadataStoreContext.Provider>
       </ClusterRegisterRequesterContext.Provider>
