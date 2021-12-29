@@ -14,6 +14,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/eks v1.15.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.6.1
 	github.com/ghodss/yaml v1.0.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/schollz/jsonstore v1.1.0
@@ -23,6 +24,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.228
 	github.krafton.com/xtrm/fox v1.1.1
+	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.27.1
@@ -78,6 +80,8 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tidwall/sjson v1.2.2 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602 // indirect
 	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
