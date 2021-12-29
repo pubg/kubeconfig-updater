@@ -36,15 +36,15 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 		if err != nil {
 			return err
 		}
-		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ClusterRegion.String())
+		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTag_ClusterRegion.String())
 		if err != nil {
-			return fmt.Errorf("clusterMetadata should have ClusterRegion tag, but not exists")
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTag_ClusterRegion.String())
 		}
 		return aws_service.RegisterEksWithIamUser(clusterName, clusterRegion, profileOrEmpty)
 	} else if strings.EqualFold(vendor, types.InfraVendor_Azure.String()) {
-		resourceGroup, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ResourceGroup.String())
+		resourceGroup, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTag_ResourceGroup.String())
 		if err != nil {
-			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTags_ResourceGroup.String())
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTag_ResourceGroup.String())
 		}
 		return azure_service.RegisterAksCluster(resourceGroup, clusterName)
 	} else if strings.EqualFold(vendor, types.InfraVendor_Tencent.String()) {
@@ -52,13 +52,13 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 		if err != nil {
 			return err
 		}
-		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ClusterRegion.String())
+		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTag_ClusterRegion.String())
 		if err != nil {
-			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTags_ClusterRegion.String())
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTag_ClusterRegion.String())
 		}
-		clusterId, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTags_ClusterId.String())
+		clusterId, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTag_ClusterId.String())
 		if err != nil {
-			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTags_ClusterId.String())
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTag_ClusterId.String())
 		}
 		return tencent_service.RegisterTkeCluster0(clusterRegion, clusterId, clusterName, credProvider)
 	}

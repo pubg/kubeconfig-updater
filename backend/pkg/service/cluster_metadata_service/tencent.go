@@ -110,7 +110,7 @@ func (r *TencentResolver) listTke(region string) ([]*protos.ClusterMetadata, err
 			CredResolverId: r.tcAccountId,
 			ClusterTags:    map[string]string{},
 		}
-		meta.ClusterTags[types.KnownClusterTags_ClusterId.String()] = *cluster.ClusterId
+		meta.ClusterTags[types.KnownClusterTag_ClusterId.String()] = *cluster.ClusterId
 		for _, tagSpec := range cluster.TagSpecification {
 			for _, tag := range tagSpec.Tags {
 				meta.ClusterTags[*tag.Key] = *tag.Value

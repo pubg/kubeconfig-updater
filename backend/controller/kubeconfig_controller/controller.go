@@ -26,14 +26,13 @@ func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverSt
 }
 
 func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.GetCredResolversRes, error) {
-	cfgs := s.credStoreService.ListCredResolvers()
+	resolvers := s.credStoreService.ListCredResolvers()
 
 	res := &protos.GetCredResolversRes{
 		CommonRes: &protos.CommonRes{
-			Status:  protos.ResultCode_SUCCESS,
-			Message: "list resolvers success",
+			Message: fmt.Sprintf("List %d resolvers success", len(resolvers)),
 		},
-		Configs: cfgs,
+		Configs: resolvers,
 	}
 	return res, nil
 }
@@ -41,10 +40,14 @@ func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.C
 func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.CredResolverConfig) (*protos.CommonRes, error) {
 	err := s.credStoreService.SetCredResolver(req)
 	if err != nil {
-		return nil, err
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
 	}
+
 	return &protos.CommonRes{
-		Message: "set resolver success",
+		Message: "Set resolver success",
 	}, nil
 }
 
@@ -53,21 +56,41 @@ func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.Cr
 	for _, cfg := range cfgs {
 		err := s.credStoreService.SetCredResolver(cfg)
 		if err != nil {
-			return nil, err
+			return &protos.CommonRes{
+				Status:  protos.ResultCode_SERVER_INTERNAL,
+				Message: err.Error(),
+			}, nil
 		}
 	}
 	return &protos.CommonRes{
-		Message: "set resolvers success",
+		Message: "Set resolver success",
 	}, nil
 }
 
 func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.DeleteCredResolverReq) (*protos.CommonRes, error) {
-	err := s.credStoreService.DeleteCredResolver(cfg.AccountId)
+	_, exists, err := s.credStoreService.GetCredResolver(cfg.AccountId)
 	if err != nil {
-		return nil, err
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
+	}
+	if !exists {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_NOT_FOUND,
+			Message: fmt.Sprintf("Requested CredResolver is not exists id:%s", cfg.AccountId),
+		}, nil
+	}
+
+	err = s.credStoreService.DeleteCredResolver(cfg.AccountId)
+	if err != nil {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
 	}
 	return &protos.CommonRes{
-		Message: "delete resolver success",
+		Message: "Delete CredResolver success",
 	}, nil
 }
 
@@ -76,12 +99,16 @@ func (s *kubeconfigService) SyncAvailableCredResolvers(context.Context, *protos.
 	start := time.Now()
 	err := s.credResolverService.SyncCredResolversStatus()
 	delta := time.Since(start)
-	fmt.Printf("Success SyncAvailableCredResolver duration: %fs\n", delta.Seconds())
+	fmt.Printf("Success SyncAvailableCredResolver duration: %.2fs\n", delta.Seconds())
 	if err != nil {
-		return nil, err
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
 	}
+
 	return &protos.CommonRes{
-		Message: fmt.Sprintf("sync success"),
+		Message: fmt.Sprintf("Sync success"),
 	}, nil
 }
 
@@ -107,7 +134,7 @@ func (s *kubeconfigService) GetRegisteredProfiles(ctx context.Context, req *prot
 
 	return &protos.GetRegisteredProfilesRes{
 		CommonRes: &protos.CommonRes{
-			Message: "get registered profiles success",
+			Message: "Get registered profiles success",
 		},
 		Profiles: profiles,
 	}, nil
@@ -118,7 +145,7 @@ func (s *kubeconfigService) GetAvailableClusters(context.Context, *protos.Common
 
 	return &protos.GetAvailableClustersRes{
 		CommonRes: &protos.CommonRes{
-			Message: "discover success",
+			Message: "Get AvailableClusters Cache Success",
 		},
 		Clusters: clusters,
 	}, nil
@@ -139,7 +166,6 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 			Message: err.Error(),
 		}, nil
 	}
-
 	if !exists {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_INVALID_ARGUMENT,
@@ -178,12 +204,14 @@ func (s *kubeconfigService) DeleteCluster(ctx context.Context, req *protos.Delet
 
 	success, err := kubeconfig_service.DeleteContext(req.ClusterName, req.Cascade)
 	if err != nil {
-		return nil, err
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
 	}
 
 	if success {
 		return &protos.CommonRes{
-			Status:  protos.ResultCode_SUCCESS,
 			Message: fmt.Sprintf("Delete Context Success Name:%s", req.ClusterName),
 		}, nil
 	} else {
@@ -199,9 +227,12 @@ func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.Commo
 	start := time.Now()
 	err := s.metadataService.SyncAvailableClusters()
 	delta := time.Since(start)
-	fmt.Printf("Success SyncAvailableClusters duration: %fs\n", delta.Seconds())
+	fmt.Printf("Success SyncAvailableClusters duration: %.2fs\n", delta.Seconds())
 	if err != nil {
-		return nil, err
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INTERNAL,
+			Message: err.Error(),
+		}, nil
 	}
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("sync success"),

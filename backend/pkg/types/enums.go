@@ -37,18 +37,24 @@ func ToInfraVendorIgnoreCase(vendor string) (InfraVendor, bool) {
 	return _InfraVendorValues[0], false
 }
 
-type KnownClusterTags int32
+func InfraVendors() []InfraVendor {
+	slice := make([]InfraVendor, len(_InfraVendorValues))
+	copy(slice, _InfraVendorValues)
+	return slice
+}
+
+type KnownClusterTag int32
 
 const (
-	KnownClusterTags_ClusterRegion KnownClusterTags = 0
-	KnownClusterTags_ClusterId     KnownClusterTags = 1
-	KnownClusterTags_ResourceGroup KnownClusterTags = 2
+	KnownClusterTag_ClusterRegion KnownClusterTag = 0
+	KnownClusterTag_ClusterId     KnownClusterTag = 1
+	KnownClusterTag_ResourceGroup KnownClusterTag = 2
 )
 
 var _KnownClusterTagsNames = []string{"ClusterRegion", "ClusterId", "ResourceGroup"}
-var _KnownClusterTagsValues = []KnownClusterTags{KnownClusterTags_ClusterRegion, KnownClusterTags_ClusterId, KnownClusterTags_ResourceGroup}
+var _KnownClusterTagsValues = []KnownClusterTag{KnownClusterTag_ClusterRegion, KnownClusterTag_ClusterId, KnownClusterTag_ResourceGroup}
 
-func (v KnownClusterTags) String() string {
+func (v KnownClusterTag) String() string {
 	return _KnownClusterTagsNames[v]
 }
 
@@ -61,7 +67,7 @@ func IsKnownClusterTagsIgnoreCase(tag string) bool {
 	return false
 }
 
-func ToKnownClusterTagsIgnoreCase(tag string) (KnownClusterTags, bool) {
+func ToKnownClusterTagsIgnoreCase(tag string) (KnownClusterTag, bool) {
 	for index, name := range _KnownClusterTagsNames {
 		if strings.EqualFold(name, tag) {
 			return _KnownClusterTagsValues[index], true
@@ -70,16 +76,22 @@ func ToKnownClusterTagsIgnoreCase(tag string) (KnownClusterTags, bool) {
 	return _KnownClusterTagsValues[0], false
 }
 
-type KnownCredAttributes int32
+func KnownClusterTags() []KnownClusterTag {
+	slice := make([]KnownClusterTag, len(_KnownClusterTagsValues))
+	copy(slice, _KnownClusterTagsValues)
+	return slice
+}
+
+type KnownCredAttribute int32
 
 const (
-	KnownCredAttributes_profile KnownCredAttributes = 0
+	KnownCredAttribute_profile KnownCredAttribute = 0
 )
 
 var _KnownCredAttributesNames = []string{"profile"}
-var _KnownCredAttributesValues = []KnownCredAttributes{KnownCredAttributes_profile}
+var _KnownCredAttributesValues = []KnownCredAttribute{KnownCredAttribute_profile}
 
-func (v KnownCredAttributes) String() string {
+func (v KnownCredAttribute) String() string {
 	return _KnownCredAttributesNames[v]
 }
 
@@ -92,11 +104,17 @@ func IsKnownCredAttributesIgnoreCase(tag string) bool {
 	return false
 }
 
-func ToKnownCredAttributesIgnoreCase(tag string) (KnownCredAttributes, bool) {
+func ToKnownCredAttributesIgnoreCase(tag string) (KnownCredAttribute, bool) {
 	for index, name := range _KnownCredAttributesNames {
 		if strings.EqualFold(name, tag) {
 			return _KnownCredAttributesValues[index], true
 		}
 	}
 	return _KnownCredAttributesValues[0], false
+}
+
+func KnownCredAttributes() []KnownCredAttribute {
+	slice := make([]KnownCredAttribute, len(_KnownCredAttributesValues))
+	copy(slice, _KnownCredAttributesValues)
+	return slice
 }

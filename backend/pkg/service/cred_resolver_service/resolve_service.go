@@ -41,7 +41,7 @@ func (s *CredResolveService) GetAwsSdkConfig(ctx context.Context, credConf *prot
 		if attributes == nil {
 			return nil, "", fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[types.KnownCredAttributes_profile.String()]
+		profile, exists := attributes[types.KnownCredAttribute_profile.String()]
 		if !exists {
 			return nil, "", fmt.Errorf("profile attribute should be exist")
 		}
@@ -66,7 +66,7 @@ func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *pr
 		if attributes == nil {
 			return nil, fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[types.KnownCredAttributes_profile.String()]
+		profile, exists := attributes[types.KnownCredAttribute_profile.String()]
 		if !exists {
 			return nil, fmt.Errorf("profile attribute should be exist")
 		}
@@ -89,7 +89,7 @@ func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverCo
 		if attributes == nil {
 			return nil, fmt.Errorf("attribute should not null")
 		}
-		profile, exists := attributes[types.KnownCredAttributes_profile.String()]
+		profile, exists := attributes[types.KnownCredAttribute_profile.String()]
 		if !exists {
 			return nil, fmt.Errorf("profile attribute should be exist")
 		}
