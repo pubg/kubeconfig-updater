@@ -37,7 +37,7 @@ export default function App() {
       <ClusterRegisterRequesterContext.Provider value={clusterRegisterRequester}>
         <ClusterMetadataStoreContext.Provider value={clusterMetadataStore}>
           <ThemeProvider theme={theme}>
-            <SnackbarProvider>
+            <SnackbarProvider maxSnack={10} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
               <NotiSnackbar />
               <Router>
                 <Paper

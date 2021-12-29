@@ -5,7 +5,8 @@ export default class EventStore<T> {
   @observable
   _value: T | null = null
 
-  @action emit(value: T) {
+  @action
+  emit(value: T) {
     this._value = value
   }
 }

@@ -2,7 +2,7 @@ import { flow, makeObservable, observable } from 'mobx'
 import React from 'react'
 import { container, injectable } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
-import { ResultCode } from '../protos/common_pb'
+import { CommonRes, ResultCode } from '../protos/common_pb'
 import RegisterClusterService from '../services/registerClusters'
 import EventStore from '../store/eventStore'
 
@@ -28,7 +28,8 @@ export class ClusterRegisterRequester {
   @observable
   currentItem: Item | null = null
 
-  requestErrorEvent = new EventStore<Error>()
+  @observable
+  error: Error | null = null
 
   constructor() {
     makeObservable(this)
@@ -42,22 +43,18 @@ export class ClusterRegisterRequester {
     this.state = 'processing'
 
     for (const item of items) {
-      try {
-        yield (async () => {
-          const req = container.resolve(RegisterClusterService)
-          browserLogger.debug(
-            `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
-          )
-          this.currentItem = item
-          const res = await req.request(item.clusterName, item.accountId)
+      const res: CommonRes = yield (async () => {
+        const req = container.resolve(RegisterClusterService)
+        browserLogger.debug(
+          `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
+        )
+        this.currentItem = item
+        return req.request(item.clusterName, item.accountId)
+      })()
 
-          if (res.getStatus() !== ResultCode.SUCCESS) {
-            throw new Error(res.getMessage())
-          }
-        })()
-      } catch (err: unknown) {
-        browserLogger.error(err)
-        this.requestErrorEvent.emit(err as Error)
+      if (res.getStatus() !== ResultCode.SUCCESS) {
+        browserLogger.debug('failed to register cluster.')
+        this.error = new Error(`registeration failed: ${item.clusterName}`)
       }
 
       this.processedCount += 1
