@@ -5,6 +5,7 @@ import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
 import { Theme as MuiTheme } from '@mui/material/styles/createTheme'
 import { createTheme } from '@mui/material/styles'
 import { PaletteMode } from '@mui/material'
+import browserLogger from '../logger/browserLogger'
 
 export type ThemeType = 'dark' | 'light' | 'system'
 export type ThemeStorageType = 'browser' | 'electron'
@@ -46,7 +47,7 @@ class ElectronThemeStorage implements ThemeStorage {
     if (window.themeSetPreferredTheme) {
       window.themeSetPreferredTheme(theme)
     } else {
-      console.log('error!!!')
+      browserLogger.error('Electron preload script not work as expected, window.themeSetPreferredTheme is not defined')
     }
   }
 
@@ -55,7 +56,7 @@ class ElectronThemeStorage implements ThemeStorage {
     if (window.themeGetPreferredTheme) {
       return window.themeGetPreferredTheme() as ThemeType
     }
-    console.log('error!!!')
+    browserLogger.error('Electron preload script not work as expected, window.themeGetPreferredTheme is not defined')
     return 'light'
   }
 
@@ -64,7 +65,7 @@ class ElectronThemeStorage implements ThemeStorage {
     if (window.themeGetTheme) {
       return window.themeGetTheme() as ThemeType
     }
-    console.log('error!!!')
+    browserLogger.error('Electron preload script not work as expected, window.themeGetTheme is not defined')
     return 'light'
   }
 }

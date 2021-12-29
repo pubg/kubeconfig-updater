@@ -1,23 +1,19 @@
-import {PaletteMode, Paper, ThemeProvider} from '@mui/material'
-import {MemoryRouter as Router, Route, Switch} from 'react-router-dom'
+import { PaletteMode, Paper, ThemeProvider } from '@mui/material'
+import { MemoryRouter as Router, Route, Switch } from 'react-router-dom'
 import './App.css'
+import { container } from 'tsyringe'
+import { useState } from 'react'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
 import About from './pages/about/about'
 import RegisterProgressSnackbar from './components/registerProgressPopup'
 import * as containerHooks from './hooks/container'
-import {ClusterMetadataRequester, ClusterMetadataRequesterContext} from './components/clusterMetadataRequester'
-import {ClusterRegisterRequester, ClusterRegisterRequesterContext} from './components/clusterRegisterRequester'
-import {ClusterMetadataStore, ClusterMetadataStoreContext} from './pages/clusterManagement/clusterMetadataStore'
+import { ClusterMetadataRequester, ClusterMetadataRequesterContext } from './components/clusterMetadataRequester'
+import { ClusterRegisterRequester, ClusterRegisterRequesterContext } from './components/clusterRegisterRequester'
+import { ClusterMetadataStore, ClusterMetadataStoreContext } from './pages/clusterManagement/clusterMetadataStore'
 import Configuration from './pages/configuration/configuration'
-import {container} from "tsyringe";
-import {ThemeStore} from "./components/themeStore";
-import browserLogger from "./logger/browserLogger";
-import {createTheme} from "@mui/material/styles";
-import {autorun} from "mobx";
-import {useState} from "react";
-import {useAutorun} from "./hooks/mobx";
-import {Theme} from "@mui/material/styles/createTheme";
+import { ThemeStore } from './components/themeStore'
+import { useAutorun } from './hooks/mobx'
 
 export default function App() {
   const themeStore = container.resolve(ThemeStore)
@@ -57,15 +53,15 @@ export default function App() {
                     flexGrow: 0,
                   }}
                 >
-                  <Sidebar/>
+                  <Sidebar />
                 </Paper>
                 <Switch>
-                  <Route exact path="/" component={ClusterManagement}/>
-                  <Route path="/cluster-management" component={ClusterManagement}/>
-                  <Route path="/configuration" component={Configuration}/>
-                  <Route path="/about" component={About}/>
+                  <Route exact path="/" component={ClusterManagement} />
+                  <Route path="/cluster-management" component={ClusterManagement} />
+                  <Route path="/configuration" component={Configuration} />
+                  <Route path="/about" component={About} />
                 </Switch>
-                <RegisterProgressSnackbar/>
+                <RegisterProgressSnackbar />
               </Paper>
             </Router>
           </ThemeProvider>

@@ -1,17 +1,16 @@
-import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider } from '@fluentui/react'
+import { DetailsList, IColumn, IDetailsListProps, ThemeProvider } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
-import { PaletteMode, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
 import { toJS } from 'mobx'
-import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
+import { container } from 'tsyringe'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
-import {container} from "tsyringe";
-import {ThemeStore} from "../../components/themeStore";
-import {useAutorun} from "../../hooks/mobx";
+import { ThemeStore } from '../../components/themeStore'
+import { useAutorun } from '../../hooks/mobx'
 
 /*
 const columns: IColumn[] = [
