@@ -1,14 +1,16 @@
-import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider } from '@fluentui/react'
+import { DetailsList, IColumn, IDetailsListProps, ThemeProvider } from '@fluentui/react'
 import { Selection } from '@fluentui/react/lib/DetailsList'
-import { PaletteMode, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import LINQ from 'linq'
 import { toJS } from 'mobx'
-import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
+import { container } from 'tsyringe'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
+import { ThemeStore } from '../../components/themeStore'
+import { useAutorun } from '../../hooks/mobx'
 
 /*
 const columns: IColumn[] = [
@@ -76,20 +78,6 @@ const columns: IColumn[] = [
 ]
 */
 
-function getFluentuiTheme(): Theme {
-  browserLogger.info(`Init FluentUi Theme: ${window.theme}, Default is AzureThemeLight`)
-  if (window.theme === undefined) {
-    return AzureThemeLight
-  }
-  if (window.theme === 'dark') {
-    return AzureThemeDark
-  }
-  if (window.theme === 'light') {
-    return AzureThemeLight
-  }
-  return AzureThemeLight
-}
-
 export default observer(function ClusterInfoList() {
   const store = useStore()
 
@@ -141,7 +129,11 @@ export default observer(function ClusterInfoList() {
     return linq.toArray()
   }, [descending, store.filter, store.items])
 
-  const currentTheme = useMemo<Theme>(getFluentuiTheme, [window.theme])
+  const themeStore = container.resolve(ThemeStore)
+  const [theme, setTheme] = useState(themeStore.getFluentUiTheme())
+  useAutorun(() => {
+    setTheme(themeStore.getFluentUiTheme())
+  })
 
   // TODO
   const onHeaderNameClicked: IDetailsListProps['onColumnHeaderClick'] = () => {}
@@ -152,7 +144,7 @@ export default observer(function ClusterInfoList() {
   }, [])
 
   return (
-    <ThemeProvider theme={currentTheme}>
+    <ThemeProvider theme={theme}>
       <DetailsList
         columns={columns}
         items={items}

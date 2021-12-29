@@ -1,14 +1,13 @@
 // required by tsyringe
 import 'reflect-metadata'
 
-import { PaletteMode, ThemeProvider } from '@mui/material'
 import { initializeIcons } from '@fluentui/react/lib/Icons'
 import { render } from 'react-dom'
-import { createTheme } from '@mui/material/styles'
 import { container } from 'tsyringe'
 import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
+import { ThemeStorageType, ThemeStore } from './components/themeStore'
 
 browserLogger.debug('browser debug mode enabled')
 
@@ -16,19 +15,12 @@ declare global {
   interface Window {
     grpcWebPort?: number
     theme?: string
+    themeGetTheme?: () => string
+    themeGetPreferredTheme?: () => string
+    themeSetPreferredTheme?: (preferredTheme: string) => void
+    managedFromElectron?: boolean
   }
 }
-
-function getMuiTheme(): PaletteMode {
-  browserLogger.info(`Init Theme: ${window.theme}, Default is light`)
-  return (window.theme as PaletteMode) ?? 'light'
-}
-
-const theme = createTheme({
-  palette: {
-    mode: getMuiTheme(),
-  },
-})
 
 initializeIcons()
 
@@ -43,9 +35,7 @@ function getHostName() {
 const client = new KubeconfigClient(getHostName())
 container.register(KubeconfigClient, { useValue: client })
 
-render(
-  <ThemeProvider theme={theme}>
-    <App />
-  </ThemeProvider>,
-  document.getElementById('root')
-)
+const themeStorageType: ThemeStorageType = window.managedFromElectron === undefined ? 'browser' : 'electron'
+container.register(ThemeStore, { useValue: new ThemeStore(themeStorageType) })
+
+render(<App />, document.getElementById('root'))
