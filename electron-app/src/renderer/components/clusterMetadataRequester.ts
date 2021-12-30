@@ -4,9 +4,8 @@ import { flow, makeObservable, observable } from 'mobx'
 import { container, injectable } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
-import GetAvailableClusterService from '../services/getAvailableClusters'
-import SyncAvailableClustersService from '../services/syncAvailableClusters'
 import browserLogger from '../logger/browserLogger'
+import ClusterRepository from '../repositories/clusterRepository'
 
 /**
  * manages cluster metadata requesting
@@ -82,15 +81,16 @@ export class ClusterMetadataRequester {
   })
 
   private static async sync() {
-    const req = container.resolve(SyncAvailableClustersService)
+    const repo = container.resolve(ClusterRepository)
     // TODO: does this throw error or do I have to use error handling with returned value?
     // does it even need try/catch? need to read doc first...
-    return req.request()
+
+    return repo.SyncAvailableClusters()
   }
 
   private static async fetch() {
-    const req = container.resolve(GetAvailableClusterService)
-    const res = await req.request()
+    const repository = container.resolve(ClusterRepository)
+    const res = await repository.GetAvailableClusters()
 
     return res.getClustersList()
   }

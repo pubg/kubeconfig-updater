@@ -208,90 +208,90 @@ export class KubeconfigClient {
     this.methodInfoDeleteCredResolver);
   }
 
-  methodInfoGetKubeConfig = new grpcWeb.MethodDescriptor(
-    '/kubeconfig.Kubeconfig/GetKubeConfig',
+  methodInfoSyncAvailableCredResolvers = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/SyncAvailableCredResolvers',
     grpcWeb.MethodType.UNARY,
     protos_common_pb.CommonReq,
-    protos_kubeconfig_service_pb.KubeConfigRes,
-    (request: protos_common_pb.CommonReq) => {
-      return request.serializeBinary();
-    },
-    protos_kubeconfig_service_pb.KubeConfigRes.deserializeBinary
-  );
-
-  getKubeConfig(
-    request: protos_common_pb.CommonReq,
-    metadata: grpcWeb.Metadata | null): Promise<protos_kubeconfig_service_pb.KubeConfigRes>;
-
-  getKubeConfig(
-    request: protos_common_pb.CommonReq,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: protos_kubeconfig_service_pb.KubeConfigRes) => void): grpcWeb.ClientReadableStream<protos_kubeconfig_service_pb.KubeConfigRes>;
-
-  getKubeConfig(
-    request: protos_common_pb.CommonReq,
-    metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: protos_kubeconfig_service_pb.KubeConfigRes) => void) {
-    if (callback !== undefined) {
-      return this.client_.rpcCall(
-        this.hostname_ +
-          '/kubeconfig.Kubeconfig/GetKubeConfig',
-        request,
-        metadata || {},
-        this.methodInfoGetKubeConfig,
-        callback);
-    }
-    return this.client_.unaryCall(
-    this.hostname_ +
-      '/kubeconfig.Kubeconfig/GetKubeConfig',
-    request,
-    metadata || {},
-    this.methodInfoGetKubeConfig);
-  }
-
-  methodInfoSetKubeConfig = new grpcWeb.MethodDescriptor(
-    '/kubeconfig.Kubeconfig/SetKubeConfig',
-    grpcWeb.MethodType.UNARY,
-    protos_kubeconfig_service_pb.KubeConfigReq,
     protos_common_pb.CommonRes,
-    (request: protos_kubeconfig_service_pb.KubeConfigReq) => {
+    (request: protos_common_pb.CommonReq) => {
       return request.serializeBinary();
     },
     protos_common_pb.CommonRes.deserializeBinary
   );
 
-  setKubeConfig(
-    request: protos_kubeconfig_service_pb.KubeConfigReq,
+  syncAvailableCredResolvers(
+    request: protos_common_pb.CommonReq,
     metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
 
-  setKubeConfig(
-    request: protos_kubeconfig_service_pb.KubeConfigReq,
+  syncAvailableCredResolvers(
+    request: protos_common_pb.CommonReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
 
-  setKubeConfig(
-    request: protos_kubeconfig_service_pb.KubeConfigReq,
+  syncAvailableCredResolvers(
+    request: protos_common_pb.CommonReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
                response: protos_common_pb.CommonRes) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/kubeconfig.Kubeconfig/SetKubeConfig',
+          '/kubeconfig.Kubeconfig/SyncAvailableCredResolvers',
         request,
         metadata || {},
-        this.methodInfoSetKubeConfig,
+        this.methodInfoSyncAvailableCredResolvers,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/kubeconfig.Kubeconfig/SetKubeConfig',
+      '/kubeconfig.Kubeconfig/SyncAvailableCredResolvers',
     request,
     metadata || {},
-    this.methodInfoSetKubeConfig);
+    this.methodInfoSyncAvailableCredResolvers);
+  }
+
+  methodInfoGetRegisteredProfiles = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/GetRegisteredProfiles',
+    grpcWeb.MethodType.UNARY,
+    protos_kubeconfig_service_pb.GetRegisteredProfilesReq,
+    protos_kubeconfig_service_pb.GetRegisteredProfilesRes,
+    (request: protos_kubeconfig_service_pb.GetRegisteredProfilesReq) => {
+      return request.serializeBinary();
+    },
+    protos_kubeconfig_service_pb.GetRegisteredProfilesRes.deserializeBinary
+  );
+
+  getRegisteredProfiles(
+    request: protos_kubeconfig_service_pb.GetRegisteredProfilesReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_kubeconfig_service_pb.GetRegisteredProfilesRes>;
+
+  getRegisteredProfiles(
+    request: protos_kubeconfig_service_pb.GetRegisteredProfilesReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_kubeconfig_service_pb.GetRegisteredProfilesRes) => void): grpcWeb.ClientReadableStream<protos_kubeconfig_service_pb.GetRegisteredProfilesRes>;
+
+  getRegisteredProfiles(
+    request: protos_kubeconfig_service_pb.GetRegisteredProfilesReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_kubeconfig_service_pb.GetRegisteredProfilesRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Kubeconfig/GetRegisteredProfiles',
+        request,
+        metadata || {},
+        this.methodInfoGetRegisteredProfiles,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Kubeconfig/GetRegisteredProfiles',
+    request,
+    metadata || {},
+    this.methodInfoGetRegisteredProfiles);
   }
 
   methodInfoGetAvailableClusters = new grpcWeb.MethodDescriptor(
@@ -378,6 +378,49 @@ export class KubeconfigClient {
     request,
     metadata || {},
     this.methodInfoRegisterCluster);
+  }
+
+  methodInfoDeleteCluster = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/DeleteCluster',
+    grpcWeb.MethodType.UNARY,
+    protos_kubeconfig_service_pb.DeleteClusterReq,
+    protos_common_pb.CommonRes,
+    (request: protos_kubeconfig_service_pb.DeleteClusterReq) => {
+      return request.serializeBinary();
+    },
+    protos_common_pb.CommonRes.deserializeBinary
+  );
+
+  deleteCluster(
+    request: protos_kubeconfig_service_pb.DeleteClusterReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
+
+  deleteCluster(
+    request: protos_kubeconfig_service_pb.DeleteClusterReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
+
+  deleteCluster(
+    request: protos_kubeconfig_service_pb.DeleteClusterReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_common_pb.CommonRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Kubeconfig/DeleteCluster',
+        request,
+        metadata || {},
+        this.methodInfoDeleteCluster,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Kubeconfig/DeleteCluster',
+    request,
+    metadata || {},
+    this.methodInfoDeleteCluster);
   }
 
   methodInfoSyncAvailableClusters = new grpcWeb.MethodDescriptor(

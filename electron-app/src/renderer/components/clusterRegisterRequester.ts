@@ -3,8 +3,7 @@ import React from 'react'
 import { container, injectable } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
 import { CommonRes, ResultCode } from '../protos/common_pb'
-import RegisterClusterService from '../services/registerClusters'
-import EventStore from '../store/eventStore'
+import ClusterRepository from '../repositories/clusterRepository'
 
 type Item = {
   clusterName: string
@@ -44,12 +43,12 @@ export class ClusterRegisterRequester {
 
     for (const item of items) {
       const res: CommonRes = yield (async () => {
-        const req = container.resolve(RegisterClusterService)
+        const repo = container.resolve(ClusterRepository)
         browserLogger.debug(
           `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
         )
         this.currentItem = item
-        return req.request(item.clusterName, item.accountId)
+        return repo.RegisterCluster(item.clusterName, item.accountId)
       })()
 
       if (res.getStatus() !== ResultCode.SUCCESS) {

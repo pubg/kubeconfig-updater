@@ -22,6 +22,9 @@ export class CredResolverConfig extends jspb.Message {
   getStatus(): CredentialResolverStatus;
   setStatus(value: CredentialResolverStatus): CredResolverConfig;
 
+  getStatusdetail(): string;
+  setStatusdetail(value: string): CredResolverConfig;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CredResolverConfig.AsObject;
   static toObject(includeInstance: boolean, msg: CredResolverConfig): CredResolverConfig.AsObject;
@@ -38,6 +41,7 @@ export namespace CredResolverConfig {
     kind: CredentialResolverKind,
     resolverattributesMap: Array<[string, string]>,
     status: CredentialResolverStatus,
+    statusdetail: string,
   }
 }
 
@@ -102,6 +106,76 @@ export class DeleteCredResolverReq extends jspb.Message {
 export namespace DeleteCredResolverReq {
   export type AsObject = {
     accountid: string,
+  }
+}
+
+export class GetRegisteredProfilesReq extends jspb.Message {
+  getInfravendor(): string;
+  setInfravendor(value: string): GetRegisteredProfilesReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetRegisteredProfilesReq.AsObject;
+  static toObject(includeInstance: boolean, msg: GetRegisteredProfilesReq): GetRegisteredProfilesReq.AsObject;
+  static serializeBinaryToWriter(message: GetRegisteredProfilesReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetRegisteredProfilesReq;
+  static deserializeBinaryFromReader(message: GetRegisteredProfilesReq, reader: jspb.BinaryReader): GetRegisteredProfilesReq;
+}
+
+export namespace GetRegisteredProfilesReq {
+  export type AsObject = {
+    infravendor: string,
+  }
+}
+
+export class GetRegisteredProfilesRes extends jspb.Message {
+  getCommonres(): protos_common_pb.CommonRes | undefined;
+  setCommonres(value?: protos_common_pb.CommonRes): GetRegisteredProfilesRes;
+  hasCommonres(): boolean;
+  clearCommonres(): GetRegisteredProfilesRes;
+
+  getProfilesList(): Array<Profile>;
+  setProfilesList(value: Array<Profile>): GetRegisteredProfilesRes;
+  clearProfilesList(): GetRegisteredProfilesRes;
+  addProfiles(value?: Profile, index?: number): Profile;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetRegisteredProfilesRes.AsObject;
+  static toObject(includeInstance: boolean, msg: GetRegisteredProfilesRes): GetRegisteredProfilesRes.AsObject;
+  static serializeBinaryToWriter(message: GetRegisteredProfilesRes, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetRegisteredProfilesRes;
+  static deserializeBinaryFromReader(message: GetRegisteredProfilesRes, reader: jspb.BinaryReader): GetRegisteredProfilesRes;
+}
+
+export namespace GetRegisteredProfilesRes {
+  export type AsObject = {
+    commonres?: protos_common_pb.CommonRes.AsObject,
+    profilesList: Array<Profile.AsObject>,
+  }
+}
+
+export class Profile extends jspb.Message {
+  getProfilename(): string;
+  setProfilename(value: string): Profile;
+
+  getAccountid(): string;
+  setAccountid(value: string): Profile;
+
+  getInfravendor(): string;
+  setInfravendor(value: string): Profile;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Profile.AsObject;
+  static toObject(includeInstance: boolean, msg: Profile): Profile.AsObject;
+  static serializeBinaryToWriter(message: Profile, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Profile;
+  static deserializeBinaryFromReader(message: Profile, reader: jspb.BinaryReader): Profile;
+}
+
+export namespace Profile {
+  export type AsObject = {
+    profilename: string,
+    accountid: string,
+    infravendor: string,
   }
 }
 
@@ -260,6 +334,34 @@ export namespace RegisterClusterReq {
     commonreq?: protos_common_pb.CommonReq.AsObject,
     clustername: string,
     accountid: string,
+  }
+}
+
+export class DeleteClusterReq extends jspb.Message {
+  getCommonreq(): protos_common_pb.CommonReq | undefined;
+  setCommonreq(value?: protos_common_pb.CommonReq): DeleteClusterReq;
+  hasCommonreq(): boolean;
+  clearCommonreq(): DeleteClusterReq;
+
+  getClustername(): string;
+  setClustername(value: string): DeleteClusterReq;
+
+  getCascade(): boolean;
+  setCascade(value: boolean): DeleteClusterReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteClusterReq.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteClusterReq): DeleteClusterReq.AsObject;
+  static serializeBinaryToWriter(message: DeleteClusterReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteClusterReq;
+  static deserializeBinaryFromReader(message: DeleteClusterReq, reader: jspb.BinaryReader): DeleteClusterReq;
+}
+
+export namespace DeleteClusterReq {
+  export type AsObject = {
+    commonreq?: protos_common_pb.CommonReq.AsObject,
+    clustername: string,
+    cascade: boolean,
   }
 }
 
