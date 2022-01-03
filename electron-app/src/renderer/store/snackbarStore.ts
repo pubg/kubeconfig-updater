@@ -1,4 +1,4 @@
-import { action, autorun, makeObservable, observable } from 'mobx'
+import { action, makeObservable, observable } from 'mobx'
 import { OptionsObject, SnackbarMessage } from 'notistack'
 import { singleton } from 'tsyringe'
 

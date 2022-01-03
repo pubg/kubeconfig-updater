@@ -1,5 +1,5 @@
-import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, GroupedList } from '@fluentui/react'
-import { DetailsRow, IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
+import { DetailsList, IColumn, IDetailsListProps, ThemeProvider } from '@fluentui/react'
+import { Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography, Box } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
@@ -10,7 +10,7 @@ import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
 import { useAutorun } from '../../hooks/mobx'
-import { ThemeStore } from '../../components/themeStore'
+import ThemeStore from '../../components/themeStore'
 import GroupedClusterList from './groupedClusterList'
 
 /*
