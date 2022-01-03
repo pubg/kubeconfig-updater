@@ -9,9 +9,8 @@ import { container } from 'tsyringe'
 import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
-import * as MetadataRequester from '../../components/clusterMetadataRequester'
 import { useAutorun } from '../../hooks/mobx'
-import { ThemeStore } from '../../components/themeStore'
+import ThemeStore from '../../components/themeStore'
 
 /*
 const columns: IColumn[] = [

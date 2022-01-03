@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -134,7 +135,7 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 
 	grpcOption := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 		grpc_zap.PayloadUnaryServerInterceptor(logger, func(ctx context.Context, fullMethodName string, servingObject interface{}) bool {
-			return true
+			return !strings.Contains(fullMethodName, "GetAvailable")
 		}),
 		grpc_zap.UnaryServerInterceptor(logger),
 	))

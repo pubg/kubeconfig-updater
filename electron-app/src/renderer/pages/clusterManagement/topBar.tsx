@@ -31,7 +31,7 @@ function filterFactory(name: string, showRegistered: boolean): ClusterMetadataIt
   const filter = ({ data }: ClusterMetadataItem): boolean => {
     // fuzzy search
     const clusterName = data.metadata.clustername
-    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === neme.length)) {
+    if (name.length > 0 && !(longestCommonSequence(clusterName, name) === name.length)) {
       return false
     }
 

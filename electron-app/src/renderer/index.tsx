@@ -7,7 +7,7 @@ import { container } from 'tsyringe'
 import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
-import { ThemeStorageType, ThemeStore } from './components/themeStore'
+import { ThemeRepository, BrowserThemeImpl, ElectronThemeImpl } from './repositories/themeRepository'
 
 browserLogger.debug('browser debug mode enabled')
 
@@ -35,7 +35,10 @@ function getHostName() {
 const client = new KubeconfigClient(getHostName())
 container.register(KubeconfigClient, { useValue: client })
 
-const themeStorageType: ThemeStorageType = window.managedFromElectron === undefined ? 'browser' : 'electron'
-container.register(ThemeStore, { useValue: new ThemeStore(themeStorageType) })
+if (window.managedFromElectron === undefined) {
+  container.register('ThemeRepository', { useValue: new BrowserThemeImpl('system') })
+} else {
+  container.register('ThemeRepository', { useValue: new ElectronThemeImpl() })
+}
 
 render(<App />, document.getElementById('root'))
