@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import { DependencyContainer, InjectionToken, container as defaultContainer } from 'tsyringe'
+import browserLogger from '../logger/browserLogger'
 
 export const ContainerContext = React.createContext<DependencyContainer | null>(null)
 
@@ -20,7 +21,13 @@ interface ContainerContextProviderProps {
 }
 
 export const ContainerContextProvider = ({ children, containerValue }: ContainerContextProviderProps) => {
-  const childContainer = (containerValue ?? defaultContainer).createChildContainer()
+  const childContainer = useMemo(() => {
+    return (containerValue ?? defaultContainer).createChildContainer()
+  }, [containerValue])
+
+  useEffect(() => {
+    return () => childContainer.clearInstances()
+  }, [childContainer])
 
   return <ContainerContext.Provider value={childContainer}>{children}</ContainerContext.Provider>
 }
