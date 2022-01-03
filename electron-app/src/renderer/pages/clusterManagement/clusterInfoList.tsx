@@ -1,5 +1,5 @@
 import { DetailsList, IColumn, IDetailsListProps, Theme, ThemeProvider, GroupedList } from '@fluentui/react'
-import { IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
+import { DetailsRow, IGroupedListProps, Selection } from '@fluentui/react/lib/DetailsList'
 import { Typography, Box } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
@@ -10,7 +10,8 @@ import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
 import { useAutorun } from '../../hooks/mobx'
-import ThemeStore from '../../components/themeStore'
+import { ThemeStore } from '../../components/themeStore'
+import GroupedClusterList from './groupedClusterList'
 
 /*
 const columns: IColumn[] = [
@@ -78,14 +79,7 @@ const columns: IColumn[] = [
 ]
 */
 
-function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, ClusterMetadataItem[]][] {
-  const groupedItems = LINQ.from(data)
-    .groupBy((item) => item.tags.get(tag) ?? null)
-    .select((e) => [e.key(), e.toArray()])
-    .toArray() as [string | null, ClusterMetadataItem[]][]
-
-  return groupedItems
-}
+// TODO: refactor this
 
 export default observer(function ClusterInfoList() {
   const store = useStore()
@@ -140,10 +134,6 @@ export default observer(function ClusterInfoList() {
     return linq.toArray()
   }, [descending, store.filter, store.items])
 
-  const groupedItems = useMemo(() => {
-    return store.selectedGroupTag ? groupByTag(items, store.selectedGroupTag) : []
-  }, [items, store.selectedGroupTag])
-
   const themeStore = container.resolve(ThemeStore)
   const [theme, setTheme] = useState(themeStore.getFluentUiTheme())
   useAutorun(() => {
@@ -158,14 +148,12 @@ export default observer(function ClusterInfoList() {
     browserLogger.debug(item)
   }, [])
 
-  const onRenderCell: IGroupedListProps['onRenderCell'] = (depthLevel, item, index) => {}
-
   // TODO: split GroupedList to another component
   return (
     <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
       <ThemeProvider theme={theme}>
-        {isGrouped ? (
-          <GroupedList items={groupedItems} onRenderCell={onRenderCell} />
+        {isGrouped && store.selectedGroupTag ? (
+          <GroupedClusterList items={items} tag={store.selectedGroupTag} selection={store.selectionRef as Selection} />
         ) : (
           <DetailsList
             columns={columns}
