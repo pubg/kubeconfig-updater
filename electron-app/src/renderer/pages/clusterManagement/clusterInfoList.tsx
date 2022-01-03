@@ -153,7 +153,12 @@ export default observer(function ClusterInfoList() {
     <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
       <ThemeProvider theme={theme}>
         {isGrouped && store.selectedGroupTag ? (
-          <GroupedClusterList items={items} tag={store.selectedGroupTag} selection={store.selectionRef as Selection} />
+          <GroupedClusterList
+            overrides={{ onActiveItemChanged }}
+            items={items}
+            tag={store.selectedGroupTag}
+            selection={store.selectionRef as Selection}
+          />
         ) : (
           <DetailsList
             columns={columns}

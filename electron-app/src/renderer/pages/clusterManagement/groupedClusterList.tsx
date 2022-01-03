@@ -1,4 +1,4 @@
-import { DetailsList, IColumn, IGroup, ISelection } from '@fluentui/react'
+import { DetailsList, IColumn, IDetailsListProps, IGroup, ISelection } from '@fluentui/react'
 import { Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
@@ -70,14 +70,16 @@ function getIGroups(groupedItems: [string | null, ClusterMetadataItem[]][]): IGr
 }
 
 interface GroupedClusterListProps {
+  overrides?: Partial<IDetailsListProps>
   tag: string
   selection: ISelection
   items: ClusterMetadataItem[]
 }
 
-export default observer(function GroupedClusterList({ tag, items, selection }: GroupedClusterListProps) {
+export default observer(function GroupedClusterList({ overrides, tag, items, selection }: GroupedClusterListProps) {
   const groupedItems = useMemo(() => groupByTag(items, tag), [items, tag])
   const IGroups = useMemo(() => getIGroups(groupedItems), [groupedItems])
 
-  return <DetailsList groups={IGroups} items={items} columns={columns} selection={selection} />
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <DetailsList {...overrides} groups={IGroups} items={items} columns={columns} selection={selection} />
 })
