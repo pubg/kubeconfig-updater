@@ -38,6 +38,7 @@ export default observer(function ClusterList() {
 
   browserLogger.debug('current Item: ', items)
 
+  // TODO: width not limited to 100%
   return (
     <>
       {isGrouped && store.selectedGroupTag ? (
