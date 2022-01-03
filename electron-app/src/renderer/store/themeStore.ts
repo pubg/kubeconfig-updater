@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import { action, makeObservable, observable } from 'mobx'
 import { Theme as FluentUiTheme } from '@fluentui/react'
 import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
@@ -12,17 +11,22 @@ import { ThemePreferredType, ThemeRepository, ThemeType } from '../repositories/
 export default class ThemeStore {
   /** @readonly */
   @observable
-  theme: ThemeType = 'light'
+  private _theme: ThemeType = 'light'
 
+  get theme(): ThemeType {
+    return this._theme
+  }
+
+  // TODO: change string inject to Token (or Symbol?)
   constructor(@inject('ThemeRepository') readonly storage: ThemeRepository) {
-    this.theme = this.storage.getTheme()
     makeObservable(this)
+    this._theme = this.storage.getTheme()
   }
 
   @action
   setPreferredTheme(targetTheme: ThemePreferredType) {
     this.storage.setPreferredTheme(targetTheme)
-    this.theme = this.storage.getTheme()
+    this._theme = this.storage.getTheme()
   }
 
   getPreferredTheme(): ThemePreferredType {

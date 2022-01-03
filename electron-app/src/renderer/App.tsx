@@ -14,7 +14,7 @@ import { ClusterMetadataRequester, ClusterMetadataRequesterContext } from './com
 import { ClusterRegisterRequester, ClusterRegisterRequesterContext } from './components/clusterRegisterRequester'
 import { ClusterMetadataStore, ClusterMetadataStoreContext } from './pages/clusterManagement/clusterMetadataStore'
 import Configuration from './pages/configuration/configuration'
-import ThemeStore from './components/themeStore'
+import ThemeStore from './store/themeStore'
 import { useAutorun } from './hooks/mobx'
 import NotiSnackbar from './components/notiSnackbar'
 import SnackbarStore from './store/snackbarStore'

@@ -10,7 +10,7 @@ import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import browserLogger from '../../logger/browserLogger'
 import { useAutorun } from '../../hooks/mobx'
-import ThemeStore from '../../components/themeStore'
+import ThemeStore from '../../store/themeStore'
 import GroupedClusterList from './groupedClusterList'
 
 /*
