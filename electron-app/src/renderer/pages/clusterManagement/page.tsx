@@ -1,7 +1,7 @@
 import { Box, Paper } from '@mui/material'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { ClusterMetadataItem, useStore } from './clusterMetadataStore'
+import { ClusterMetadataItem, useStore } from './UIStore/ClusterManagementUIStore'
 import TopBar from './topBar'
 import BottomBar from './bottomBar'
 import ClusterInfoList from './clusterInfoList'

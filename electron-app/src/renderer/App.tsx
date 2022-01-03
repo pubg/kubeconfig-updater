@@ -12,7 +12,7 @@ import RegisterProgressSnackbar from './components/registerProgressPopup'
 import * as containerHooks from './hooks/container'
 import { ClusterMetadataRequester, ClusterMetadataRequesterContext } from './components/clusterMetadataRequester'
 import { ClusterRegisterRequester, ClusterRegisterRequesterContext } from './components/clusterRegisterRequester'
-import { ClusterMetadataStore, ClusterMetadataStoreContext } from './pages/clusterManagement/clusterMetadataStore'
+import { ClusterManagementUIStore, ClusterMetadataStoreContext } from './pages/clusterManagement/UIStore/ClusterManagementUIStore'
 import Configuration from './pages/configuration/configuration'
 import ThemeStore from './store/themeStore'
 import { useAutorun } from './hooks/mobx'
@@ -26,7 +26,7 @@ export default function App() {
     setTheme(themeStore.getMuiTheme())
   })
 
-  const clusterMetadataStore = containerHooks.useResolve(ClusterMetadataStore)
+  const clusterMetadataStore = containerHooks.useResolve(ClusterManagementUIStore)
   const clusterRegisterRequester = containerHooks.useResolve(ClusterRegisterRequester)
   const clusterMetadataRequester = containerHooks.useResolve(ClusterMetadataRequester)
 

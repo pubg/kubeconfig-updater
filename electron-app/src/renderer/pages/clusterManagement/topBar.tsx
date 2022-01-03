@@ -23,7 +23,7 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
-import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './clusterMetadataStore'
+import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './UIStore/ClusterManagementUIStore'
 import { longestCommonSequence } from '../../utils/strings/lcs'
 import browserLogger from '../../logger/browserLogger'
 
