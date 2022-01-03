@@ -30,7 +30,6 @@ export interface ClusterMetadataItem extends IObjectWithKey {
 export namespace ClusterMetadataItem {
   export function fromObject(metadata: AggregatedClusterMetadata): ClusterMetadataItem {
     const data = metadata.toObject() as ClusterMetadata
-    console.log(data.metadata)
     const tags = new Map<string, string>(data.metadata.clustertagsMap)
 
     return {

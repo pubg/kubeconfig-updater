@@ -43,10 +43,24 @@ const columns: IColumn[] = [
 ]
 
 function groupByTag(data: ClusterMetadataItem[], tag: string) {
-  const groupedItems = LINQ.from(data)
-    .groupBy((item) => item.tags.get(tag) ?? null)
-    .select((e) => [e.key(), e.toArray()])
-    .toArray() as [string | null, ClusterMetadataItem[]][]
+  const sortFunc = (key1: string | null, key2: string | null): number => {
+    if (key1 === null) {
+      return 1
+    }
+
+    if (key2 === null) {
+      return -1
+    }
+
+    return key1.localeCompare(key2)
+  }
+
+  const groupedItems = (
+    LINQ.from(data)
+      .groupBy((item) => item.tags.get(tag) ?? null)
+      .select((e) => [e.key(), e.toArray()])
+      .toArray() as [string | null, ClusterMetadataItem[]][]
+  ).sort(([k1], [k2]) => sortFunc(k1, k2))
 
   const orderedItems = groupedItems.map((grouped) => grouped[1]).flat()
 
