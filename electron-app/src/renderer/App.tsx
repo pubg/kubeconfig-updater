@@ -1,4 +1,4 @@
-import { Paper, ThemeProvider } from '@mui/material'
+import { createTheme, Paper, ThemeProvider } from '@mui/material'
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom'
 import './App.css'
 import { container } from 'tsyringe'
@@ -14,6 +14,7 @@ import ThemeStore from './store/themeStore'
 import { useAutorun } from './hooks/mobx'
 import NotiSnackbar from './components/notiSnackbar'
 import SnackbarStore from './store/snackbarStore'
+import browserLogger from './logger/browserLogger'
 
 export default function App() {
   const themeStore = container.resolve(ThemeStore)
@@ -22,10 +23,12 @@ export default function App() {
     setTheme(themeStore.getMuiTheme())
   })
 
+  browserLogger.debug('current theme: ', theme)
+
   const snackbarStore = containerHooks.useResolve(SnackbarStore)
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={createTheme()}>
       <SnackbarProvider maxSnack={10} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
         <NotiSnackbar />
         <Router>

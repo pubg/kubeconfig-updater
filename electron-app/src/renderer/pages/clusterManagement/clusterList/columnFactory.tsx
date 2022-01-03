@@ -21,6 +21,7 @@ const clusterNameColumn: IColumn = {
 
 const statusColumn: IColumn = {
   ...columnBase(),
+  minWidth: 128,
   key: 'status',
   name: 'Status',
   onRender(item: ClusterMetadataItem) {
@@ -47,6 +48,7 @@ export default function columnsFactory(additionalColumns: ColumnType[]): IColumn
     ...columnBase(),
     key,
     name,
+    isResizable: true,
   }))
 
   return [clusterNameColumn, ...columns, statusColumn]
