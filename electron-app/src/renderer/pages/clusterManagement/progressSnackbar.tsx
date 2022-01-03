@@ -2,7 +2,8 @@ import { SxProps } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import Progress from '../../components/Progress'
-import * as MetadataRequester from '../../components/clusterMetadataRequester'
+import { useResolve } from '../../hooks/container'
+import ClusterMetadataStore from '../../store/clusterMetadataStore'
 
 const sx: SxProps = {
   position: 'absolute',
@@ -14,10 +15,10 @@ const sx: SxProps = {
 } as const
 
 function ProgressSnackbar() {
-  const requester = MetadataRequester.useContext()
+  const clusterStore = useResolve(ClusterMetadataStore)
 
   const title = useMemo(() => {
-    switch (requester.state) {
+    switch (clusterStore.state) {
       case 'fetch':
         return 'fetching cluster in progress...'
 
@@ -27,11 +28,11 @@ function ProgressSnackbar() {
       default:
         return 'placeholder'
     }
-  }, [requester.state])
+  }, [clusterStore.state])
 
   const open = useMemo(() => {
-    return requester.state !== 'ready'
-  }, [requester.state])
+    return clusterStore.state !== 'ready'
+  }, [clusterStore.state])
 
   return <Progress open={open} title={title} sx={sx} />
 }

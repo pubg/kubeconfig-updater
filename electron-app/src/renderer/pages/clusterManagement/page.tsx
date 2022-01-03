@@ -1,38 +1,28 @@
-import { Box, Paper } from '@mui/material'
+import { Box, Paper, ThemeProvider } from '@mui/material'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { ClusterMetadataItem, useStore } from './UIStore/ClusterManagementUIStore'
 import TopBar from './topBar'
 import BottomBar from './bottomBar'
-import ClusterInfoList from './clusterInfoList'
-import { useContext as useMetadataRequesterContext } from '../../components/clusterMetadataRequester'
 import ProgressSnackbar from './progressSnackbar'
-import RegisterErrorToNoti from '../../components/registerErrorToNoti'
+import { useResolve } from '../../hooks/container'
+import ThemeStore from '../../store/themeStore'
+import ClusterInfoList from './clusterList'
+import ClusterMetadataStore from '../../store/clusterMetadataStore'
+import ErrorNotification from './errorNotification'
 
 export default observer(function ClusterManagement() {
-  const clusterMetadataStore = useStore()
-  const clusterMetadataRequester = useMetadataRequesterContext()
+  const clusterMetadataStore = useResolve(ClusterMetadataStore)
+  const themeStore = useResolve(ThemeStore)
 
-  // TODO: improve this
+  // invoke on mount
   useEffect(() => {
-    // IIFE
-    ;(async () => {
-      await clusterMetadataRequester.fetchMetadata()
-
-      const clusterMetadataItems = clusterMetadataRequester.items.map<ClusterMetadataItem>((item) =>
-        ClusterMetadataItem.fromObject(item)
-      )
-
-      clusterMetadataStore.setItems(clusterMetadataItems)
-    })()
-    // intentionally ignore this warning because we want to call this only once in onMount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    clusterMetadataStore.fetchMetadata(true)
   }, [])
 
   return (
     /** background */
     <Paper sx={{ width: '100%', height: '100%' }} square>
-      <RegisterErrorToNoti />
+      <ErrorNotification />
 
       {/* actual container */}
       <Box
@@ -58,7 +48,11 @@ export default observer(function ClusterManagement() {
 
         <Box height="100%" overflow="hidden" position="relative">
           <ProgressSnackbar />
-          <ClusterInfoList />
+          <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
+            <ThemeProvider theme={themeStore.theme}>
+              <ClusterInfoList />
+            </ThemeProvider>
+          </Box>
         </Box>
 
         {/* bottom sidebar container */}

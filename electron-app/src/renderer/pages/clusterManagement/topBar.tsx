@@ -17,15 +17,16 @@ import {
   MenuItem,
   Grow,
   useTheme,
-  MenuItemProps,
 } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
-import * as ClusterMetadataRequester from '../../components/clusterMetadataRequester'
-import { useStore, ClusterMetadataItem, ClusterMetadataItemFilter } from './UIStore/ClusterManagementUIStore'
 import { longestCommonSequence } from '../../utils/strings/lcs'
 import browserLogger from '../../logger/browserLogger'
+import { useResolve } from '../../hooks/container'
+import ClusterManagementUIStore from './UIStore/ClusterManagementUIStore'
+import ClusterMetadataStore from '../../store/clusterMetadataStore'
+import { ClusterMetadataItem, ClusterMetadataItemFilter } from './UIStore/types'
 
 function filterFactory(name: string, showRegistered: boolean): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
@@ -52,8 +53,8 @@ function filterFactory(name: string, showRegistered: boolean): ClusterMetadataIt
 }
 
 export default observer(function TopBar() {
-  const store = useStore()
-  const requester = ClusterMetadataRequester.useContext()
+  const store = useResolve(ClusterManagementUIStore)
+  const requester = useResolve(ClusterMetadataStore)
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
@@ -79,9 +80,7 @@ export default observer(function TopBar() {
   // TODO: refactor this hard-coded requester binding to parent?
   const onReloadClick = useCallback(async () => {
     await requester.fetchMetadata()
-    // NOTE: can this belongs to here?
-    store.setItems(requester.items.map((item) => ClusterMetadataItem.fromObject(item)))
-  }, [requester, store])
+  }, [requester])
 
   const onHardReloadClick = useCallback(async () => {
     setShowReloadDropdown(false)
