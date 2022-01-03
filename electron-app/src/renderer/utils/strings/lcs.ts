@@ -1,4 +1,3 @@
-// source code: https://github.com/zzzz465/rwxml-language-server/blob/d31c22aa83f61db88e5002a763172400eb656a8d/language-server/src/data-structures/trie-ext/lcs.ts
 /* eslint-disable no-param-reassign */
 export function longestCommonSequence(heystack: string, needle: string, caseSensitive = false): number {
   if (!caseSensitive) {

@@ -36,8 +36,6 @@ export default observer(function ClusterList() {
     browserLogger.debug(item)
   }, [])
 
-  browserLogger.debug('current Item: ', items)
-
   // TODO: width not limited to 100%
   return (
     <>
