@@ -33,7 +33,7 @@ if (!requiredByDLLConfig && !(fs.existsSync(webpackPaths.dllPath) && fs.existsSy
 }
 
 export default merge(baseConfig, {
-  devtool: 'eval-source-map',
+  devtool: 'inline-source-map',
 
   mode: 'development',
 
