@@ -42,13 +42,15 @@ const columns: IColumn[] = [
   },
 ]
 
-function groupByTag(data: ClusterMetadataItem[], tag: string): [string | null, ClusterMetadataItem[]][] {
+function groupByTag(data: ClusterMetadataItem[], tag: string) {
   const groupedItems = LINQ.from(data)
     .groupBy((item) => item.tags.get(tag) ?? null)
     .select((e) => [e.key(), e.toArray()])
     .toArray() as [string | null, ClusterMetadataItem[]][]
 
-  return groupedItems
+  const orderedItems = groupedItems.map((grouped) => grouped[1]).flat()
+
+  return { groupedItems, orderedItems }
 }
 
 function getIGroups(groupedItems: [string | null, ClusterMetadataItem[]][]): IGroup[] {
@@ -77,9 +79,9 @@ interface GroupedClusterListProps {
 }
 
 export default observer(function GroupedClusterList({ overrides, tag, items, selection }: GroupedClusterListProps) {
-  const groupedItems = useMemo(() => groupByTag(items, tag), [items, tag])
+  const { groupedItems, orderedItems } = useMemo(() => groupByTag(items, tag), [items, tag])
   const IGroups = useMemo(() => getIGroups(groupedItems), [groupedItems])
 
   // eslint-disable-next-line react/jsx-props-no-spreading
-  return <DetailsList {...overrides} groups={IGroups} items={items} columns={columns} selection={selection} />
+  return <DetailsList {...overrides} groups={IGroups} items={orderedItems} columns={columns} selection={selection} />
 })
