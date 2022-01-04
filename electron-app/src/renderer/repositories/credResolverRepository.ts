@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { singleton } from 'tsyringe'
 import { KubeconfigClient } from '../protos/Kubeconfig_serviceServiceClientPb'
 import { CommonReq, CommonRes } from '../protos/common_pb'
+import { CredentialResolverKind, CredResolverConfig } from '../protos/kubeconfig_service_pb'
+
+type Req = Pick<CredResolverConfig.AsObject, 'accountid' | 'infravendor'>
+
+export type OtherCredResolverRegisterReq = Omit<CredentialResolverKind, CredentialResolverKind.PROFILE>
+export type ProfileCredResolverRegisterReq = Pick<
+  CredResolverConfig.AsObject,
+  'accountid' | 'accountalias' | 'infravendor'
+>
 
 @singleton()
 export default class CredResolverRepository {
@@ -8,5 +18,24 @@ export default class CredResolverRepository {
 
   async SyncAvailableCredResolvers(): Promise<CommonRes> {
     return this.client.syncAvailableCredResolvers(new CommonReq(), null)
+  }
+
+  async registerCredResolver(metadata: Req, accountAlias: string): Promise<CommonRes>
+  async registerCredResolver(metadata: Req, type: OtherCredResolverRegisterReq): Promise<CommonRes>
+  async registerCredResolver(metadata: Req, params: string | OtherCredResolverRegisterReq): Promise<CommonRes> {
+    const req = new CredResolverConfig()
+
+    req.setAccountid(metadata.accountid)
+    req.setInfravendor(metadata.infravendor)
+
+    if (typeof params === 'number') {
+      const type = params as OtherCredResolverRegisterReq
+      req.setKind(type as CredentialResolverKind)
+    } else {
+      req.setAccountalias(params as string)
+      req.setKind(CredentialResolverKind.PROFILE)
+    }
+
+    return this.client.setCredResolver(req, null)
   }
 }
