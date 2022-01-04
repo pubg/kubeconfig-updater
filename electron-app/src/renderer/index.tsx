@@ -7,7 +7,7 @@ import { container } from 'tsyringe'
 import App from './App'
 import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
-import { ThemeRepository, BrowserThemeImpl, ElectronThemeImpl } from './repositories/themeRepository'
+import { BrowserThemeImpl, ElectronThemeImpl } from './repositories/themeRepository'
 
 browserLogger.debug('browser debug mode enabled')
 

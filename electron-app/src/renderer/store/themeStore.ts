@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 import { Theme as FluentUiTheme } from '@fluentui/react'
 import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
 import { Theme as MuiTheme } from '@mui/material/styles/createTheme'
@@ -15,6 +15,15 @@ export default class ThemeStore {
 
   get theme(): ThemeType {
     return this._theme
+  }
+
+  @computed
+  get muiTheme(): MuiTheme {
+    return createTheme({
+      palette: {
+        mode: this.theme as PaletteMode,
+      },
+    })
   }
 
   // TODO: change string inject to Token (or Symbol?)
@@ -38,13 +47,5 @@ export default class ThemeStore {
       return AzureThemeDark
     }
     return AzureThemeLight
-  }
-
-  getMuiTheme(): MuiTheme {
-    return createTheme({
-      palette: {
-        mode: this.theme as PaletteMode,
-      },
-    })
   }
 }

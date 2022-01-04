@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { Button, Divider, FormControlLabel, Paper, Radio, RadioGroup, Stack, styled, Typography } from '@mui/material'
+import { FormControlLabel, Paper, Radio, RadioGroup, Stack, styled, Typography } from '@mui/material'
 import { useResolve } from '../../hooks/container'
-import { ThemeStore, ThemeType } from '../../store/themeStore'
 import browserLogger from '../../logger/browserLogger'
+import ThemeStore from '../../store/themeStore'
+import { ThemeType } from '../../repositories/themeRepository'
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,

@@ -1,34 +1,25 @@
-import { createTheme, Paper, ThemeProvider } from '@mui/material'
+import { Paper, ThemeProvider } from '@mui/material'
 import { MemoryRouter as Router, Route, Switch } from 'react-router-dom'
 import './App.css'
 import { container } from 'tsyringe'
-import { useState } from 'react'
 import { SnackbarProvider } from 'notistack'
+import { observer } from 'mobx-react-lite'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
 import About from './pages/about/about'
 import RegisterProgressSnackbar from './components/registerProgressPopup'
-import * as containerHooks from './hooks/container'
 import Configuration from './pages/configuration/configuration'
 import ThemeStore from './store/themeStore'
-import { useAutorun } from './hooks/mobx'
 import NotiSnackbar from './components/notiSnackbar'
-import SnackbarStore from './store/snackbarStore'
 import browserLogger from './logger/browserLogger'
 
-export default function App() {
-  const themeStore = container.resolve(ThemeStore)
-  const [theme, setTheme] = useState(themeStore.getMuiTheme())
-  useAutorun(() => {
-    setTheme(themeStore.getMuiTheme())
-  })
+export default observer(function App() {
+  const { muiTheme } = container.resolve(ThemeStore)
 
-  browserLogger.debug('current theme: ', theme)
-
-  const snackbarStore = containerHooks.useResolve(SnackbarStore)
+  browserLogger.debug('current theme: ', muiTheme)
 
   return (
-    <ThemeProvider theme={createTheme()}>
+    <ThemeProvider theme={muiTheme}>
       <SnackbarProvider maxSnack={10} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
         <NotiSnackbar />
         <Router>
@@ -67,4 +58,4 @@ export default function App() {
       </SnackbarProvider>
     </ThemeProvider>
   )
-}
+})
