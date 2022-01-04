@@ -18,7 +18,7 @@ export default function CredentialsResolverList({ vendor, children }: Credential
       <Typography variant="h6">{vendor}</Typography>
       <List>
         {children.map((item) => (
-          <ListItem>{item}</ListItem>
+          <ListItem key={item.key}>{item}</ListItem>
         ))}
       </List>
     </Container>
