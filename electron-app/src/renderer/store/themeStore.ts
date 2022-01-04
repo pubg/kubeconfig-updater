@@ -1,5 +1,4 @@
-// eslint-disable-next-line max-classes-per-file
-import { action, makeObservable, observable } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 import { Theme as FluentUiTheme } from '@fluentui/react'
 import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
 import { Theme as MuiTheme } from '@mui/material/styles/createTheme'
@@ -12,35 +11,42 @@ import { ThemePreferredType, ThemeRepository, ThemeType } from '../repositories/
 export default class ThemeStore {
   /** @readonly */
   @observable
-  theme: ThemeType = 'light'
+  private _theme: ThemeType = 'light'
 
-  constructor(@inject('ThemeRepository') readonly storage: ThemeRepository) {
-    this.theme = this.storage.getTheme()
-    makeObservable(this)
+  get theme(): ThemeType {
+    return this._theme
   }
 
-  @action
-  setPreferredTheme(targetTheme: ThemePreferredType) {
-    this.storage.setPreferredTheme(targetTheme)
-    this.theme = this.storage.getTheme()
+  @computed
+  get muiTheme(): MuiTheme {
+    return createTheme({
+      palette: {
+        mode: this.theme as PaletteMode,
+      },
+    })
   }
 
-  getPreferredTheme(): ThemePreferredType {
-    return this.storage.getPreferredTheme()
-  }
-
-  getFluentUiTheme(): FluentUiTheme {
+  @computed
+  get fluentUiTheme(): FluentUiTheme {
     if (this.theme === 'dark') {
       return AzureThemeDark
     }
     return AzureThemeLight
   }
 
-  getMuiTheme(): MuiTheme {
-    return createTheme({
-      palette: {
-        mode: this.theme as PaletteMode,
-      },
-    })
+  // TODO: change string inject to Token (or Symbol?)
+  constructor(@inject('ThemeRepository') readonly storage: ThemeRepository) {
+    makeObservable(this)
+    this._theme = this.storage.getTheme()
+  }
+
+  @action
+  setPreferredTheme(targetTheme: ThemePreferredType) {
+    this.storage.setPreferredTheme(targetTheme)
+    this._theme = this.storage.getTheme()
+  }
+
+  getPreferredTheme(): ThemePreferredType {
+    return this.storage.getPreferredTheme()
   }
 }

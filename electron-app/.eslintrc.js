@@ -17,6 +17,7 @@ module.exports = {
     'prettier/prettier': 'warn',
     'no-restricted-syntax': ['off'],
     '@typescript-eslint/no-namespace': ['off'],
+    'func-names': ['off'],
   },
   parserOptions: {
     ecmaVersion: 2020,

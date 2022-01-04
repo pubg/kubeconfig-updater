@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import LINQ from 'linq'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
-import { ClusterMetadataItem } from './clusterMetadataStore'
+import { ClusterMetadataItem } from './UIStore/types'
 
 export type GroupedItem = [string | null, ClusterMetadataItem[]]
 

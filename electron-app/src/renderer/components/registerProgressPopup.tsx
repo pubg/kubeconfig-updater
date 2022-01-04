@@ -12,8 +12,9 @@ import {
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo, useState } from 'react'
 import { sprintf } from 'sprintf-js'
+import { useResolve } from '../hooks/container'
 import { useAutorun } from '../hooks/mobx'
-import { useContext } from './clusterRegisterRequester'
+import ClusterRegisterStore from '../store/clusterRegisterStore'
 
 // reserved for future use
 /*
@@ -42,18 +43,18 @@ const RegisterProgressTitle = styled(Typography, {
 })
 
 export default observer(function RegisterProgressPopup() {
-  const requester = useContext()
+  const registerStore = useResolve(ClusterRegisterStore)
 
   const [open, setOpen] = useState(false)
   const [hideDuration, setHideDuration] = useState<number | null>(null)
   const desiredAutoHideDuration = 1000 // ms
 
   const percentComplete = useMemo<number>(() => {
-    return (requester.processedCount / (requester.length || 1)) * 100
-  }, [requester.length, requester.processedCount])
+    return (registerStore.processedCount / (registerStore.length || 1)) * 100
+  }, [registerStore.length, registerStore.processedCount])
 
   useAutorun(() => {
-    if (requester.state === 'processing') {
+    if (registerStore.state === 'processing') {
       setHideDuration(null)
       setOpen(true)
     } else {
