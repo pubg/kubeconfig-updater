@@ -26,6 +26,14 @@ export default class ThemeStore {
     })
   }
 
+  @computed
+  get fluentUiTheme(): FluentUiTheme {
+    if (this.theme === 'dark') {
+      return AzureThemeDark
+    }
+    return AzureThemeLight
+  }
+
   // TODO: change string inject to Token (or Symbol?)
   constructor(@inject('ThemeRepository') readonly storage: ThemeRepository) {
     makeObservable(this)
@@ -40,12 +48,5 @@ export default class ThemeStore {
 
   getPreferredTheme(): ThemePreferredType {
     return this.storage.getPreferredTheme()
-  }
-
-  getFluentUiTheme(): FluentUiTheme {
-    if (this.theme === 'dark') {
-      return AzureThemeDark
-    }
-    return AzureThemeLight
   }
 }

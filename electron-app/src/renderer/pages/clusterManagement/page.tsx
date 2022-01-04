@@ -1,4 +1,5 @@
-import { Box, Paper, ThemeProvider } from '@mui/material'
+import { Box, Paper } from '@mui/material'
+import { ThemeProvider } from '@fluentui/react'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import TopBar from './topBar'
@@ -12,7 +13,7 @@ import ErrorNotification from './errorNotification'
 
 export default observer(function ClusterManagement() {
   const clusterMetadataStore = useResolve(ClusterMetadataStore)
-  const themeStore = useResolve(ThemeStore)
+  const { fluentUiTheme } = useResolve(ThemeStore)
 
   // invoke on mount
   useEffect(() => {
@@ -50,7 +51,7 @@ export default observer(function ClusterManagement() {
           <Box height="100%" overflow="hidden" position="relative">
             <ProgressSnackbar />
             <Box height="100%" overflow="hidden" sx={{ overflowY: 'scroll' }}>
-              <ThemeProvider theme={themeStore.theme}>
+              <ThemeProvider theme={fluentUiTheme}>
                 <ClusterInfoList />
               </ThemeProvider>
             </Box>
