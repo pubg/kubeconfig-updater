@@ -103,7 +103,6 @@ const installExtensions = async () => {
 }
 
 const createWindow = async () => {
-  mainLogger.info('CreateWindow')
   if (isDevelopment) {
     await installExtensions()
   }
@@ -156,7 +155,7 @@ const createWindow = async () => {
 
   // https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-    callback({ requestHeaders: { ...details.requestHeaders, Origin: '*' } })
+    callback({ requestHeaders: { ...details.requestHeaders } })
   })
 
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
