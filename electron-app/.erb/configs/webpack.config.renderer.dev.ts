@@ -150,8 +150,8 @@ export default merge(baseConfig, {
     port,
     compress: true,
     hot: true,
+    allowedHosts: 'auto',
     headers: {
-      Origin: '*',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
       'Access-Control-Allow-Headers': '*',
