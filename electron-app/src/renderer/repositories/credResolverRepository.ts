@@ -7,10 +7,6 @@ import { CredentialResolverKind, CredResolverConfig } from '../protos/kubeconfig
 type Req = Pick<CredResolverConfig.AsObject, 'accountid' | 'infravendor'>
 
 export type OtherCredResolverRegisterReq = Omit<CredentialResolverKind, CredentialResolverKind.PROFILE>
-export type ProfileCredResolverRegisterReq = Pick<
-  CredResolverConfig.AsObject,
-  'accountid' | 'accountalias' | 'infravendor'
->
 
 @singleton()
 export default class CredResolverRepository {
@@ -18,6 +14,10 @@ export default class CredResolverRepository {
 
   async SyncAvailableCredResolvers(): Promise<CommonRes> {
     return this.client.syncAvailableCredResolvers(new CommonReq(), null)
+  }
+
+  async getCredResolvers() {
+    return this.client.getAvailableCredResolvers(new CommonReq(), null)
   }
 
   async registerCredResolver(metadata: Req, accountAlias: string): Promise<CommonRes>
