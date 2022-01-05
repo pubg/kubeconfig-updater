@@ -44,4 +44,16 @@ export default class CredResolverStore {
 
     this.fetchCredResolver()
   })
+
+  deleteCredResolver = flow(function* (this: CredResolverStore, accountId: string) {
+    this.logger.info(`delete cred resolver key: ${accountId}`)
+
+    const res: CommonRes = yield this.credResolverRepository.deleteCredResolver(accountId)
+
+    if (res.getStatus() !== ResultCode.SUCCESS) {
+      this.logger.error('failed to delete cred resolver. err: ', res.getMessage())
+    }
+
+    this.fetchCredResolver()
+  })
 }

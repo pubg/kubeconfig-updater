@@ -2,7 +2,7 @@
 import { singleton } from 'tsyringe'
 import { KubeconfigClient } from '../protos/Kubeconfig_serviceServiceClientPb'
 import { CommonReq, CommonRes } from '../protos/common_pb'
-import { CredentialResolverKind, CredResolverConfig } from '../protos/kubeconfig_service_pb'
+import { CredentialResolverKind, CredResolverConfig, DeleteCredResolverReq } from '../protos/kubeconfig_service_pb'
 
 type Req = Pick<CredResolverConfig.AsObject, 'accountid' | 'infravendor'>
 
@@ -37,5 +37,12 @@ export default class CredResolverRepository {
     }
 
     return this.client.setCredResolver(req, null)
+  }
+
+  async deleteCredResolver(accountId: string) {
+    const req = new DeleteCredResolverReq()
+    req.setAccountid(accountId)
+
+    return this.client.deleteCredResolver(req, null)
   }
 }
