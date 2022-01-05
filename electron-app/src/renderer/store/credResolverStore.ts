@@ -5,6 +5,7 @@ import { CommonRes, ResultCode } from '../protos/common_pb'
 import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
 
+// TODO: move this type declaration to model/ directory?
 type CredResolver = CredResolverConfig.AsObject
 type RegisterCredResolverParams = Parameters<CredResolverRepository['registerCredResolver']>
 

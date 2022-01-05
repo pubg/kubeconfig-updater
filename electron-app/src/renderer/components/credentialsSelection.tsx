@@ -20,29 +20,23 @@ const CredentialsSelectionContainer = styled(Box)(({ theme }) => {
 export interface CredentialsSelectionProps {
   accountName: string
   onChange: (value: string) => unknown
-  defaultValue?: Option
+  value: string
   options: Option[]
 }
 
-export default function CredentialsSelection({
-  accountName,
-  onChange,
-  defaultValue,
-  options,
-}: CredentialsSelectionProps) {
-  const [value, setValue] = useState(defaultValue?.name ?? '')
-  const changeHandler = useCallback(
-    (e: SelectChangeEvent<string>) => {
-      setValue(e.target.value)
-      onChange(value)
-    },
-    [onChange, value]
-  )
+export default function CredentialsSelection({ accountName, onChange, value, options }: CredentialsSelectionProps) {
+  console.log('value: ', value)
 
   return (
     <CredentialsSelectionContainer>
       <Typography>{accountName}</Typography>
-      <Select id="credentials-select" size="small" value={value} onChange={changeHandler} sx={{ width: '16em' }}>
+      <Select
+        id="credentials-select"
+        size="small"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        sx={{ width: '16em' }}
+      >
         {options.map(({ name, inactive }) => (
           <MenuItem value={name} key={name}>
             {name}
