@@ -1,7 +1,6 @@
 import { Box, styled } from '@mui/material'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import CredentialsSelection from '../../components/credentialsSelection'
 import { useResolve } from '../../hooks/container'
 import browserLogger from '../../logger/browserLogger'
@@ -46,11 +45,7 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
       updateConfig(item, newKind, profile)
 
       // request update to backend
-      if (profile) {
-        uiStore.credResolverStore.setCredResolver(item, profile)
-      } else {
-        uiStore.credResolverStore.setCredResolver(item)
-      }
+      uiStore.credResolverStore.setCredResolver(item)
     },
     [item, uiStore.credResolverStore, value]
   )

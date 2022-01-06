@@ -4,12 +4,8 @@ import { singleton } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
 import { ObservedCredResolverConfig } from '../pages/credResolver/type'
 import { CommonRes, ResultCode } from '../protos/common_pb'
-import { CredentialResolverKind, CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
+import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
-
-// TODO: move this type declaration to model/ directory?
-// @observable
-type RegisterCredResolverParams = Parameters<CredResolverRepository['setCredResolver']>
 
 /**
  * CredResolverStore provides CRUD functionality to application.
@@ -53,7 +49,6 @@ export default class CredResolverStore {
     if (res.getCommonres()?.getStatus() === ResultCode.SUCCESS) {
       const objects = res.getConfigsList().map((c) => c.toObject())
       this.updateCredResolvers(objects)
-      console.log(this._credResolverMap)
       // TODO: fix this logging error
       // this.logger.debug(`fetched ${this.credResolvers.length} resolvers: `, JSON.stringify(this._credResolverMap))
     } else {
@@ -62,7 +57,7 @@ export default class CredResolverStore {
   })
 
   // TODO: break down this function
-  setCredResolver = flow(function* (this: CredResolverStore, value: CredResolverConfig.AsObject, profile?: string) {
+  setCredResolver = flow(function* (this: CredResolverStore, value: CredResolverConfig.AsObject) {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
 
@@ -145,7 +140,6 @@ export default class CredResolverStore {
     if (needToUpdateArray) {
       // allocate a new array to invoke mobx autoruns, etc...
       this._credResolverMap = new Map(this._credResolverMap)
-      console.debug('updating internal map to a new instance, value: ', this._credResolverMap)
       // this.logger.debug('updating internal map to a new instance, value: ', this._credResolverMap)
     }
   }

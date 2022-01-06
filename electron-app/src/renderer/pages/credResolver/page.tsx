@@ -5,8 +5,6 @@ import LINQ from 'linq'
 import CredentialsResolverList from '../../components/credentialsResolverList'
 import { useResolve } from '../../hooks/container'
 import UIStore from './UIStore'
-import { CredResolverConfig } from '../../protos/kubeconfig_service_pb'
-import CredentialSelectionListItem from './CredentialSelectionListItem'
 import { ObservedCredResolverConfig } from './type'
 import browserLogger from '../../logger/browserLogger'
 
@@ -28,8 +26,9 @@ export default observer(function CredResolver() {
       .groupBy((credResolver) => credResolver.infravendor)
       .select((g) => ({
         vendor: g.key(),
-        items: g.toArray(),
+        items: g.toArray().sort((a, b) => a.accountid.localeCompare(b.accountid)),
       }))
+      .orderBy(({ vendor }) => vendor)
       .toArray()
 
     return grouped

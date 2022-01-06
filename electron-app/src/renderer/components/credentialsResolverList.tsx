@@ -1,4 +1,4 @@
-import { Box, List, ListItem, styled, Typography } from '@mui/material'
+import { Box, List, styled, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import CredentialSelectionListItem from '../pages/credResolver/CredentialSelectionListItem'
 import { ObservedCredResolverConfig } from '../pages/credResolver/type'
