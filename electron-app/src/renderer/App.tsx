@@ -12,6 +12,7 @@ import Configuration from './pages/configuration/configuration'
 import ThemeStore from './store/themeStore'
 import NotiSnackbar from './components/notiSnackbar'
 import browserLogger from './logger/browserLogger'
+import CredResolver from './pages/credResolver/page'
 
 export default observer(function App() {
   const { muiTheme } = container.resolve(ThemeStore)
@@ -49,6 +50,7 @@ export default observer(function App() {
             <Switch>
               <Route exact path="/" component={ClusterManagement} />
               <Route path="/cluster-management" component={ClusterManagement} />
+              <Route path="/credentials-resolver" component={CredResolver} />
               <Route path="/configuration" component={Configuration} />
               <Route path="/about" component={About} />
             </Switch>
