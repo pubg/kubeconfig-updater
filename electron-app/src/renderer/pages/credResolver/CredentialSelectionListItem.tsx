@@ -28,12 +28,10 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   const { options } = uiStore
 
   const { accountid } = item
-  const value = useMemo(() => configToResolverKey(item), [item])
-
-  browserLogger.debug('value: ', value)
+  const value = configToResolverKey(item)
 
   // TODO: inspect this error
-  // why value is not changed?
+  // why value is not changed? -> because item is a new object when credResolverRepository fetch a new array
   // 1. reference has changed when passing updateConfig()
   const onChange = (newValue: string) => {
     browserLogger.debug(`old value: ${value}, new value: ${newValue}`)
@@ -41,7 +39,7 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
     const profile = newKind === CredentialResolverKind.PROFILE ? newValue : undefined
     updateConfig(item, newKind, profile)
 
-    browserLogger.debug('updated item: ', toJS(item))
+    // TODO: call credResolverStore.setCredResolver()
   }
 
   return (

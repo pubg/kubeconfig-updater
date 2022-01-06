@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import { runInAction } from 'mobx'
+import { runInAction, toJS } from 'mobx'
+import browserLogger from '../../logger/browserLogger'
 import { CredentialResolverKind } from '../../protos/kubeconfig_service_pb'
 import { RESOLVER_UNKNOWN, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_DEFAULT } from './const'
 import { ObservedCredResolverConfig } from './type'
@@ -52,9 +53,7 @@ export function setProfile(config: ObservedCredResolverConfig, profile?: string)
     newKVMapArray.push(['profile', profile])
   }
 
-  runInAction(() => {
-    config.resolverattributesMap = newKVMapArray
-  })
+  config.resolverattributesMap = newKVMapArray
 }
 
 export function updateConfig(
@@ -68,6 +67,10 @@ export function updateConfig(
     throw new Error('credentialResolverKind is PROFILE, but provided profile value is undefined.')
   }
 
-  config.kind = newKind
-  setProfile(config, profile)
+  runInAction(() => {
+    config.kind = newKind
+    setProfile(config, profile)
+  })
+
+  browserLogger.debug('update config, value: ', toJS(config))
 }
