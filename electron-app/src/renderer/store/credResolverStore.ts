@@ -40,7 +40,12 @@ export default class CredResolverStore {
   /**
    * update resolvers to match backend state.
    */
-  fetchCredResolver = flow(function* (this: CredResolverStore) {
+  fetchCredResolver = flow(function* (this: CredResolverStore, reload = false) {
+    if (reload) {
+      // this._credResolverMap.clear() // NOTE: should I do this? no memory leak?
+      this._credResolverMap = new Map()
+    }
+
     this.logger.debug('fetching cred resolvers...')
     const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
 
@@ -59,11 +64,24 @@ export default class CredResolverStore {
     this.logger.info(`set cred resolver key: ${JSON.stringify(params[0])}, value: ${params[1]}`)
     const res: CommonRes = yield this.credResolverRepository.registerCredResolver(...params)
 
+    this.fetchCredResolver()
+
+    const config = this._credResolverMap.get(params[0].accountid)
+    if (!config) {
+      // WTF?
+      // when adding new set failed?
+      // do I have to pass this error as event?
+      return
+    }
+
+    config.setResponse = {
+      resultCode: res.getStatus(),
+      message: res.getMessage(),
+    }
+
     if (res.getStatus() !== ResultCode.SUCCESS) {
       this.logger.error('failed to set cred resolver. err: ', res.getMessage())
     }
-
-    this.fetchCredResolver()
   })
 
   deleteCredResolver = flow(function* (this: CredResolverStore, accountId: string) {
