@@ -1,11 +1,14 @@
 import { Box, styled } from '@mui/material'
+import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import CredentialsSelection from '../../components/credentialsSelection'
 import { useResolve } from '../../hooks/container'
-import { CredResolverConfig } from '../../protos/kubeconfig_service_pb'
+import browserLogger from '../../logger/browserLogger'
+import { CredentialResolverKind } from '../../protos/kubeconfig_service_pb'
+import { ObservedCredResolverConfig } from './type'
 import UIStore from './UIStore'
-import { configToResolverKey } from './utils'
+import { configToResolverKey, getKind, updateConfig } from './utils'
 
 const CredentialSelectionListItemContainer = styled(Box)(({ theme }) => {
   return {
@@ -15,7 +18,7 @@ const CredentialSelectionListItemContainer = styled(Box)(({ theme }) => {
 })
 
 export interface CredentialSelectionListItemProps {
-  item: CredResolverConfig.AsObject
+  item: ObservedCredResolverConfig
 }
 
 export default observer(function CredentialSelectionListItem({ item }: CredentialSelectionListItemProps) {
@@ -27,7 +30,19 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   const { accountid } = item
   const value = useMemo(() => configToResolverKey(item), [item])
 
-  const onChange = (newValue: string) => {}
+  browserLogger.debug('value: ', value)
+
+  // TODO: inspect this error
+  // why value is not changed?
+  // 1. reference has changed when passing updateConfig()
+  const onChange = (newValue: string) => {
+    browserLogger.debug(`old value: ${value}, new value: ${newValue}`)
+    const newKind = getKind(newValue)
+    const profile = newKind === CredentialResolverKind.PROFILE ? newValue : undefined
+    updateConfig(item, newKind, profile)
+
+    browserLogger.debug('updated item: ', toJS(item))
+  }
 
   return (
     <CredentialSelectionListItemContainer>

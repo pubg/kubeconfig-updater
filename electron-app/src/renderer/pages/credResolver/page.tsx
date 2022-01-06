@@ -3,17 +3,16 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 import LINQ from 'linq'
 import CredentialsResolverList from '../../components/credentialsResolverList'
-import { CredentialsSelectionProps } from '../../components/credentialsSelection'
 import { useResolve } from '../../hooks/container'
 import UIStore from './UIStore'
-import { RESOLVER_DEFAULT, RESOLVER_ENV, RESOLVER_IMDS, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
 import { CredResolverConfig } from '../../protos/kubeconfig_service_pb'
 import CredentialSelectionListItem from './CredentialSelectionListItem'
+import { ObservedCredResolverConfig } from './type'
 
 // TODO: make dedicated UI Store with Model, and use that.
 export default observer(function CredResolver() {
   const uiStore = useResolve(UIStore)
-  const { credResolverStore, profileStore } = uiStore
+  const { credResolverStore } = uiStore
 
   // only calls one time on mount
   useEffect(() => {
@@ -23,7 +22,7 @@ export default observer(function CredResolver() {
 
   // NOTE: if we use useMemo with observed, doesn't it render this component twice?
   // does it need a custom hook?
-  const groups = useMemo<{ vendor: string; items: CredResolverConfig.AsObject[] }[]>(() => {
+  const groups = useMemo<{ vendor: string; items: ObservedCredResolverConfig[] }[]>(() => {
     const grouped = LINQ.from(credResolverStore.credResolvers)
       .groupBy((credResolver) => credResolver.infravendor)
       .select((g) => ({
