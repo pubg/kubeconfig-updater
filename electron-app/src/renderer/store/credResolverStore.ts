@@ -6,16 +6,25 @@ import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_se
 import CredResolverRepository from '../repositories/credResolverRepository'
 
 // TODO: move this type declaration to model/ directory?
+// @observable
 type CredResolver = CredResolverConfig.AsObject
 type RegisterCredResolverParams = Parameters<CredResolverRepository['registerCredResolver']>
 
+/**
+ * CredResolverStore provides CRUD functionality to application.
+ */
 @singleton()
 export default class CredResolverStore {
   private readonly logger = browserLogger
 
   @observable
+  // NOTE: every object in array is also a observable object
   private _credResolvers: CredResolver[] = []
 
+  /**
+   * updated when array length is changed
+   * item will be changed in-place on update
+   */
   get credResolvers() {
     return this._credResolvers
   }
@@ -24,12 +33,15 @@ export default class CredResolverStore {
     makeObservable(this)
   }
 
+  /**
+   * update resolvers to match backend state.
+   */
   fetchCredResolver = flow(function* (this: CredResolverStore) {
     this.logger.info('fetching cred resolvers...')
     const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
 
     if (res.getCommonres()?.getStatus() === ResultCode.SUCCESS) {
-      this._credResolvers = res.getConfigsList().map((c) => c.toObject())
+      this._credResolvers = res.getConfigsList().map((c) => makeObservable(c.toObject()))
     } else {
       this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
     }

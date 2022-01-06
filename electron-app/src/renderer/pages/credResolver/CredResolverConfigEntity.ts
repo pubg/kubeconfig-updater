@@ -1,5 +1,6 @@
-import { action, observable } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { CredentialResolverKind, CredResolverConfig } from '../../protos/kubeconfig_service_pb'
+import { RESOLVER_DEFAULT, RESOLVER_ENV, RESOLVER_IMDS, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
 
 type ConfigKindProfile = {
   kind: CredentialResolverKind.PROFILE
@@ -7,13 +8,15 @@ type ConfigKindProfile = {
 }
 
 type ConfigKindOthers = {
-  kind: Omit<CredentialResolverKind, CredentialResolverKind.PROFILE>
+  kind: Exclude<CredentialResolverKind, CredentialResolverKind.PROFILE>
 }
 
 type ConfigKind = ConfigKindProfile | ConfigKindOthers
 
 export default class CredResolverConfigEntity {
   readonly accountId: string
+
+  readonly vendor: string
 
   readonly accountAlias?: string
 
@@ -24,8 +27,26 @@ export default class CredResolverConfigEntity {
     return this._config
   }
 
+  @computed
+  get value() {
+    switch (this.config.kind) {
+      case CredentialResolverKind.DEFAULT:
+        return RESOLVER_DEFAULT
+      case CredentialResolverKind.ENV:
+        return RESOLVER_IMDS
+      case CredentialResolverKind.IMDS:
+        return RESOLVER_ENV
+      case CredentialResolverKind.PROFILE:
+        return RESOLVER_PROFILE_FACTORY(this.config.profile)
+
+      default:
+        return RESOLVER_UNKNOWN
+    }
+  }
+
   constructor(object: CredResolverConfig.AsObject) {
     this.accountId = object.accountid
+    this.vendor = object.infravendor
     this.accountAlias = object.accountalias
 
     // TODO: refactor this

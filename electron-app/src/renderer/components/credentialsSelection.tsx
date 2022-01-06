@@ -18,18 +18,17 @@ const CredentialsSelectionContainer = styled(Box)(({ theme }) => {
 })
 
 export interface CredentialsSelectionProps {
-  accountName: string
+  accountId: string
+  accountAlias?: string
   onChange: (value: string) => unknown
   value: string
   options: Option[]
 }
 
-export default function CredentialsSelection({ accountName, onChange, value, options }: CredentialsSelectionProps) {
-  console.log('value: ', value)
-
+export default function CredentialsSelection({ accountId, onChange, value, options }: CredentialsSelectionProps) {
   return (
     <CredentialsSelectionContainer>
-      <Typography>{accountName}</Typography>
+      <Typography>{accountId}</Typography>
       <Select
         id="credentials-select"
         size="small"
