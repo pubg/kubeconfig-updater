@@ -64,6 +64,7 @@ export default class CredResolverStore {
   // TODO: break down this function
   setCredResolver = flow(function* (this: CredResolverStore, param: CredResolverConfig.AsObject, profile?: string) {
     this.logger.debug(`request set cred resolver, accountId: ${param.accountid}, infraVendor: ${param.infravendor}`)
+    this.logger.debug('value: ', toJS(param))
 
     // TODO: refactor this
     let res: CommonRes
@@ -136,12 +137,10 @@ export default class CredResolverStore {
       // this.logger.debug('new: ', toJS(newValue))
 
       // update to new values
-      /*
       config.kind = newValue.kind
       config.resolverattributesMap = newValue.resolverattributesMap
       config.status = newValue.status
       config.statusdetail = newValue.statusdetail
-      */
     }
 
     for (const value of added) {

@@ -28,8 +28,7 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   const { options } = uiStore
 
   const { accountid } = item
-  // const value = configToResolverKey(item)
-  const value = '[UNKNOWN]'
+  const value = configToResolverKey(item)
 
   // TODO: inspect this error
   // why value is not changed? -> because item is a new object when credResolverRepository fetch a new array
@@ -53,7 +52,7 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
         uiStore.credResolverStore.setCredResolver(item)
       }
     },
-    [item, uiStore.credResolverStore]
+    [item, uiStore.credResolverStore, value]
   )
 
   return (
