@@ -41,6 +41,9 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
       // update UI config
       const newKind = getKind(newValue)
       const profile = newKind === CredentialResolverKind.PROFILE ? newValue : undefined
+
+      // TODO: updateConfig() causes "all list item" to be re-rendered. try to avoid that
+      // this is not necessary but I wanna achieve this.
       updateConfig(item, newKind, profile)
 
       // request update to backend
