@@ -5,7 +5,7 @@ import LINQ from 'linq'
 import { CredentialsSelectionProps } from '../../components/credentialsSelection'
 import CredResolverStore from '../../store/credResolverStore'
 import ProfileStore from '../../store/profileStore'
-import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY } from './const'
+import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
 
 type Option = CredentialsSelectionProps['options'][number]
 
@@ -60,7 +60,7 @@ export default class UIStore {
       map.set(option.key, option)
     }
 
-    return [...map.values()]
+    return [...map.values(), { key: RESOLVER_UNKNOWN, label: RESOLVER_UNKNOWN }]
   }
 
   constructor(readonly credResolverStore: CredResolverStore, readonly profileStore: ProfileStore) {
