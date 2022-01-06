@@ -1,13 +1,13 @@
 import { flow, makeAutoObservable, makeObservable, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
+import { ObservedCredResolverConfig } from '../pages/credResolver/type'
 import { CommonRes, ResultCode } from '../protos/common_pb'
-import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
+import { GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
 
 // TODO: move this type declaration to model/ directory?
 // @observable
-type CredResolver = CredResolverConfig.AsObject
 type RegisterCredResolverParams = Parameters<CredResolverRepository['registerCredResolver']>
 
 /**
@@ -20,7 +20,7 @@ export default class CredResolverStore {
   // TODO: internal map 을 만들어서 in-place update 지원하게 하기
   @observable
   // NOTE: every object in array is also a observable object
-  private _credResolvers: CredResolver[] = []
+  private _credResolvers: ObservedCredResolverConfig[] = []
 
   /**
    * updated when array length is changed
