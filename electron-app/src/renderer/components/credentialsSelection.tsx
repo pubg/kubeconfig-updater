@@ -37,7 +37,7 @@ export default function CredentialsSelection({ accountId, onChange, value, optio
         sx={{ width: '16em' }}
       >
         {options.map(({ key, label, inactive }) => (
-          <MenuItem value={key} key={value}>
+          <MenuItem key={key} value={key}>
             {label}
           </MenuItem>
         ))}

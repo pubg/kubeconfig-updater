@@ -48,9 +48,19 @@ export default class UIStore {
       .toArray()
   }
 
+  /**
+   * all possible option values (duplicate removed)
+   */
   @computed
   get options(): Option[] {
-    return [...this.defaultOptions, ...this.profileOptions, ...this.configOptions]
+    // remove duplicates
+    const map = new Map<string, Option>()
+
+    for (const option of [...this.defaultOptions, ...this.profileOptions, ...this.configOptions]) {
+      map.set(option.key, option)
+    }
+
+    return [...map.values()]
   }
 
   constructor(readonly credResolverStore: CredResolverStore, readonly profileStore: ProfileStore) {
