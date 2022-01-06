@@ -1,4 +1,4 @@
-import { flow, observable, toJS } from 'mobx'
+import { computed, flow, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
@@ -20,6 +20,7 @@ export default class ProfileStore {
   @observable
   private _profiles: Profile.AsObject[] = []
 
+  @computed
   get profiles() {
     return this._profiles
   }

@@ -36,16 +36,22 @@ export default class UIStore {
 
   @computed
   get configOptions(): Option[] {
-    return LINQ.from(this.credResolverStore.credResolvers)
-      .selectMany((config) => config.resolverattributesMap)
-      .where(([key]) => key === 'profile')
-      .select(([_, value]) => value)
-      .distinct()
-      .select<Option>((profile) => ({
-        key: profile,
-        label: RESOLVER_PROFILE_FACTORY(profile),
-      }))
-      .toArray()
+    return []
+    /*
+    return (
+      LINQ.from(this.credResolverStore.credResolvers)
+        // BUG: accessing this attribute causes @computed to be re-evaluated
+        .selectMany((config) => config.resolverattributesMap)
+        .where(([key]) => key === 'profile')
+        .select(([_, value]) => value)
+        .distinct()
+        .select<Option>((profile) => ({
+          key: profile,
+          label: RESOLVER_PROFILE_FACTORY(profile),
+        }))
+        .toArray()
+    )
+    */
   }
 
   /**
