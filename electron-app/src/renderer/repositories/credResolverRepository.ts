@@ -21,28 +21,17 @@ export default class CredResolverRepository {
   }
 
   // do I have to make this function overload?? WHY???
-  async registerCredResolver(accountId: string, infraVendor: string, profile: string): Promise<CommonRes>
-  async registerCredResolver(
-    accountId: string,
-    infraVendor: string,
-    type: OtherCredResolverRegisterReq
-  ): Promise<CommonRes>
-  async registerCredResolver(
-    accountId: string,
-    infraVendor: string,
-    typeOrProfile: string | OtherCredResolverRegisterReq
-  ): Promise<CommonRes> {
+  async setCredResolver(config: CredResolverConfig.AsObject): Promise<CommonRes> {
     const req = new CredResolverConfig()
 
-    req.setAccountid(accountId)
-    req.setInfravendor(infraVendor)
+    req.setAccountid(config.accountid)
+    req.setInfravendor(config.infravendor)
+    req.setAccountalias(config.accountalias)
+    req.setKind(config.kind)
+    const resolverAttrMap = req.getResolverattributesMap()
 
-    if (typeof typeOrProfile === 'number') {
-      const type = typeOrProfile as OtherCredResolverRegisterReq
-      req.setKind(type as CredentialResolverKind)
-    } else {
-      req.setAccountalias(typeOrProfile as string)
-      req.setKind(CredentialResolverKind.PROFILE)
+    for (const [key, value] of config.resolverattributesMap) {
+      resolverAttrMap.set(key, value)
     }
 
     return this.client.setCredResolver(req, null)

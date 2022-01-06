@@ -9,7 +9,7 @@ import CredResolverRepository from '../repositories/credResolverRepository'
 
 // TODO: move this type declaration to model/ directory?
 // @observable
-type RegisterCredResolverParams = Parameters<CredResolverRepository['registerCredResolver']>
+type RegisterCredResolverParams = Parameters<CredResolverRepository['setCredResolver']>
 
 /**
  * CredResolverStore provides CRUD functionality to application.
@@ -62,36 +62,27 @@ export default class CredResolverStore {
   })
 
   // TODO: break down this function
-  setCredResolver = flow(function* (this: CredResolverStore, param: CredResolverConfig.AsObject, profile?: string) {
-    this.logger.debug(`request set cred resolver, accountId: ${param.accountid}, infraVendor: ${param.infravendor}`)
-    this.logger.debug('value: ', toJS(param))
+  setCredResolver = flow(function* (this: CredResolverStore, value: CredResolverConfig.AsObject, profile?: string) {
+    this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
+    this.logger.debug('value: ', toJS(value))
 
     // TODO: refactor this
-    let res: CommonRes
-    if (param.kind === CredentialResolverKind.PROFILE) {
-      if (!profile) {
-        throw new Error('expected profile value in config, but found undefined.')
-      }
-
-      res = yield this.credResolverRepository.registerCredResolver(param.accountid, param.infravendor, profile)
-    } else {
-      res = yield this.credResolverRepository.registerCredResolver(param.accountid, param.infravendor, param.kind)
-    }
+    const res: CommonRes = yield this.credResolverRepository.setCredResolver(value)
 
     this.logger.debug('response: ', res.toObject())
 
     this.fetchCredResolver()
 
-    const config = this._credResolverMap.get(param.accountid)
-    if (!config) {
+    const newConfig = this._credResolverMap.get(value.accountid)
+    if (!newConfig) {
       // WTF?
       // when adding new set failed?
       // do I have to pass this error as event?
-      this.logger.error('failed setting new config: ', param)
+      this.logger.error('failed setting new config: ', value)
       return
     }
 
-    config.setResponse = {
+    newConfig.setResponse = {
       resultCode: res.getStatus(),
       message: res.getMessage(),
     }
