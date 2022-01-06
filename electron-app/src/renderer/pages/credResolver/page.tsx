@@ -44,11 +44,7 @@ export default observer(function CredResolver() {
           {uiStore.state === 'ready' &&
             groups.map(({ vendor, items }) => (
               <ListItem key={vendor} divider>
-                <CredentialsResolverList vendor={vendor}>
-                  {items.map((item) => (
-                    <CredentialSelectionListItem key={item.accountid} item={item} />
-                  ))}
-                </CredentialsResolverList>
+                <CredentialsResolverList vendor={vendor} items={items} />
               </ListItem>
             ))}
         </List>

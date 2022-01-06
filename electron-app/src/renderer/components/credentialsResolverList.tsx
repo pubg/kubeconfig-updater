@@ -1,4 +1,7 @@
 import { Box, List, ListItem, styled, Typography } from '@mui/material'
+import { observer } from 'mobx-react-lite'
+import CredentialSelectionListItem from '../pages/credResolver/CredentialSelectionListItem'
+import { ObservedCredResolverConfig } from '../pages/credResolver/type'
 
 const Container = styled(Box)(({ theme }) => {
   return {
@@ -9,18 +12,25 @@ const Container = styled(Box)(({ theme }) => {
 
 export interface CredentialsResolverListProps {
   vendor: string
-  children: JSX.Element[]
+  items: ObservedCredResolverConfig[]
 }
 
-export default function CredentialsResolverList({ vendor, children }: CredentialsResolverListProps) {
+// https://mobx.js.org/react-optimizations.html#render-lists-in-dedicated-components
+const ListView = observer(({ items }: { items: ObservedCredResolverConfig[] }) => {
+  return (
+    <List>
+      {items.map((item) => (
+        <CredentialSelectionListItem key={item.accountid} item={item} />
+      ))}
+    </List>
+  )
+})
+
+export default observer(function CredentialsResolverList({ vendor, items }: CredentialsResolverListProps) {
   return (
     <Container>
       <Typography variant="h6">{vendor}</Typography>
-      <List>
-        {children.map((item) => (
-          <ListItem key={item.key}>{item}</ListItem>
-        ))}
-      </List>
+      <ListView items={items} />
     </Container>
   )
-}
+})
