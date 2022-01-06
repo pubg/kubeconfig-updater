@@ -1,31 +1,72 @@
+/* eslint-disable class-methods-use-this */
 import { computed, flow, makeObservable, observable } from 'mobx'
 import { Lifecycle, scoped } from 'tsyringe'
+import LINQ from 'linq'
+import { CredentialsSelectionProps } from '../../components/credentialsSelection'
 import CredResolverStore from '../../store/credResolverStore'
-import CredResolverConfigEntity from './CredResolverConfigEntity'
+import ProfileStore from '../../store/profileStore'
+import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY } from './const'
+
+type Option = CredentialsSelectionProps['options'][number]
 
 @scoped(Lifecycle.ContainerScoped)
 export default class UIStore {
   @observable
-  private _state: 'ready' | 'fetching' = 'ready'
+  private _loadCounter: number = 0
 
-  get state() {
-    return this._state
-  }
-
-  // does it updated after @observable state changed?
   @computed
-  get configEntites(): CredResolverConfigEntity[] {
-    return this.configStore.credResolvers.map((config) => new CredResolverConfigEntity(config))
+  get state(): 'ready' | 'fetching' {
+    return this._loadCounter > 0 ? 'fetching' : 'ready'
   }
 
-  constructor(private readonly configStore: CredResolverStore) {
+  @computed
+  get defaultOptions(): Option[] {
+    return [RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV].map((value) => ({
+      key: value,
+      label: value,
+    }))
+  }
+
+  @computed
+  get profileOptions(): Option[] {
+    return LINQ.from(this.profileStore.profiles)
+      .select<Option>(({ profilename }) => ({ key: profilename, label: RESOLVER_PROFILE_FACTORY(profilename) }))
+      .toArray()
+  }
+
+  @computed
+  get configOptions(): Option[] {
+    return LINQ.from(this.credResolverStore.credResolvers)
+      .selectMany((config) => config.resolverattributesMap)
+      .where(([key]) => key === 'profile')
+      .select(([_, value]) => value)
+      .distinct()
+      .select<Option>((profile) => ({
+        key: profile,
+        label: RESOLVER_PROFILE_FACTORY(profile),
+      }))
+      .toArray()
+  }
+
+  @computed
+  get options(): Option[] {
+    return [...this.defaultOptions, ...this.profileOptions, ...this.configOptions]
+  }
+
+  constructor(readonly credResolverStore: CredResolverStore, readonly profileStore: ProfileStore) {
     makeObservable(this)
   }
 
   // reload local entity state to match backend's state
-  fetch = flow(function* (this: UIStore) {
-    this._state = 'fetching'
-    yield this.configStore.fetchCredResolver()
-    this._state = 'ready'
+  fetchCredResolvers = flow(function* (this: UIStore) {
+    this._loadCounter += 1
+    yield this.credResolverStore.fetchCredResolver()
+    this._loadCounter -= 1
+  })
+
+  fetchProfiles = flow(function* (this: UIStore) {
+    this._loadCounter += 1
+    yield this.profileStore.fetchProfiles()
+    this._loadCounter -= 1
   })
 }

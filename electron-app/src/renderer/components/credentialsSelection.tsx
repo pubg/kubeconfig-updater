@@ -1,8 +1,8 @@
-import { Box, MenuItem, Select, SelectChangeEvent, SelectProps, styled, Typography } from '@mui/material'
-import { useCallback, useState } from 'react'
+import { Box, MenuItem, Select, styled, Typography } from '@mui/material'
 
 type Option = {
-  name: string
+  key: string
+  label: string
   inactive?: boolean
 }
 
@@ -20,7 +20,7 @@ const CredentialsSelectionContainer = styled(Box)(({ theme }) => {
 export interface CredentialsSelectionProps {
   accountId: string
   accountAlias?: string
-  onChange: (value: string) => unknown
+  onChange?: (value: string) => unknown
   value: string
   options: Option[]
 }
@@ -33,12 +33,12 @@ export default function CredentialsSelection({ accountId, onChange, value, optio
         id="credentials-select"
         size="small"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange?.(e.target.value)}
         sx={{ width: '16em' }}
       >
-        {options.map(({ name, inactive }) => (
-          <MenuItem value={name} key={name}>
-            {name}
+        {options.map(({ key, label, inactive }) => (
+          <MenuItem value={key} key={value}>
+            {label}
           </MenuItem>
         ))}
       </Select>

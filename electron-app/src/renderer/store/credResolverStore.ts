@@ -1,4 +1,4 @@
-import { flow, makeObservable, observable } from 'mobx'
+import { flow, makeAutoObservable, makeObservable, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
 import { CommonRes, ResultCode } from '../protos/common_pb'
@@ -17,6 +17,7 @@ type RegisterCredResolverParams = Parameters<CredResolverRepository['registerCre
 export default class CredResolverStore {
   private readonly logger = browserLogger
 
+  // TODO: internal map 을 만들어서 in-place update 지원하게 하기
   @observable
   // NOTE: every object in array is also a observable object
   private _credResolvers: CredResolver[] = []
@@ -37,11 +38,12 @@ export default class CredResolverStore {
    * update resolvers to match backend state.
    */
   fetchCredResolver = flow(function* (this: CredResolverStore) {
-    this.logger.info('fetching cred resolvers...')
+    this.logger.debug('fetching cred resolvers...')
     const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
 
     if (res.getCommonres()?.getStatus() === ResultCode.SUCCESS) {
-      this._credResolvers = res.getConfigsList().map((c) => makeObservable(c.toObject()))
+      this._credResolvers = res.getConfigsList().map((c) => makeAutoObservable(c.toObject()))
+      this.logger.debug(`fetched ${this.credResolvers.length} resolvers: `, toJS(this.credResolvers))
     } else {
       this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
     }

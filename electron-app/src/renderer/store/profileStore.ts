@@ -1,12 +1,15 @@
-import { flow, observable } from 'mobx'
+import { flow, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import EventStore from '../event/eventStore'
+import browserLogger from '../logger/browserLogger'
 import { ResultCode } from '../protos/common_pb'
 import { GetRegisteredProfilesRes, Profile } from '../protos/kubeconfig_service_pb'
 import ProfileRepository from '../repositories/profileRepository'
 
 @singleton()
 export default class ProfileStore {
+  private readonly logger = browserLogger
+
   @observable
   private _state: 'ready' | 'fetching' = 'ready'
 
@@ -14,7 +17,8 @@ export default class ProfileStore {
     return this._state
   }
 
-  @observable _profiles: Profile.AsObject[] = []
+  @observable
+  private _profiles: Profile.AsObject[] = []
 
   get profiles() {
     return this._profiles
@@ -26,6 +30,7 @@ export default class ProfileStore {
 
   fetchProfiles = flow(function* (this: ProfileStore) {
     this._state = 'fetching'
+    this.logger.debug('fetching profiles...')
 
     const profiles: Profile.AsObject[] = []
 
@@ -51,6 +56,9 @@ export default class ProfileStore {
 
     profiles.push(...tencentProfilesResult.getProfilesList().map((profile) => profile.toObject()))
 
+    this._profiles = profiles
+
     this._state = 'ready'
+    this.logger.debug(`fetched ${this.profiles.length} profiles: `, toJS(this.profiles))
   })
 }

@@ -1,3 +1,5 @@
+import { CredentialResolverKind, CredResolverConfig } from '../../protos/kubeconfig_service_pb'
+
 export const RESOLVER_DEFAULT = '[DEFAULT]'
 export const RESOLVER_IMDS = '[IMDS]'
 export const RESOLVER_ENV = '[ENV]'
