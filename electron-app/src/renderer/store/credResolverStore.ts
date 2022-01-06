@@ -18,9 +18,10 @@ type RegisterCredResolverParams = Parameters<CredResolverRepository['registerCre
 export default class CredResolverStore {
   private readonly logger = browserLogger
 
-  // TODO: internal map 을 만들어서 in-place update 지원하게 하기
-  @observable
   // NOTE: every object in array is also a observable object
+  // object is actually ES6 Map, not mobx observable converted, because of @observable.ref
+  // don't use toJS() on this property
+  @observable.ref
   private _credResolverMap: Map<string, ObservedCredResolverConfig> = new Map()
 
   /**
@@ -52,9 +53,9 @@ export default class CredResolverStore {
     if (res.getCommonres()?.getStatus() === ResultCode.SUCCESS) {
       const objects = res.getConfigsList().map((c) => c.toObject())
       this.updateCredResolvers(objects)
-      // NOTE: toJS on @computed property doesn't work. (causes an "an object could not be cloned - electron ipc")
-      // READ: https://github.com/mobxjs/mobx/issues/1532
-      this.logger.debug(`fetched ${this.credResolvers.length} resolvers: `, toJS(this._credResolverMap))
+      console.log(this._credResolverMap)
+      // TODO: fix this logging error
+      // this.logger.debug(`fetched ${this.credResolvers.length} resolvers: `, JSON.stringify(this._credResolverMap))
     } else {
       this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
     }
@@ -130,15 +131,17 @@ export default class CredResolverStore {
         throw new Error()
       }
 
-      this.logger.debug('updating old credResolverConfig to new value')
-      this.logger.debug('old: ', toJS(config))
-      this.logger.debug('new: ', toJS(newValue))
+      // this.logger.debug('updating old credResolverConfig to new value')
+      // this.logger.debug('old: ', toJS(config))
+      // this.logger.debug('new: ', toJS(newValue))
 
       // update to new values
+      /*
       config.kind = newValue.kind
       config.resolverattributesMap = newValue.resolverattributesMap
       config.status = newValue.status
       config.statusdetail = newValue.statusdetail
+      */
     }
 
     for (const value of added) {
@@ -152,7 +155,8 @@ export default class CredResolverStore {
     if (needToUpdateArray) {
       // allocate a new array to invoke mobx autoruns, etc...
       this._credResolverMap = new Map(this._credResolverMap)
-      this.logger.debug('updating internal map to a new instance, value: ', toJS(this._credResolverMap))
+      console.debug('updating internal map to a new instance, value: ', this._credResolverMap)
+      // this.logger.debug('updating internal map to a new instance, value: ', this._credResolverMap)
     }
   }
 }

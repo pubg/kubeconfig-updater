@@ -1,7 +1,7 @@
 import { Box, styled } from '@mui/material'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import CredentialsSelection from '../../components/credentialsSelection'
 import { useResolve } from '../../hooks/container'
 import browserLogger from '../../logger/browserLogger'
@@ -28,26 +28,30 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   const { options } = uiStore
 
   const { accountid } = item
-  const value = configToResolverKey(item)
+  // const value = configToResolverKey(item)
+  const value = '[UNKNOWN]'
 
   // TODO: inspect this error
   // why value is not changed? -> because item is a new object when credResolverRepository fetch a new array
   // 1. reference has changed when passing updateConfig()
-  const onChange = (newValue: string) => {
-    browserLogger.debug(`old value: ${value}, new value: ${newValue}`)
+  const onChange = useCallback(
+    (newValue: string) => {
+      browserLogger.debug(`old value: ${value}, new value: ${newValue}`)
 
-    // update UI config
-    const newKind = getKind(newValue)
-    const profile = newKind === CredentialResolverKind.PROFILE ? newValue : undefined
-    updateConfig(item, newKind, profile)
+      // update UI config
+      const newKind = getKind(newValue)
+      const profile = newKind === CredentialResolverKind.PROFILE ? newValue : undefined
+      updateConfig(item, newKind, profile)
 
-    // request update to backend
-    if (profile) {
-      uiStore.credResolverStore.setCredResolver(item, profile)
-    } else {
-      uiStore.credResolverStore.setCredResolver(item)
-    }
-  }
+      // request update to backend
+      if (profile) {
+        uiStore.credResolverStore.setCredResolver(item, profile)
+      } else {
+        uiStore.credResolverStore.setCredResolver(item)
+      }
+    },
+    [item, uiStore.credResolverStore]
+  )
 
   return (
     <CredentialSelectionListItemContainer>

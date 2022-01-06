@@ -8,6 +8,7 @@ import UIStore from './UIStore'
 import { CredResolverConfig } from '../../protos/kubeconfig_service_pb'
 import CredentialSelectionListItem from './CredentialSelectionListItem'
 import { ObservedCredResolverConfig } from './type'
+import browserLogger from '../../logger/browserLogger'
 
 // TODO: make dedicated UI Store with Model, and use that.
 export default observer(function CredResolver() {
