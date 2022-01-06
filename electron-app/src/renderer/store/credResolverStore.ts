@@ -4,7 +4,7 @@ import { singleton } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
 import { ObservedCredResolverConfig } from '../pages/credResolver/type'
 import { CommonRes, ResultCode } from '../protos/common_pb'
-import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
+import { CredentialResolverKind, CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
 
 // TODO: move this type declaration to model/ directory?
@@ -60,17 +60,32 @@ export default class CredResolverStore {
     }
   })
 
-  setCredResolver = flow(function* (this: CredResolverStore, ...params: RegisterCredResolverParams) {
-    this.logger.info(`set cred resolver key: ${JSON.stringify(params[0])}, value: ${params[1]}`)
-    const res: CommonRes = yield this.credResolverRepository.registerCredResolver(...params)
+  // TODO: break down this function
+  setCredResolver = flow(function* (this: CredResolverStore, param: CredResolverConfig.AsObject, profile?: string) {
+    this.logger.debug(`request set cred resolver, accountId: ${param.accountid}, infraVendor: ${param.infravendor}`)
+
+    // TODO: refactor this
+    let res: CommonRes
+    if (param.kind === CredentialResolverKind.PROFILE) {
+      if (!profile) {
+        throw new Error('expected profile value in config, but found undefined.')
+      }
+
+      res = yield this.credResolverRepository.registerCredResolver(param.accountid, param.infravendor, profile)
+    } else {
+      res = yield this.credResolverRepository.registerCredResolver(param.accountid, param.infravendor, param.kind)
+    }
+
+    this.logger.debug('response: ', res.toObject())
 
     this.fetchCredResolver()
 
-    const config = this._credResolverMap.get(params[0].accountid)
+    const config = this._credResolverMap.get(param.accountid)
     if (!config) {
       // WTF?
       // when adding new set failed?
       // do I have to pass this error as event?
+      this.logger.error('failed setting new config: ', param)
       return
     }
 
@@ -115,8 +130,15 @@ export default class CredResolverStore {
         throw new Error()
       }
 
-      // NOTE: can I do this on observed value?
-      Object.assign(config, newValue)
+      this.logger.debug('updating old credResolverConfig to new value')
+      this.logger.debug('old: ', toJS(config))
+      this.logger.debug('new: ', toJS(newValue))
+
+      // update to new values
+      config.kind = newValue.kind
+      config.resolverattributesMap = newValue.resolverattributesMap
+      config.status = newValue.status
+      config.statusdetail = newValue.statusdetail
     }
 
     for (const value of added) {

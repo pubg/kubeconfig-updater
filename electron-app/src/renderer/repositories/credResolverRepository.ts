@@ -20,19 +20,28 @@ export default class CredResolverRepository {
     return this.client.getAvailableCredResolvers(new CommonReq(), null)
   }
 
-  async registerCredResolver(metadata: Req, accountAlias: string): Promise<CommonRes>
-  async registerCredResolver(metadata: Req, type: OtherCredResolverRegisterReq): Promise<CommonRes>
-  async registerCredResolver(metadata: Req, params: string | OtherCredResolverRegisterReq): Promise<CommonRes> {
+  // do I have to make this function overload?? WHY???
+  async registerCredResolver(accountId: string, infraVendor: string, profile: string): Promise<CommonRes>
+  async registerCredResolver(
+    accountId: string,
+    infraVendor: string,
+    type: OtherCredResolverRegisterReq
+  ): Promise<CommonRes>
+  async registerCredResolver(
+    accountId: string,
+    infraVendor: string,
+    typeOrProfile: string | OtherCredResolverRegisterReq
+  ): Promise<CommonRes> {
     const req = new CredResolverConfig()
 
-    req.setAccountid(metadata.accountid)
-    req.setInfravendor(metadata.infravendor)
+    req.setAccountid(accountId)
+    req.setInfravendor(infraVendor)
 
-    if (typeof params === 'number') {
-      const type = params as OtherCredResolverRegisterReq
+    if (typeof typeOrProfile === 'number') {
+      const type = typeOrProfile as OtherCredResolverRegisterReq
       req.setKind(type as CredentialResolverKind)
     } else {
-      req.setAccountalias(params as string)
+      req.setAccountalias(typeOrProfile as string)
       req.setKind(CredentialResolverKind.PROFILE)
     }
 

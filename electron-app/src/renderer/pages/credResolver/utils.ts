@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { runInAction, toJS } from 'mobx'
 import browserLogger from '../../logger/browserLogger'
-import { CredentialResolverKind } from '../../protos/kubeconfig_service_pb'
+import { CredentialResolverKind, CredResolverConfig } from '../../protos/kubeconfig_service_pb'
 import { RESOLVER_UNKNOWN, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_DEFAULT } from './const'
 import { ObservedCredResolverConfig } from './type'
 
@@ -44,6 +44,10 @@ export function getKind(value: string): CredentialResolverKind {
     default:
       return CredentialResolverKind.PROFILE
   }
+}
+
+export function getProfile(config: CredResolverConfig.AsObject): string | undefined {
+  return config.resolverattributesMap.find(([key]) => key === 'profile')?.[1]
 }
 
 export function setProfile(config: ObservedCredResolverConfig, profile?: string): void {

@@ -35,11 +35,18 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   // 1. reference has changed when passing updateConfig()
   const onChange = (newValue: string) => {
     browserLogger.debug(`old value: ${value}, new value: ${newValue}`)
+
+    // update UI config
     const newKind = getKind(newValue)
     const profile = newKind === CredentialResolverKind.PROFILE ? newValue : undefined
     updateConfig(item, newKind, profile)
 
-    // TODO: call credResolverStore.setCredResolver()
+    // request update to backend
+    if (profile) {
+      uiStore.credResolverStore.setCredResolver(item, profile)
+    } else {
+      uiStore.credResolverStore.setCredResolver(item)
+    }
   }
 
   return (
