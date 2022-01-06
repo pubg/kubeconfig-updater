@@ -1,11 +1,12 @@
-import { Box, ListItem, styled } from '@mui/material'
+import { Box, ListItem, styled, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import CredentialsSelection from '../../components/credentialsSelection'
 import { useResolve } from '../../hooks/container'
 import browserLogger from '../../logger/browserLogger'
 import { CredentialResolverKind } from '../../protos/kubeconfig_service_pb'
-import { ObservedCredResolverConfig } from './type'
+import { ObservedCredResolverConfig } from '../../store/credResolverStore'
+import ConfigStatusView from './ConfigStatusView'
 import UIStore from './UIStore'
 import { configToResolverKey, getKind, updateConfig } from './utils'
 
@@ -50,7 +51,9 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   return (
     <CredentialSelectionListItemContainer>
       <CredentialsSelection accountId={accountid} value={value} options={options} onChange={onChange} />
-      <Box sx={{ width: '64px', border: '2px solid red' }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid red', ml: '6px' }}>
+        <ConfigStatusView config={item} />
+      </Box>
     </CredentialSelectionListItemContainer>
   )
 })
