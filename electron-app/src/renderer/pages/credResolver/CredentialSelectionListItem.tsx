@@ -1,4 +1,4 @@
-import { Box, styled } from '@mui/material'
+import { Box, ListItem, styled } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import CredentialsSelection from '../../components/credentialsSelection'
@@ -9,11 +9,8 @@ import { ObservedCredResolverConfig } from './type'
 import UIStore from './UIStore'
 import { configToResolverKey, getKind, updateConfig } from './utils'
 
-const CredentialSelectionListItemContainer = styled(Box)(({ theme }) => {
-  return {
-    width: '100%',
-    height: '100%',
-  }
+const CredentialSelectionListItemContainer = styled(ListItem)(({ theme }) => {
+  return {}
 })
 
 export interface CredentialSelectionListItemProps {
@@ -53,6 +50,7 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
   return (
     <CredentialSelectionListItemContainer>
       <CredentialsSelection accountId={accountid} value={value} options={options} onChange={onChange} />
+      <Box sx={{ width: '64px', border: '2px solid red' }} />
     </CredentialSelectionListItemContainer>
   )
 })
