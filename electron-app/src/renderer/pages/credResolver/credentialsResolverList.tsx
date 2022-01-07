@@ -1,6 +1,6 @@
 import { Box, List, styled, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import CredentialSelectionListItem from './CredentialSelectionListItem'
+import CredentialSelectionListItem from './listItem/item'
 import { ObservedCredResolverConfig } from '../../store/credResolverStore'
 
 const Container = styled(Box)(({ theme }) => {

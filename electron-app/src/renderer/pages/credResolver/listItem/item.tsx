@@ -1,15 +1,15 @@
-import { Box, CircularProgress, ListItem, styled, Tooltip } from '@mui/material'
+import { Box, CircularProgress, IconButton, ListItem, styled, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
-import IconDone from '@mui/icons-material/Done'
-import CredentialsSelection from '../../components/credentialsSelection'
-import { useResolve } from '../../hooks/container'
-import browserLogger from '../../logger/browserLogger'
-import { CredentialResolverKind } from '../../protos/kubeconfig_service_pb'
-import { ObservedCredResolverConfig } from '../../store/credResolverStore'
-import ConfigStatusView from './configStatusView'
-import UIStore from './UIStore'
-import { configToResolverKey, getKind, updateConfig } from './utils'
+import { Clear } from '@mui/icons-material'
+import CredentialsSelection from '../../../components/credentialsSelection'
+import { useResolve } from '../../../hooks/container'
+import browserLogger from '../../../logger/browserLogger'
+import { CredentialResolverKind } from '../../../protos/kubeconfig_service_pb'
+import { ObservedCredResolverConfig } from '../../../store/credResolverStore'
+import ConfigStatusView from '../configStatusView'
+import UIStore from '../UIStore'
+import { configToResolverKey, getKind, updateConfig } from '../utils'
 
 const CredentialSelectionListItemContainer = styled(ListItem)(({ theme }) => {
   return {
@@ -67,6 +67,9 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
       >
         <ConfigStatusView config={item} size={size} />
       </Box>
+      <IconButton>
+        <Clear />
+      </IconButton>
     </CredentialSelectionListItemContainer>
   )
 })
