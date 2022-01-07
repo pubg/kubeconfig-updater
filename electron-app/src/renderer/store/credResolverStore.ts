@@ -67,9 +67,11 @@ export default class CredResolverStore {
   })
 
   // TODO: break down this function
-  setCredResolver = flow(function* (this: CredResolverStore, value: CredResolverConfig.AsObject) {
+  setCredResolver = flow(function* (this: CredResolverStore, value: ObservedCredResolverConfig) {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
+
+    value.resolved = false
 
     // TODO: refactor this
     const res: CommonRes = yield this.credResolverRepository.setCredResolver(value)
@@ -141,7 +143,7 @@ export default class CredResolverStore {
     }
 
     for (const value of added) {
-      this._credResolverMap.set(value.accountid, makeAutoObservable(value))
+      this._credResolverMap.set(value.accountid, observable(value) as ObservedCredResolverConfig)
     }
 
     for (const value of deleted) {

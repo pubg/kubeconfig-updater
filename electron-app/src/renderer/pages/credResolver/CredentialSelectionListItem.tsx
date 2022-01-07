@@ -1,6 +1,7 @@
-import { Box, ListItem, styled, Tooltip } from '@mui/material'
+import { Box, CircularProgress, ListItem, styled, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
+import IconDone from '@mui/icons-material/Done'
 import CredentialsSelection from '../../components/credentialsSelection'
 import { useResolve } from '../../hooks/container'
 import browserLogger from '../../logger/browserLogger'
@@ -11,7 +12,9 @@ import UIStore from './UIStore'
 import { configToResolverKey, getKind, updateConfig } from './utils'
 
 const CredentialSelectionListItemContainer = styled(ListItem)(({ theme }) => {
-  return {}
+  return {
+    display: 'flex',
+  }
 })
 
 export interface CredentialSelectionListItemProps {
@@ -48,11 +51,21 @@ export default observer(function CredentialSelectionListItem({ item }: Credentia
     [item, uiStore.credResolverStore, value]
   )
 
+  const size = '32px'
+
   return (
     <CredentialSelectionListItemContainer>
       <CredentialsSelection accountId={accountid} value={value} options={options} onChange={onChange} />
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid red', ml: '6px' }}>
-        <ConfigStatusView config={item} />
+      <Box
+        sx={{
+          width: size,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          ml: '6px',
+        }}
+      >
+        <ConfigStatusView config={item} size={size} />
       </Box>
     </CredentialSelectionListItemContainer>
   )
