@@ -5,8 +5,8 @@ import LINQ from 'linq'
 import CredentialsResolverList from '../../components/credentialsResolverList'
 import { useResolve } from '../../hooks/container'
 import UIStore from './UIStore'
-import { ObservedCredResolverConfig } from './type'
 import browserLogger from '../../logger/browserLogger'
+import { ObservedCredResolverConfig } from '../../store/credResolverStore'
 
 // TODO: make dedicated UI Store with Model, and use that.
 export default observer(function CredResolver() {
@@ -15,7 +15,7 @@ export default observer(function CredResolver() {
 
   // only calls one time on mount
   useEffect(() => {
-    uiStore.fetchCredResolvers()
+    uiStore.fetchCredResolvers(true)
     uiStore.fetchProfiles()
   }, [uiStore])
 

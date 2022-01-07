@@ -2,8 +2,8 @@
 import { runInAction, toJS } from 'mobx'
 import browserLogger from '../../logger/browserLogger'
 import { CredentialResolverKind, CredResolverConfig } from '../../protos/kubeconfig_service_pb'
+import { ObservedCredResolverConfig } from '../../store/credResolverStore'
 import { RESOLVER_UNKNOWN, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_DEFAULT } from './const'
-import { ObservedCredResolverConfig } from './type'
 
 // get actual key from config
 export function configToResolverKey(config: ObservedCredResolverConfig) {

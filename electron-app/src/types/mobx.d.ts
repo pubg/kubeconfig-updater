@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable import/prefer-default-export */
-import { AnnotationsMap, CreateObservableOptions } from 'mobx'
+import mobx from 'mobx'
 
 declare type OBSERVED_OBJECT_TYPING = {
   /**
@@ -18,7 +18,7 @@ declare type NoInfer<T> = [T][T extends any ? 0 : never]
 declare module 'mobx' {
   export function makeAutoObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
-    options?: CreateObservableOptions
+    overrides?: mobx.AnnotationsMap<T, NoInfer<AdditionalKeys>>,
+    options?: mobx.CreateObservableOptions
   ): OBSERVED<T>
 }
