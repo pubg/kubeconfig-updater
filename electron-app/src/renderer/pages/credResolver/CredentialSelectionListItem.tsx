@@ -7,7 +7,7 @@ import { useResolve } from '../../hooks/container'
 import browserLogger from '../../logger/browserLogger'
 import { CredentialResolverKind } from '../../protos/kubeconfig_service_pb'
 import { ObservedCredResolverConfig } from '../../store/credResolverStore'
-import ConfigStatusView from './ConfigStatusView'
+import ConfigStatusView from './configStatusView'
 import UIStore from './UIStore'
 import { configToResolverKey, getKind, updateConfig } from './utils'
 
