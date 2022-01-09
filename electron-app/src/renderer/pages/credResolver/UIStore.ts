@@ -31,6 +31,7 @@ export default class UIStore {
   get profileOptions(): Option[] {
     return LINQ.from(this.profileStore.profiles)
       .select<Option>(({ profilename }) => ({ key: profilename, label: RESOLVER_PROFILE_FACTORY(profilename) }))
+      .orderBy((e) => e.label)
       .toArray()
   }
 
