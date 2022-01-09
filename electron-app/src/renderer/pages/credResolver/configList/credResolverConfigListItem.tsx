@@ -1,9 +1,10 @@
-import { ListItem, SelectChangeEvent, styled, Typography } from '@mui/material'
+import { Box, ListItem, SelectChangeEvent, styled, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { useResolve } from '../../../hooks/container'
 import CredResolverStore from '../../../store/credResolverStore'
 import ObservedCredResolverConfig from '../credResolverConfig'
+import CredResolverConfigStatusIndicator from './credResolverConfigStatusIndicator'
 import ProfileSelection from './profileSelection'
 
 const Container = styled(ListItem)(({ theme }) => {
@@ -45,7 +46,10 @@ export default observer(function CredResolverConfigListItem({ config, getOptions
   return (
     <Container>
       <Typography>{accountId}</Typography>
-      <ProfileSelection value={value} getOptions={getOptions} onChange={onChange} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <CredResolverConfigStatusIndicator config={config} size="32px" />
+        <ProfileSelection value={value} getOptions={getOptions} onChange={onChange} />
+      </Box>
     </Container>
   )
 })
