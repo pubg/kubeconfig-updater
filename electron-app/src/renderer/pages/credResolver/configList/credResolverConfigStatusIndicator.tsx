@@ -2,8 +2,8 @@ import { observer } from 'mobx-react-lite'
 import { CircularProgress, Tooltip } from '@mui/material'
 import DoneIcon from '@mui/icons-material/Done'
 import ErrorIcon from '@mui/icons-material/ErrorOutline'
-import { ResultCode } from '../../protos/common_pb'
-import ObservedCredResolverConfig from '../../models/credResolverConfig'
+import ObservedCredResolverConfig from '../credResolverConfig'
+import { ResultCode } from '../../../protos/common_pb'
 
 interface ConfigStatusViewProps {
   config: ObservedCredResolverConfig

@@ -2,21 +2,21 @@
 import { computed, flow, makeObservable, observable } from 'mobx'
 import { Lifecycle, scoped } from 'tsyringe'
 import LINQ from 'linq'
-import { CredentialsSelectionProps } from '../../components/credentialsSelection'
 import CredResolverStore from '../../store/credResolverStore'
+import { ProfileSelectionProps } from './configList/profileSelection'
 import ProfileStore from '../../store/profileStore'
 import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
 
-type Option = CredentialsSelectionProps['options'][number]
+type Option = ReturnType<ProfileSelectionProps['getOptions']>[number]
 
 @scoped(Lifecycle.ContainerScoped)
 export default class UIStore {
   @observable
-  private _loadCounter: number = 0
+  private _initLoading = true
 
   @computed
   get state(): 'ready' | 'fetching' {
-    return this._loadCounter > 0 ? 'fetching' : 'ready'
+    return this.profileStore.state !== 'ready' || this._initLoading ? 'fetching' : 'ready'
   }
 
   @computed
@@ -75,14 +75,11 @@ export default class UIStore {
 
   // reload local entity state to match backend's state
   fetchCredResolvers = flow(function* (this: UIStore, reload = false) {
-    this._loadCounter += 1
     yield this.credResolverStore.fetchCredResolver(reload)
-    this._loadCounter -= 1
+    this._initLoading = false
   })
 
   fetchProfiles = flow(function* (this: UIStore) {
-    this._loadCounter += 1
     yield this.profileStore.fetchProfiles()
-    this._loadCounter -= 1
   })
 }

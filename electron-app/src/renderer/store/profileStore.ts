@@ -1,4 +1,4 @@
-import { computed, flow, observable, toJS } from 'mobx'
+import { computed, flow, makeObservable, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
@@ -13,6 +13,7 @@ export default class ProfileStore {
   @observable
   private _state: 'ready' | 'fetching' = 'ready'
 
+  @computed
   get state() {
     return this._state
   }
@@ -27,7 +28,9 @@ export default class ProfileStore {
 
   readonly errorEvent = new EventStore<Error>()
 
-  constructor(private readonly profileRepository: ProfileRepository) {}
+  constructor(private readonly profileRepository: ProfileRepository) {
+    makeObservable(this)
+  }
 
   fetchProfiles = flow(function* (this: ProfileStore) {
     this._state = 'fetching'

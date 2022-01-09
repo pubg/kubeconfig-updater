@@ -1,8 +1,8 @@
 import _ from 'lodash'
-import { action, computed, flow, makeObservable, observable, toJS } from 'mobx'
+import { action, computed, flow, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import browserLogger from '../logger/browserLogger'
-import ObservedCredResolverConfig from '../models/credResolverConfig'
+import ObservedCredResolverConfig from '../pages/credResolver/credResolverConfig'
 import { CommonRes, ResultCode } from '../protos/common_pb'
 import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
@@ -75,18 +75,19 @@ export default class CredResolverStore {
     const newConfig = this._credResolverMap.get(value.accountid)
     if (!newConfig) {
       // WTF?
-      // when adding new set failed?
-      // do I have to pass this error as event?
       this.logger.error('failed setting new config: ', value)
       return
     }
 
     if (newConfig.response) {
-      newConfig.response.resolved = true
-      newConfig.response.data = {
-        resultCode: res.getStatus(),
-        message: res.getMessage(),
-      }
+      const { response } = newConfig
+      runInAction(() => {
+        response.resolved = true
+        response.data = {
+          resultCode: res.getStatus(),
+          message: res.getMessage(),
+        }
+      })
     } else {
       throw new Error('response property is not defined')
     }
@@ -132,14 +133,11 @@ export default class CredResolverStore {
       // this.logger.debug('new: ', toJS(newValue))
 
       // update to new values
-      config.kind = newValue.kind
-      config.resolverattributesMap = newValue.resolverattributesMap
-      config.status = newValue.status
-      config.statusdetail = newValue.statusdetail
+      config.updateConfigFromObject(newValue)
     }
 
     for (const value of added) {
-      this._credResolverMap.set(value.accountid, observable(value) as ObservedCredResolverConfig)
+      this._credResolverMap.set(value.accountid, new ObservedCredResolverConfig(value))
     }
 
     for (const value of deleted) {
