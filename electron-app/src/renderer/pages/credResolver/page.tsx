@@ -4,9 +4,7 @@ import { useEffect } from 'react'
 import { useResolve } from '../../hooks/container'
 import UIStore from './uiStore'
 import ConfigList from './configList'
-import { useAutorun, useReaction } from '../../hooks/mobx'
 
-// TODO: make dedicated UI Store with Model, and use that.
 export default observer(function CredResolver() {
   const uiStore = useResolve(UIStore)
 
@@ -15,10 +13,6 @@ export default observer(function CredResolver() {
     uiStore.fetchCredResolvers(true)
     uiStore.fetchProfiles()
   }, [uiStore])
-
-  useAutorun(() => {
-    console.log('uiStore state: ', uiStore.state)
-  })
 
   return (
     <Container maxWidth="md" sx={{ pt: '64px', pb: '64px', height: '100%', display: 'flex', flexDirection: 'column' }}>
