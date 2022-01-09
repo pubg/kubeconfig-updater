@@ -1,4 +1,4 @@
-import { Box, ListItem, SelectChangeEvent, styled, Typography } from '@mui/material'
+import { Box, ListItem, SelectChangeEvent, styled, Tooltip, Typography } from '@mui/material'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
@@ -60,12 +60,18 @@ export default observer(function CredResolverConfigListItem({ config, getOptions
     [config, credResolverStore]
   )
 
+  const selectionTooltip = '해당 계정에 사용할 프로필 이름입니다'
+
   return (
     <Container>
       <Typography>{accountId}</Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <CredResolverConfigStatusIndicator config={config} size="32px" />
-        <ProfileSelection value={value} options={options} onChange={onChange} />
+        <Tooltip title={selectionTooltip} placement="top" enterDelay={1000}>
+          <div>
+            <ProfileSelection value={value} options={options} onChange={onChange} />
+          </div>
+        </Tooltip>
       </Box>
     </Container>
   )
