@@ -3,7 +3,7 @@ import { CircularProgress, Tooltip } from '@mui/material'
 import DoneIcon from '@mui/icons-material/Done'
 import ErrorIcon from '@mui/icons-material/ErrorOutline'
 import { ResultCode } from '../../protos/common_pb'
-import { ObservedCredResolverConfig } from '../../store/credResolverStore'
+import ObservedCredResolverConfig from '../../models/credResolverConfig'
 
 interface ConfigStatusViewProps {
   config: ObservedCredResolverConfig
@@ -11,18 +11,18 @@ interface ConfigStatusViewProps {
 }
 
 export default observer(function ConfigStatusView({ config, size }: ConfigStatusViewProps) {
-  if (config.setResponse === undefined || config.resolved === undefined) {
+  const { response } = config
+
+  if (!response) {
     return <></>
   }
 
-  const { setResponse, resolved } = config
-
   const icon = (() => {
-    if (!resolved) {
+    if (!response.resolved) {
       return <CircularProgress size={size} />
     }
 
-    switch (setResponse.resultCode) {
+    switch (response.data?.resultCode) {
       case ResultCode.SUCCESS:
         return <DoneIcon color="success" />
 
@@ -33,10 +33,10 @@ export default observer(function ConfigStatusView({ config, size }: ConfigStatus
 
   let tooltipTitle = ''
 
-  if (setResponse.resultCode === ResultCode.SUCCESS) {
+  if (response.data?.resultCode === ResultCode.SUCCESS) {
     tooltipTitle = 'OK'
   } else {
-    tooltipTitle = setResponse.message ?? 'unknown error'
+    tooltipTitle = response.data?.message ?? 'unknown error'
   }
 
   return (

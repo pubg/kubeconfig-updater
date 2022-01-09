@@ -1,34 +1,47 @@
 import { makeObservable, observable } from 'mobx'
+import { ResultCode } from '../protos/common_pb'
 import { CredentialResolverKind, CredentialResolverStatus, CredResolverConfig } from '../protos/kubeconfig_service_pb'
+
+interface Response {
+  resolved?: boolean
+  data?: {
+    resultCode: ResultCode
+    message: string
+  }
+}
 
 export default class ObservedCredResolverConfig implements CredResolverConfig.AsObject {
   /** @readonly */
   @observable
-  accountid!: string
+  accountid: string = ''
 
   /** @readonly */
   @observable
-  infravendor!: string
+  infravendor: string = ''
 
   /** @readonly */
   @observable
-  accountalias!: string
+  accountalias: string = ''
 
   /** @readonly */
   @observable
-  kind!: CredentialResolverKind
+  kind: CredentialResolverKind = CredentialResolverKind.DEFAULT
 
   /** @readonly */
   @observable.ref
-  resolverattributesMap!: [string, string][]
+  resolverattributesMap: [string, string][] = []
 
   /** @readonly */
   @observable
-  status!: CredentialResolverStatus
+  status: CredentialResolverStatus = CredentialResolverStatus.CRED_RESOLVER_UNKNOWN
 
   /** @readonly */
   @observable
-  statusdetail!: string
+  statusdetail: string = ''
+
+  // stores response of update request of this single config data
+  @observable
+  response?: Response = undefined
 
   constructor(object: CredResolverConfig.AsObject) {
     Object.assign(this, object)

@@ -1,21 +1,11 @@
 import _ from 'lodash'
-import { action, computed, flow, makeAutoObservable, makeObservable, observable, toJS } from 'mobx'
+import { action, computed, flow, makeObservable, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
-import { OBSERVED } from '../../types/mobx'
 import browserLogger from '../logger/browserLogger'
+import ObservedCredResolverConfig from '../models/credResolverConfig'
 import { CommonRes, ResultCode } from '../protos/common_pb'
 import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
-
-export type ObservedCredResolverConfig = OBSERVED<
-  CredResolverConfig.AsObject & {
-    resolved?: boolean
-    setResponse?: {
-      resultCode: ResultCode
-      message?: string
-    }
-  }
->
 
 /**
  * CredResolverStore provides CRUD functionality to application.
@@ -71,7 +61,9 @@ export default class CredResolverStore {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
 
-    value.resolved = false
+    value.response = {
+      resolved: false,
+    }
 
     // TODO: refactor this
     const res: CommonRes = yield this.credResolverRepository.setCredResolver(value)
@@ -89,10 +81,14 @@ export default class CredResolverStore {
       return
     }
 
-    newConfig.resolved = true
-    newConfig.setResponse = {
-      resultCode: res.getStatus(),
-      message: res.getMessage(),
+    if (newConfig.response) {
+      newConfig.response.resolved = true
+      newConfig.response.data = {
+        resultCode: res.getStatus(),
+        message: res.getMessage(),
+      }
+    } else {
+      throw new Error('response property is not defined')
     }
 
     if (res.getStatus() !== ResultCode.SUCCESS) {
