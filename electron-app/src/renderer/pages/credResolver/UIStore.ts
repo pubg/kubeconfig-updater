@@ -1,13 +1,14 @@
 /* eslint-disable class-methods-use-this */
-import { computed, flow, makeObservable, observable } from 'mobx'
+import { computed, flow, makeObservable, observable, toJS } from 'mobx'
 import { Lifecycle, scoped } from 'tsyringe'
 import LINQ from 'linq'
 import CredResolverStore from '../../store/credResolverStore'
-import { ProfileSelectionProps } from './configList/profileSelection'
+import { ProfileSelectionOption } from './configList/profileSelection'
 import ProfileStore from '../../store/profileStore'
 import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
+import browserLogger from '../../logger/browserLogger'
 
-type Option = ReturnType<ProfileSelectionProps['getOptions']>[number]
+type Option = ProfileSelectionOption
 
 @scoped(Lifecycle.ContainerScoped)
 export default class UIStore {
@@ -30,7 +31,11 @@ export default class UIStore {
   @computed
   get profileOptions(): Option[] {
     return LINQ.from(this.profileStore.profiles)
-      .select<Option>(({ profilename }) => ({ key: profilename, label: RESOLVER_PROFILE_FACTORY(profilename) }))
+      .select<Option>((profile) => ({
+        key: profile.profilename,
+        label: RESOLVER_PROFILE_FACTORY(profile.profilename),
+        profile,
+      }))
       .orderBy((e) => e.label)
       .toArray()
   }
@@ -67,7 +72,7 @@ export default class UIStore {
       map.set(option.key, option)
     }
 
-    return [...map.values(), { key: RESOLVER_UNKNOWN, label: RESOLVER_UNKNOWN }]
+    return [...map.values(), { key: RESOLVER_UNKNOWN, label: RESOLVER_UNKNOWN, inactive: true }]
   }
 
   constructor(readonly credResolverStore: CredResolverStore, readonly profileStore: ProfileStore) {

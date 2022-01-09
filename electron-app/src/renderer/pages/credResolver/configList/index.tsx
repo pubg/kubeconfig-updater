@@ -2,17 +2,21 @@ import { List, SelectChangeEvent } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo } from 'react'
 import LINQ from 'linq'
+import { toJS } from 'mobx'
 import { useResolve } from '../../../hooks/container'
 import ObservedCredResolverConfig from '../credResolverConfig'
 import UIStore from '../uiStore'
 import CredResolverConfigList from './credResolverConfigList'
 import CredResolverConfigListItem from './credResolverConfigListItem'
+import browserLogger from '../../../logger/browserLogger'
 
 export default observer(() => {
   const uiStore = useResolve(UIStore)
   const { credResolverStore, options } = uiStore
 
-  const getOptions = useCallback(() => options, [options])
+  // don't use useCallback.
+  // it's updated by mobx
+  const getOptions = () => options
 
   const groups = useMemo<{ vendor: string; configs: ObservedCredResolverConfig[] }[]>(() => {
     const grouped = LINQ.from(credResolverStore.credResolvers)
