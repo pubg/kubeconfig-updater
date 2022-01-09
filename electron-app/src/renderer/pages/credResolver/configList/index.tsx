@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react'
 import LINQ from 'linq'
 import { useResolve } from '../../../hooks/container'
 import ObservedCredResolverConfig from '../credResolverConfig'
-import UIStore from '../UIStore'
+import UIStore from '../uiStore'
 import CredResolverConfigList from './credResolverConfigList'
 import CredResolverConfigListItem from './credResolverConfigListItem'
 

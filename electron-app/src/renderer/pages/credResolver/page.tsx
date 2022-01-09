@@ -2,7 +2,7 @@ import { Box, Container, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { useResolve } from '../../hooks/container'
-import UIStore from './UIStore'
+import UIStore from './uiStore'
 import ConfigList from './configList'
 import { useAutorun, useReaction } from '../../hooks/mobx'
 
