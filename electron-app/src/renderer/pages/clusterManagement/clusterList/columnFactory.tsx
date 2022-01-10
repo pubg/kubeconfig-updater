@@ -19,12 +19,20 @@ const clusterNameColumn: IColumn = {
   },
 }
 
+const statusMap: Map<ClusterInformationStatus, string> = new Map(
+  Object.entries(ClusterInformationStatus).map<[ClusterInformationStatus, string]>(([k, v]) => [
+    v as ClusterInformationStatus,
+    k as string,
+  ])
+)
+
 const statusColumn: IColumn = {
   ...columnBase(),
   minWidth: 180,
   key: 'status',
   name: 'Status',
   onRender(item: ClusterMetadataItem) {
+    const statusString = statusMap.get(item.data.status)
     switch (item.data.status) {
       case ClusterInformationStatus.REGISTERED_OK:
         return <Typography>Registered</Typography>
@@ -32,11 +40,23 @@ const statusColumn: IColumn = {
       case ClusterInformationStatus.SUGGESTION_OK:
         return <Typography>Not Registered</Typography>
 
+      case ClusterInformationStatus.REGISTERED_NOTOK_CRED_RES_NOTOK:
+        return <Typography>(Registered) Credential Resolver invalid</Typography>
+
+      case ClusterInformationStatus.SUGGESTION_NOTOK_CRED_RES_NOTOK:
+        return <Typography>(Suggested) Credential Resolver invalid</Typography>
+
+      case ClusterInformationStatus.REGISTERED_NOTOK_NO_CRED_RESOLVER:
+        return <Typography>(Registered) Credential Resolver not set</Typography>
+
+      case ClusterInformationStatus.SUGGESTION_NOTOK_NO_CRED_RESOLVER:
+        return <Typography>(Suggested) Credential Resolver not set</Typography>
+
       case ClusterInformationStatus.REGISTERED_UNKNOWN:
         return <Typography>Unknown</Typography>
 
       default:
-        return <Typography>Error</Typography>
+        return <Typography>{statusString}</Typography>
     }
   },
 }
