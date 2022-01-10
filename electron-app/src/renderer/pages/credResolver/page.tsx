@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Button, ButtonProps, PopperProps } from '@mui/material'
+import { Box, Container, Typography, Button, ButtonProps, PopperProps, CircularProgress } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { useResolve } from '../../hooks/container'
@@ -68,7 +68,22 @@ export default observer(function CredResolver() {
 
       {/* TODO: calculate max height to support sticky */}
       <Box height="100%" overflow="hidden" sx={{ overflowY: 'auto' }}>
-        <ConfigList />
+        {uiStore.state === 'fetching' ? (
+          <Box
+            width="100%"
+            height="100%"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            gap="24px"
+          >
+            <Typography variant="h5">Loading... Please wait...</Typography>
+            <CircularProgress color="secondary" size="64px" thickness={3} />
+          </Box>
+        ) : (
+          <ConfigList />
+        )}
       </Box>
     </Container>
   )
