@@ -1,12 +1,11 @@
 /* eslint-disable class-methods-use-this */
-import { computed, flow, makeObservable, observable, toJS } from 'mobx'
+import { computed, flow, makeObservable, observable } from 'mobx'
 import { Lifecycle, scoped } from 'tsyringe'
 import LINQ from 'linq'
 import CredResolverStore from '../../store/credResolverStore'
 import { ProfileSelectionOption } from './configList/profileSelection'
 import ProfileStore from '../../store/profileStore'
 import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
-import browserLogger from '../../logger/browserLogger'
 
 type Option = ProfileSelectionOption
 

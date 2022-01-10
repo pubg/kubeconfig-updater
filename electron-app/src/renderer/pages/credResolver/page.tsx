@@ -1,13 +1,12 @@
-import { Box, Container, Typography, Button, ButtonProps, PopperProps, ClickAwayListener } from '@mui/material'
+import { Box, Container, Typography, Button, ButtonProps, PopperProps } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { useResolve } from '../../hooks/container'
 import UIStore from './uiStore'
 import ConfigList from './configList'
 import ConfigAddModal, { ConfigAddModalProps } from './configAddModal'
-import browserLogger from '../../logger/browserLogger'
 import ObservedCredResolverConfig from './credResolverConfig'
-import { CredentialResolverKind, CredResolverConfig } from '../../protos/kubeconfig_service_pb'
+import { CredResolverConfig } from '../../protos/kubeconfig_service_pb'
 
 export default observer(function CredResolver() {
   const uiStore = useResolve(UIStore)
@@ -44,7 +43,7 @@ export default observer(function CredResolver() {
   return (
     <Container
       maxWidth="md"
-      sx={{ pt: '64px', pb: '64px', height: '100%', display: 'flex', flexDirection: 'column', gap: '32px' }}
+      sx={{ pt: '64px', pb: '64px', height: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}
     >
       {/* title */}
       <Typography variant="h3">Credentials Resolver Setting</Typography>

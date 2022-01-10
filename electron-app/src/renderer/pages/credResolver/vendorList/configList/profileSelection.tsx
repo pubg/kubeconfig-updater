@@ -1,25 +1,25 @@
 import { observer } from 'mobx-react-lite'
 import { MenuItem, Select, SelectProps } from '@mui/material'
-import { Profile } from '../../../protos/kubeconfig_service_pb'
 
-export type ProfileSelectionOption = {
+type ProfileSelectioOption = {
   key: string
   label: string
-  profile?: Profile.AsObject
   inactive?: boolean
 }
 
 export interface ProfileSelectionProps {
-  onChange?: SelectProps<string>['onChange']
+  onChange?: SelectProps['onChange']
   value: string
-  options: ProfileSelectionOption[]
+  getOptions: () => ProfileSelectioOption[]
 }
 
-export default observer(function ProfileSelection({ onChange, value, options }: ProfileSelectionProps) {
+export default observer(function ProfileSelection({ onChange, value, getOptions }: ProfileSelectionProps) {
+  const options = getOptions()
+
   return (
     <Select id="credentials-select" size="small" value={value} onChange={onChange} sx={{ width: '16em' }}>
       {options.map(({ key, label, inactive }) => (
-        <MenuItem key={key} value={key} disabled={inactive}>
+        <MenuItem key={key} value={key}>
           {label}
         </MenuItem>
       ))}

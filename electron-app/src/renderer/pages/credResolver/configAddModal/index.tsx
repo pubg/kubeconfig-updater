@@ -4,16 +4,14 @@ import {
   ClickAwayListener,
   Fade,
   FormControl,
-  FormHelperText,
   FormLabel,
   MenuItem,
   Paper,
   Popper,
   PopperProps,
   TextField,
-  Typography,
 } from '@mui/material'
-import { FormEventHandler, useState } from 'react'
+import { useState } from 'react'
 
 // TODO: refactor this hard-coded values
 const vendors = ['AWS', 'Azure', 'Tencent'] as const
