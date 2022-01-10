@@ -67,8 +67,8 @@ export default class ClusterRegisterStore {
       })()
 
       if (res.getStatus() !== ResultCode.SUCCESS) {
-        this.logger.debug('failed to register cluster.')
-        const err = new Error(`registeration failed: ${item.clusterName}`)
+        this.logger.debug('failed to register cluster. reason: ', res.getMessage())
+        const err = new Error(`registeration failed: ${item.clusterName}, error: ${res.getMessage()}`)
         this.errorEvent.emit(err)
       }
 
