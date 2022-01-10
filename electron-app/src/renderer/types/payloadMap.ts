@@ -17,10 +17,10 @@ export type ValueWithPayload<T, P> = OBSERVED<IValueWithPayload<T, P>>
 export type MoveFunc<T> = (dest: T, src: T) => void
 
 /**
- * PayloadStore manages T object with payload
+ * PayloadMap manages T object with payload
  */
 @injectable()
-export class PayloadStore<T, Payload = any> {
+export class PayloadMap<T, Payload = any> {
   private readonly atom: Atom
 
   private _map: Map<string, ValueWithPayload<T, Payload>> = observable.map()
