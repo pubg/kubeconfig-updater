@@ -1,5 +1,5 @@
 import { IColumn } from '@fluentui/react'
-import { Typography } from '@mui/material'
+import { Tooltip, Typography } from '@mui/material'
 import { ClusterInformationStatus } from '../../../protos/kubeconfig_service_pb'
 import { ClusterMetadataItem } from '../UIStore/types'
 
@@ -10,10 +10,40 @@ function columnBase(): Partial<IColumn> & { minWidth: number } {
   }
 }
 
+function formatDatasourceString(sources: string): string {
+  const sliced = sources.split('/')
+
+  const string = sliced.slice(-2).join('/')
+
+  return sliced.length > 2 ? `...${string}` : string
+}
+
+const dataSourceColumn: IColumn = {
+  ...columnBase(),
+  key: 'dataSource',
+  name: 'Data Source',
+  minWidth: 240,
+  onRender: (item: ClusterMetadataItem) => {
+    if (item.data.dataresolversList.length === 0) {
+      return <Typography>NOT EXISTS</Typography>
+    }
+
+    const tooltipString = item.data.dataresolversList.join('\n')
+    const previewString = formatDatasourceString(item.data.dataresolversList[0])
+
+    return (
+      <Tooltip title={tooltipString}>
+        <Typography>{previewString}</Typography>
+      </Tooltip>
+    )
+  },
+}
+
 const clusterNameColumn: IColumn = {
   ...columnBase(),
   key: 'clusterName',
   name: 'Cluster Name',
+  // maxWidth: 960,
   onRender: (item: ClusterMetadataItem) => {
     return <Typography>{item.data.metadata.clustername}</Typography>
   },
@@ -28,7 +58,7 @@ const statusMap: Map<ClusterInformationStatus, string> = new Map(
 
 const statusColumn: IColumn = {
   ...columnBase(),
-  minWidth: 180,
+  minWidth: 360,
   key: 'status',
   name: 'Status',
   onRender(item: ClusterMetadataItem) {
@@ -70,5 +100,5 @@ export default function columnsFactory(additionalColumns: ColumnType[]): IColumn
     name,
   }))
 
-  return [clusterNameColumn, ...columns, statusColumn]
+  return [clusterNameColumn, ...columns, dataSourceColumn, statusColumn]
 }
