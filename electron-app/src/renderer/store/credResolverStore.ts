@@ -70,7 +70,7 @@ export default class CredResolverStore {
 
     this.logger.debug('response: ', res.toObject())
 
-    this.fetchCredResolver()
+    yield this.fetchCredResolver()
 
     const newConfig = this._credResolverMap.get(value.accountid)
     if (!newConfig) {
@@ -89,7 +89,7 @@ export default class CredResolverStore {
         }
       })
     } else {
-      throw new Error('response property is not defined')
+      // value is added (not update)
     }
 
     if (res.getStatus() !== ResultCode.SUCCESS) {
@@ -106,7 +106,7 @@ export default class CredResolverStore {
       this.logger.error('failed to delete cred resolver. err: ', res.getMessage())
     }
 
-    this.fetchCredResolver()
+    yield this.fetchCredResolver()
   })
 
   @action
