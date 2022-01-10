@@ -68,7 +68,7 @@ const statusColumn: IColumn = {
         return <Typography>Registered</Typography>
 
       case ClusterInformationStatus.SUGGESTION_OK:
-        return <Typography>Not Registered</Typography>
+        return <Typography>(Suggested) Not Registered</Typography>
 
       case ClusterInformationStatus.REGISTERED_NOTOK_CRED_RES_NOTOK:
         return <Typography>(Registered) Credential Resolver invalid</Typography>
