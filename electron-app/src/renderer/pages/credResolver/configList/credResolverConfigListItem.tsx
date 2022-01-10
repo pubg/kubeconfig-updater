@@ -1,5 +1,5 @@
-import { Box, ListItem, SelectChangeEvent, styled, Tooltip, Typography } from '@mui/material'
-import { toJS } from 'mobx'
+import { Box, IconButton, ListItem, SelectChangeEvent, styled, Tooltip, Typography } from '@mui/material'
+import { ClearOutlined } from '@mui/icons-material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { useResolve } from '../../../hooks/container'
@@ -60,6 +60,11 @@ export default observer(function CredResolverConfigListItem({ config, getOptions
     [config, credResolverStore]
   )
 
+  const onDeleteClicked = () => {
+    // FIXME: why it only requires accountId, not vendor???
+    credResolverStore.deleteCredResolver(config.accountid)
+  }
+
   const selectionTooltip = '해당 계정에 사용할 프로필 이름입니다'
 
   return (
@@ -72,6 +77,10 @@ export default observer(function CredResolverConfigListItem({ config, getOptions
             <ProfileSelection value={value} options={options} onChange={onChange} />
           </div>
         </Tooltip>
+        {/* delete item button (X) */}
+        <IconButton onClick={onDeleteClicked}>
+          <ClearOutlined />
+        </IconButton>
       </Box>
     </Container>
   )
