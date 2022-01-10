@@ -1,21 +1,11 @@
 import _ from 'lodash'
-import { action, computed, flow, makeAutoObservable, makeObservable, observable, toJS } from 'mobx'
+import { action, computed, flow, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
-import { OBSERVED } from '../../types/mobx'
 import browserLogger from '../logger/browserLogger'
+import ObservedCredResolverConfig from '../pages/credResolver/credResolverConfig'
 import { CommonRes, ResultCode } from '../protos/common_pb'
 import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
-
-export type ObservedCredResolverConfig = OBSERVED<
-  CredResolverConfig.AsObject & {
-    resolved?: boolean
-    setResponse?: {
-      resultCode: ResultCode
-      message?: string
-    }
-  }
->
 
 /**
  * CredResolverStore provides CRUD functionality to application.
@@ -71,28 +61,35 @@ export default class CredResolverStore {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
 
-    value.resolved = false
+    value.response = {
+      resolved: false,
+    }
 
     // TODO: refactor this
     const res: CommonRes = yield this.credResolverRepository.setCredResolver(value)
 
     this.logger.debug('response: ', res.toObject())
 
-    this.fetchCredResolver()
+    yield this.fetchCredResolver()
 
     const newConfig = this._credResolverMap.get(value.accountid)
     if (!newConfig) {
       // WTF?
-      // when adding new set failed?
-      // do I have to pass this error as event?
       this.logger.error('failed setting new config: ', value)
       return
     }
 
-    newConfig.resolved = true
-    newConfig.setResponse = {
-      resultCode: res.getStatus(),
-      message: res.getMessage(),
+    if (newConfig.response) {
+      const { response } = newConfig
+      runInAction(() => {
+        response.resolved = true
+        response.data = {
+          resultCode: res.getStatus(),
+          message: res.getMessage(),
+        }
+      })
+    } else {
+      // value is added (not update)
     }
 
     if (res.getStatus() !== ResultCode.SUCCESS) {
@@ -109,7 +106,7 @@ export default class CredResolverStore {
       this.logger.error('failed to delete cred resolver. err: ', res.getMessage())
     }
 
-    this.fetchCredResolver()
+    yield this.fetchCredResolver()
   })
 
   @action
@@ -136,14 +133,11 @@ export default class CredResolverStore {
       // this.logger.debug('new: ', toJS(newValue))
 
       // update to new values
-      config.kind = newValue.kind
-      config.resolverattributesMap = newValue.resolverattributesMap
-      config.status = newValue.status
-      config.statusdetail = newValue.statusdetail
+      config.updateConfigFromObject(newValue)
     }
 
     for (const value of added) {
-      this._credResolverMap.set(value.accountid, observable(value) as ObservedCredResolverConfig)
+      this._credResolverMap.set(value.accountid, new ObservedCredResolverConfig(value))
     }
 
     for (const value of deleted) {

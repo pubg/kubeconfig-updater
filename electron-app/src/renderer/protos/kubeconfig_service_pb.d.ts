@@ -365,19 +365,19 @@ export namespace DeleteClusterReq {
   }
 }
 
-export enum CredentialResolverKind { 
+export enum CredentialResolverKind {
   DEFAULT = 0,
   ENV = 1,
   IMDS = 2,
   PROFILE = 3,
 }
-export enum CredentialResolverStatus { 
+export enum CredentialResolverStatus {
   CRED_RESOLVER_UNKNOWN = 0,
   CRED_REGISTERED_OK = 1,
   CRED_REGISTERED_NOT_OK = 2,
   CRED_SUGGESTION_OK = 101,
 }
-export enum ClusterInformationStatus { 
+export enum ClusterInformationStatus {
   INFO_NOT_SETTED = 0,
   REGISTERED_OK = 1,
   REGISTERED_NOTOK_NO_CRED_RESOLVER = 2,
