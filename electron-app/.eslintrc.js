@@ -18,6 +18,13 @@ module.exports = {
     'no-restricted-syntax': ['off'],
     '@typescript-eslint/no-namespace': ['off'],
     'func-names': ['off'],
+    'react/jsx-props-no-spreading': [
+      'warn',
+      {
+        html: 'enforce',
+        custom: 'ignore',
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 2020,
