@@ -2,6 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Attach to Electron renderer",
+      "request": "attach",
+      "type": "pwa-chrome",
+      "port": 9333,
+
+      // mapping webpack codes to source
+      "sourceMapPathOverrides": {
+        "meteor://💻app/*": "${workspaceFolder}/*",
+        "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+        "webpack://?:*/*": "${workspaceFolder}/*"
+      }
+    },
+    {
       "name": "Electron: Main",
       "type": "node",
       "request": "launch",
