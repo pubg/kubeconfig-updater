@@ -56,12 +56,13 @@ export default class ClusterRegisterStore {
     this._state = 'processing'
 
     for (const item of items) {
+      this._currentItem = item
+
       const res: CommonRes = yield (async () => {
         const repo = container.resolve(ClusterRepository)
         this.logger.debug(
           `requesting cluster registration, clusterName: ${item.clusterName}, accountId: ${item.accountId}`
         )
-        this._currentItem = item
         return repo.RegisterCluster(item.clusterName, item.accountId)
       })()
 
