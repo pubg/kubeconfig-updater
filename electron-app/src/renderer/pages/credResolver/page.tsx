@@ -48,43 +48,49 @@ export default observer(function CredResolver() {
       {/* title */}
       <Typography variant="h3">Credentials Resolver Setting</Typography>
 
-      {/* header (including menus) */}
-      <Box display="flex" alignItems="center" justifyContent="right">
-        <Button variant="outlined" onClick={onAddConfigClicked}>
-          Add new config
-        </Button>
-      </Box>
-
-      {/* config add modal */}
-      {!!anchorEl && (
-        <ConfigAddModal
-          popperProps={popperProps}
-          onSubmit={onAddConfigSubmit}
-          onAbort={() => {
-            setAnchorEl(null)
-          }}
-        />
+      {/* loading screen */}
+      {uiStore.state === 'fetching' && (
+        <Box
+          width="100%"
+          height="100%"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          gap="24px"
+        >
+          <Typography variant="h5">Loading... Please wait...</Typography>
+          <CircularProgress color="secondary" size="64px" thickness={3} />
+        </Box>
       )}
 
-      {/* TODO: calculate max height to support sticky */}
-      <Box height="100%" overflow="hidden" sx={{ overflowY: 'auto' }}>
-        {uiStore.state === 'fetching' ? (
-          <Box
-            width="100%"
-            height="100%"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            gap="24px"
-          >
-            <Typography variant="h5">Loading... Please wait...</Typography>
-            <CircularProgress color="secondary" size="64px" thickness={3} />
+      {/* display view */}
+      {uiStore.state === 'ready' && (
+        <>
+          {/* header (including menus) */}
+          <Box display="flex" alignItems="center" justifyContent="right">
+            <Button variant="outlined" onClick={onAddConfigClicked}>
+              Add new config
+            </Button>
           </Box>
-        ) : (
-          <ConfigList />
-        )}
-      </Box>
+
+          {/* config add modal */}
+          {!!anchorEl && (
+            <ConfigAddModal
+              popperProps={popperProps}
+              onSubmit={onAddConfigSubmit}
+              onAbort={() => {
+                setAnchorEl(null)
+              }}
+            />
+          )}
+
+          {/* TODO: calculate max height to support sticky */}
+          <Box height="100%" overflow="hidden" sx={{ overflowY: 'auto' }}>
+            <ConfigList />
+          </Box>
+        </>
+      )}
     </Container>
   )
 })
