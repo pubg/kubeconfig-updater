@@ -1,9 +1,9 @@
-import { computed, flow, makeAutoObservable, makeObservable, observable } from 'mobx'
-import { container, singleton } from 'tsyringe'
+import { computed, flow, makeObservable, observable } from 'mobx'
+import { singleton } from 'tsyringe'
 import { OBSERVED } from '../../types/mobx'
 import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
-import { CommonRes, ResultCode } from '../protos/common_pb'
+import { ResultCode } from '../protos/common_pb'
 import ClusterRepository from '../repositories/clusterRepository'
 import { PayloadMap, ValueWithPayload } from '../types/payloadMap'
 
@@ -39,13 +39,16 @@ export default class ClusterRegisterStore {
   }
 
   @computed
-  get length() {
+  get length(): number {
     return this._registerMap.size
   }
 
   @computed
-  get processedCount() {
-    return [...this._registerMap.values()].filter(({ payload }) => payload?.resolved)
+  get processedCount(): number {
+    const values = [...this._registerMap.values()]
+    const { length } = values.filter(({ payload }) => payload?.resolved)
+
+    return length
   }
 
   readonly errorEvent = new EventStore<Error>()
@@ -77,12 +80,13 @@ export default class ClusterRegisterStore {
     itemWithPayload: ValueWithPayload<Item, Payload>
   ): Promise<ValueWithPayload<Item, Payload>> {
     const { accountId, clusterName } = itemWithPayload.value
-    itemWithPayload.payload = makeAutoObservable({ resolved: false })
+    itemWithPayload.payload = observable({ resolved: false }) as Payload
 
     this.logger.info(`request cluster register, clusterName: ${clusterName}, accountId: ${accountId}`)
 
     const response = await this.clusterRepository.RegisterCluster(clusterName, accountId)
 
+    itemWithPayload.payload.resolved = true
     itemWithPayload.payload.response = {
       resultCode: response.getStatus(),
       message: response.getMessage(),
