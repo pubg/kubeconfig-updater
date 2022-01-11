@@ -65,8 +65,14 @@ export default class ClusterRegisterStore {
     this._registerMap.clear()
     this._registerMap.update(items)
 
-    // TODO: parallel computation?
-    // const promises: Promise<void>[] = []
+    // NOTE: parallel run is not supported yet.
+    const parallelRun = false
+
+    if (parallelRun) {
+      this.requestParallel()
+    } else {
+      this.requestSync()
+    }
 
     for (const [, itemWithPayload] of this._registerMap) {
       yield this.requestRegister(itemWithPayload)
@@ -75,6 +81,19 @@ export default class ClusterRegisterStore {
     this._state = 'ready'
     this.logger.info('finished cluster register request')
   })
+
+  private async requestParallel() {
+    const promises: Promise<unknown>[] = [...this._registerMap.values()].map((p) => this.requestRegister(p))
+
+    await Promise.all(promises)
+  }
+
+  private async requestSync() {
+    for (const [, itemWithPayload] of this._registerMap) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.requestRegister(itemWithPayload)
+    }
+  }
 
   private async requestRegister(
     itemWithPayload: ValueWithPayload<Item, Payload>
