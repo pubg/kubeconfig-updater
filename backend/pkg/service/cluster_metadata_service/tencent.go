@@ -116,6 +116,11 @@ func (r *TencentResolver) listTke(region string) ([]*protos.ClusterMetadata, err
 				meta.ClusterTags[*tag.Key] = *tag.Value
 			}
 		}
+
+		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterRegion.String()]; !ok {
+			meta.ClusterTags[types.KnownClusterTag_ClusterRegion.String()] = region
+		}
+
 		clusters = append(clusters, meta)
 	}
 	return clusters, nil
