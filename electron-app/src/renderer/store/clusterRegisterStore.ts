@@ -39,6 +39,11 @@ export default class ClusterRegisterStore {
   }
 
   @computed
+  get items() {
+    return this._registerMap.values()
+  }
+
+  @computed
   get length(): number {
     return this._registerMap.size
   }
