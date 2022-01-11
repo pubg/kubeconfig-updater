@@ -112,6 +112,7 @@ export class PayloadMap<T, Payload = any> {
   }
 
   get size() {
+    this.atom.reportObserved()
     return this._map.size
   }
 
