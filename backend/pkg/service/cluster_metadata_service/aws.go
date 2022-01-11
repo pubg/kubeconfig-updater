@@ -104,6 +104,10 @@ func (r *AwsResolver) listEks(region string) ([]*protos.ClusterMetadata, error) 
 		}
 		meta.ClusterTags = clusterOut.Cluster.Tags
 
+		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterRegion.String()]; !ok {
+			meta.ClusterTags[types.KnownClusterTag_ClusterRegion.String()] = region
+		}
+
 		clusters = append(clusters, meta)
 	}
 	return clusters, nil
