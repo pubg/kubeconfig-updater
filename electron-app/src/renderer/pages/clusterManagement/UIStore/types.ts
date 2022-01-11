@@ -13,6 +13,10 @@ export interface ClusterMetadataItem extends IObjectWithKey {
 export namespace ClusterMetadataItem {
   export function fromObject(metadata: AggregatedClusterMetadata): ClusterMetadataItem {
     const data = metadata.toObject() as ClusterMetadata
+
+    // normalize text
+    data.dataresolversList = data.dataresolversList.map((text) => text.replaceAll('\\', '/'))
+
     const tags = new Map<string, string>(data.metadata.clustertagsMap)
 
     return {

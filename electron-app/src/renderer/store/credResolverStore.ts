@@ -109,6 +109,7 @@ export default class CredResolverStore {
     yield this.fetchCredResolver()
   })
 
+  // TODO: refactor this to use payloadStore<T, P>
   @action
   private updateCredResolvers(newArray: CredResolverConfig.AsObject[]) {
     this.logger.debug('init updating cred resolvers, value: ', toJS(newArray))

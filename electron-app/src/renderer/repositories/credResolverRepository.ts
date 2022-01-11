@@ -2,7 +2,12 @@
 import { singleton } from 'tsyringe'
 import { KubeconfigClient } from '../protos/Kubeconfig_serviceServiceClientPb'
 import { CommonReq, CommonRes } from '../protos/common_pb'
-import { CredentialResolverKind, CredResolverConfig, DeleteCredResolverReq } from '../protos/kubeconfig_service_pb'
+import {
+  CredentialResolverKind,
+  CredentialResolverStatus,
+  CredResolverConfig,
+  DeleteCredResolverReq,
+} from '../protos/kubeconfig_service_pb'
 
 type Req = Pick<CredResolverConfig.AsObject, 'accountid' | 'infravendor'>
 
@@ -28,6 +33,10 @@ export default class CredResolverRepository {
     req.setInfravendor(config.infravendor)
     req.setAccountalias(config.accountalias)
     req.setKind(config.kind)
+
+    // NOTE: currently it needs to be set on renderer (it will be fixed later)
+    req.setStatus(CredentialResolverStatus.CRED_REGISTERED_OK)
+
     const resolverAttrMap = req.getResolverattributesMap()
 
     for (const [key, value] of config.resolverattributesMap) {

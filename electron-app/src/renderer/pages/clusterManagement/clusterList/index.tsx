@@ -10,6 +10,7 @@ import GroupedClusterList from './groupedClusterList'
 import DefaultClusterList from './defaultClusterList'
 import columnsFactory from './columnFactory'
 import browserLogger from '../../../logger/browserLogger'
+import ContextMenu, { ContextMenuProps } from './contextMenu'
 
 export default observer(function ClusterList() {
   const store = useResolve(ClusterManagementUIStore)
@@ -36,9 +37,32 @@ export default observer(function ClusterList() {
     browserLogger.debug(item)
   }, [])
 
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+  const [contextItem, setContextItem] = useState<ClusterMetadataItem | null>(null)
+
+  const onItemContextMenu = useCallback((item: ClusterMetadataItem, index: any, e?: PointerEvent) => {
+    e?.preventDefault()
+    if (e) {
+      setContextItem(item)
+      setPos({ left: e.x, top: e.y })
+    } else {
+      setPos(null)
+    }
+  }, []) as IDetailsListProps['onItemContextMenu']
+
+  const onItemContextMenuDismiss = () => {
+    setPos(null)
+  }
+
   // TODO: width not limited to 100%
   return (
-    <>
+    <div>
+      <ContextMenu
+        onSelected={onItemContextMenuDismiss}
+        onDismiss={onItemContextMenuDismiss}
+        position={pos ?? undefined}
+        item={contextItem}
+      />
       {isGrouped && store.selectedGroupTag ? (
         // when grouped
         <GroupedClusterList
@@ -46,7 +70,7 @@ export default observer(function ClusterList() {
           columns={columns}
           tag={store.selectedGroupTag}
           selection={store.selectionRef as Selection}
-          overrides={{ onActiveItemChanged }}
+          overrides={{ onActiveItemChanged, onItemContextMenu }}
         />
       ) : (
         // when not grouped
@@ -54,9 +78,9 @@ export default observer(function ClusterList() {
           items={items}
           columns={columns}
           selection={store.selectionRef as Selection}
-          overrides={{ onActiveItemChanged }}
+          overrides={{ onActiveItemChanged, onItemContextMenu }}
         />
       )}
-    </>
+    </div>
   )
 })
