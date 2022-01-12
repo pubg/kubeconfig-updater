@@ -25,10 +25,10 @@ export class PayloadMap<T, Payload = any> {
 
   private _map: Map<string, ValueWithPayload<T, Payload>> = observable.map()
 
-  values(): IterableIterator<ValueWithPayload<T, Payload>> {
+  values() {
     this.atom.reportObserved()
 
-    return this._map.values()
+    return [...this._map.values()]
   }
 
   constructor(private readonly keySelector: KeySelector<T>, private readonly moveFunc?: MoveFunc<T>) {
