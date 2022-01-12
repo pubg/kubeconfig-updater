@@ -12,17 +12,15 @@ import {
   List,
   ListItem,
   Paper,
-  Popover,
   Popper,
   Tooltip,
-  Typography,
   useTheme,
 } from '@mui/material'
 import _ from 'lodash'
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { genAccountId, genClusterName } from '../../../mock/data/metadata'
 import ClusterRegisterStore from '../../../store/clusterRegisterStore'
 import { ResultCode } from '../../../protos/common_pb'
@@ -75,7 +73,6 @@ export default observer(function RegistrationProgressModal() {
 
   const ItemView = ({ item }: { item: Item }) => {
     const [anchorEl, setAnchorEl] = useState<Element | null>(null)
-    const [arrowEl, setArrowEl] = useState<Element | null>(null)
 
     const theme = useTheme()
 
@@ -100,14 +97,12 @@ export default observer(function RegistrationProgressModal() {
 
             {/* cluster name */}
             <Tooltip title={item.value.clusterName}>
-              <DialogContentText width="14em" noWrap>
-                {item.value.clusterName}
-              </DialogContentText>
+              <DialogContentText noWrap>{item.value.clusterName}</DialogContentText>
             </Tooltip>
           </Box>
 
           {item.payload?.response?.resultCode !== ResultCode.SUCCESS && (
-            <Button size="small" variant="outlined" onClick={(e) => setAnchorEl(e.currentTarget)}>
+            <Button size="small" variant="text" onClick={(e) => setAnchorEl(e.currentTarget)}>
               reason
             </Button>
           )}
@@ -116,7 +111,7 @@ export default observer(function RegistrationProgressModal() {
           <Popper open={!!anchorEl} anchorEl={anchorEl} style={{ zIndex: theme.zIndex.modal + 1 }} transition>
             {({ TransitionProps }) => (
               <Fade {...TransitionProps}>
-                <Paper ref={(inst) => setArrowEl(inst)} elevation={5} sx={{ mt: '8px' }}>
+                <Paper elevation={5} sx={{ mt: '8px' }}>
                   <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
                     <DialogContentText>{item.payload?.response?.message}</DialogContentText>
                   </ClickAwayListener>
@@ -130,7 +125,7 @@ export default observer(function RegistrationProgressModal() {
   }
 
   return (
-    <Dialog open fullWidth maxWidth="xs">
+    <Dialog open fullWidth>
       <DialogTitle>Registration status</DialogTitle>
       <DialogContent dividers>
         <List>
