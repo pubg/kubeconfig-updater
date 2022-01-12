@@ -97,6 +97,9 @@ export default class ClusterRegisterStore {
     for (const [, itemWithPayload] of this._registerMap) {
       // eslint-disable-next-line no-await-in-loop
       await this.requestRegister(itemWithPayload)
+
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve, reject) => setTimeout(resolve, 1000))
     }
   }
 
