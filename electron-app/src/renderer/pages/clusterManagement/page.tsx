@@ -10,7 +10,7 @@ import ThemeStore from '../../store/themeStore'
 import ClusterInfoList from './clusterList'
 import ClusterMetadataStore from '../../store/clusterMetadataStore'
 import ErrorNotification from './errorNotification'
-import RegistrationProgressModal from './registrationProgressModal'
+import RegistrationProgressModal from './regStatusModal'
 
 export default observer(function ClusterManagement() {
   const clusterMetadataStore = useResolve(ClusterMetadataStore)
