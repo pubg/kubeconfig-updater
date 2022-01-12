@@ -1,7 +1,8 @@
 import _ from 'lodash'
-import { loremIpsum as lorem } from 'lorem-ipsum'
+import { regions, stages } from './regions'
 
-const vendors = ['AWS', 'Azure', 'Tencent'] as const
+const vendors = ['aws', 'azr', 'tc'] as const
+const sampleNames = ['main', 'test', 'game', 'web', 'devops', 'infra', 'foobar', 'lorem', 'lodash', 'something']
 
 export function genAccountId() {
   return _.random(10 * 11, 10 ** 12).toString()
@@ -12,5 +13,10 @@ export function genVendor() {
 }
 
 export function genClusterName() {
-  return lorem({ count: 5, paragraphLowerBound: 2, paragraphUpperBound: 4 })
+  const stage = _.sample(stages)
+  const name = _.sample(sampleNames)
+  const vendor = _.sample(vendors)
+  const region = _.sample(regions)
+
+  return `${stage}-${name}-${vendor}-${region}-01`
 }
