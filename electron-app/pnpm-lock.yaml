@@ -72,7 +72,6 @@ specifiers:
   linq: ^4.0.0
   lint-staged: ^11.2.6
   lodash: ^4.17.21
-  lorem-ipsum: ^2.0.4
   mini-css-extract-plugin: ^2.4.3
   mobx: ^6.3.8
   mobx-react-lite: ^3.2.2
@@ -198,7 +197,6 @@ devDependencies:
   identity-obj-proxy: 3.0.0
   jest: 27.4.3_ts-node@10.4.0
   lint-staged: 11.2.6
-  lorem-ipsum: 2.0.4
   mini-css-extract-plugin: 2.4.5_webpack@5.65.0
   opencollective-postinstall: 2.0.3
   prettier: 2.5.1
@@ -8057,14 +8055,6 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
-
-  /lorem-ipsum/2.0.4:
-    resolution: {integrity: sha512-TD+ERYfxjYiUfOyaKU6OH4euumNVeKoo3BxIhokb7bGmoCULsME48onF9NVxYK3CU1z9L5ALnkDkW8lIkHvMNQ==}
-    engines: {node: '>= 8.x', npm: '>= 5.x'}
-    hasBin: true
-    dependencies:
-      commander: 2.20.3
-    dev: true
 
   /lower-case/2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
