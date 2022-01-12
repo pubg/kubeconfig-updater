@@ -8,6 +8,7 @@ import {
   CredResolverConfig,
   DeleteCredResolverReq,
 } from '../protos/kubeconfig_service_pb'
+import { getDefaultMetadata } from './grpcMetadata'
 
 type Req = Pick<CredResolverConfig.AsObject, 'accountid' | 'infravendor'>
 
@@ -18,11 +19,11 @@ export default class CredResolverRepository {
   constructor(private readonly client: KubeconfigClient) {}
 
   async SyncAvailableCredResolvers(): Promise<CommonRes> {
-    return this.client.syncAvailableCredResolvers(new CommonReq(), null)
+    return this.client.syncAvailableCredResolvers(new CommonReq(), getDefaultMetadata())
   }
 
   async getCredResolvers() {
-    return this.client.getAvailableCredResolvers(new CommonReq(), null)
+    return this.client.getAvailableCredResolvers(new CommonReq(), getDefaultMetadata())
   }
 
   // do I have to make this function overload?? WHY???
