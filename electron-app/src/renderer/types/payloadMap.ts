@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import _ from 'lodash'
-import { action, computed, createAtom, makeObservable, observable } from 'mobx'
+import { createAtom, observable, makeAutoObservable } from 'mobx'
 import { Atom } from 'mobx/dist/internal'
 import { injectable } from 'tsyringe'
 import { OBSERVED } from '../../types/mobx'
@@ -25,12 +25,10 @@ export class PayloadMap<T, Payload = any> {
 
   private _map: Map<string, ValueWithPayload<T, Payload>> = observable.map()
 
-  get values(): IterableIterator<ValueWithPayload<T, Payload>> {
-    if (this.atom.reportObserved()) {
-      return this._map.values()
-    }
+  values() {
+    this.atom.reportObserved()
 
-    return [].values()
+    return [...this._map.values()]
   }
 
   constructor(private readonly keySelector: KeySelector<T>, private readonly moveFunc?: MoveFunc<T>) {
@@ -39,8 +37,9 @@ export class PayloadMap<T, Payload = any> {
 
   add(value: T): void {
     const key = this.keySelector(value)
-    const observedValue: ValueWithPayload<T, Payload> = makeObservable({ value, payload: null }, undefined, {
-      deep: false,
+    const observedValue: ValueWithPayload<T, Payload> = makeAutoObservable({
+      value,
+      payload: null,
     }) as ValueWithPayload<T, Payload>
 
     this._map.set(key, observedValue)
@@ -53,15 +52,13 @@ export class PayloadMap<T, Payload = any> {
    * performs in-place add, update, delete.
    */
   update(newValues: T[]): void {
-    const oldValues = [...this.values]
+    const oldValues = [...this.values()]
 
-    const added = _.differenceWith(newValues, oldValues, (newVal, oldVal) => {
-      return this.keySelector(newVal) === this.keySelector(oldVal.value)
-    })
+    const added = newValues.filter((object) => !this._map.has(this.keySelector(object)))
     const updated = _.intersectionWith(newValues, oldValues, (newVal, oldVal) => {
       return this.keySelector(newVal) === this.keySelector(oldVal.value)
     })
-    const deleted = _.differenceWith(newValues, oldValues, (newVal, oldVal) => {
+    const deleted = _.differenceWith(oldValues, newValues, (oldVal, newVal) => {
       return this.keySelector(newVal) === this.keySelector(oldVal.value)
     })
 
@@ -85,7 +82,7 @@ export class PayloadMap<T, Payload = any> {
     }
 
     for (const val of deleted) {
-      this.delete(val)
+      this.delete(val.value)
     }
 
     this.atom.reportChanged()
@@ -114,7 +111,12 @@ export class PayloadMap<T, Payload = any> {
     this.atom.reportChanged()
   }
 
+  get size() {
+    this.atom.reportObserved()
+    return this._map.size
+  }
+
   [Symbol.iterator]() {
-    return this._map[Symbol.iterator]
+    return this._map[Symbol.iterator]()
   }
 }

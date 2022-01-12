@@ -7,7 +7,6 @@ import { observer } from 'mobx-react-lite'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
 import About from './pages/about/about'
-import RegisterProgressSnackbar from './components/registerProgressPopup'
 import Configuration from './pages/configuration/configuration'
 import ThemeStore from './store/themeStore'
 import NotiSnackbar from './components/notiSnackbar'
@@ -54,7 +53,6 @@ export default observer(function App() {
               <Route path="/configuration" component={Configuration} />
               <Route path="/about" component={About} />
             </Switch>
-            <RegisterProgressSnackbar />
           </Paper>
         </Router>
       </SnackbarProvider>
