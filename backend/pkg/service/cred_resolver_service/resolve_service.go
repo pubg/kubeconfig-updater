@@ -79,7 +79,7 @@ func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *pr
 func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
-		return common.DefaultProviderChain(), nil
+		return common.NewProviderChain([]common.Provider{common.DefaultEnvProvider(), common.DefaultProfileProvider(), common.DefaultCvmRoleProvider(), tencent_service.NewTencentIntlProfileProvider("default")}), nil
 	case protos.CredentialResolverKind_ENV:
 		return common.DefaultEnvProvider(), nil
 	case protos.CredentialResolverKind_IMDS:
