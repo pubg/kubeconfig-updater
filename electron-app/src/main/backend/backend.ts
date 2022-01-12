@@ -1,6 +1,7 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import _ from 'lodash'
-import { ChildProcess, execFile } from 'child_process'
+import { ChildProcess, exec, ExecException, execFile, ExecFileException } from 'child_process'
 import { inject, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
@@ -47,15 +48,10 @@ export default class BackendManager {
   }
 
   start() {
-    const cmdArr = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`.split(' ')
-    this.backendLogger.info(`CommandLine: ${cmdArr}`)
+    const command = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`
+    this.backendLogger.info(`CommandLine: ${command}`)
     this.backendLogger.info(`WorkingDir: ${this.cwd}`)
-    this.process = execFile(cmdArr[0], cmdArr.slice(1), { cwd: this.cwd }, (err) => {
-      // if backend tree-killed, it returns exit code 1 which is expected and normal.
-      if (err && this.status !== 'on-exit') {
-        this.backendLogger.error(err)
-      }
-    })
+    this.process = this.exec(command)
 
     this.process.stdout?.on('data', (data: string) => {
       data.split('\n').forEach((line) => {
@@ -112,5 +108,22 @@ export default class BackendManager {
     }
 
     this._status = 'exited'
+  }
+
+  private exec(command: string) {
+    const errHandler = (err: ExecFileException | ExecException | null) => {
+      // if backend tree-killed, it returns exit code 1 which is expected and normal.
+      if (err && this.status !== 'on-exit') {
+        this.backendLogger.error(err)
+      }
+    }
+
+    if (process.platform === 'win32') {
+      const cmd = command.split(' ')[0]
+      const args = command.split(' ').slice(1)
+      return execFile(cmd, args, { cwd: this.cwd }, errHandler)
+    }
+
+    return exec(command, { cwd: this.cwd }, errHandler)
   }
 }
