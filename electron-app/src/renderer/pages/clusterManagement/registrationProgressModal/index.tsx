@@ -2,18 +2,27 @@ import {
   Box,
   Button,
   CircularProgress,
+  ClickAwayListener,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Fade,
   List,
   ListItem,
+  Paper,
+  Popover,
+  Popper,
   Tooltip,
+  Typography,
+  useTheme,
 } from '@mui/material'
 import _ from 'lodash'
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
 import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
 import { genAccountId, genClusterName } from '../../../mock/data/metadata'
 import ClusterRegisterStore from '../../../store/clusterRegisterStore'
 import { ResultCode } from '../../../protos/common_pb'
@@ -65,9 +74,14 @@ export default observer(function RegistrationProgressModal() {
   }
 
   const ItemView = ({ item }: { item: Item }) => {
+    const [anchorEl, setAnchorEl] = useState<Element | null>(null)
+    const [arrowEl, setArrowEl] = useState<Element | null>(null)
+
+    const theme = useTheme()
+
     return (
       <ListItem>
-        <Box display="flex" alignItems="center" gap="16px">
+        <Box width="100%" display="flex" justifyContent="space-between" alignItems="center" gap="16px">
           <Box display="flex" alignItems="center" gap="12px">
             {/* status icon */}
             <Tooltip title={item.payload?.response?.message ?? ''}>
@@ -86,17 +100,30 @@ export default observer(function RegistrationProgressModal() {
 
             {/* cluster name */}
             <Tooltip title={item.value.clusterName}>
-              <DialogContentText width="16em" noWrap>
+              <DialogContentText width="14em" noWrap>
                 {item.value.clusterName}
               </DialogContentText>
             </Tooltip>
           </Box>
 
           {item.payload?.response?.resultCode !== ResultCode.SUCCESS && (
-            <Button size="small" variant="outlined">
+            <Button size="small" variant="outlined" onClick={(e) => setAnchorEl(e.currentTarget)}>
               reason
             </Button>
           )}
+
+          {/* TODO: add popper arrow */}
+          <Popper open={!!anchorEl} anchorEl={anchorEl} style={{ zIndex: theme.zIndex.modal + 1 }} transition>
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps}>
+                <Paper ref={(inst) => setArrowEl(inst)} elevation={5} sx={{ mt: '8px' }}>
+                  <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
+                    <DialogContentText>{item.payload?.response?.message}</DialogContentText>
+                  </ClickAwayListener>
+                </Paper>
+              </Fade>
+            )}
+          </Popper>
         </Box>
       </ListItem>
     )
@@ -112,6 +139,9 @@ export default observer(function RegistrationProgressModal() {
           ))}
         </List>
       </DialogContent>
+      <DialogActions>
+        <Button>OK</Button>
+      </DialogActions>
     </Dialog>
   )
 })
