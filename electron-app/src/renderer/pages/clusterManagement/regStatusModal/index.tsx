@@ -1,39 +1,12 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, List } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List } from '@mui/material'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { Item } from 'electron'
 import { useState } from 'react'
-import { genAccountId, genClusterName } from '../../../mock/data/metadata'
 import ClusterRegisterStore from '../../../store/clusterRegisterStore'
-import { ResultCode } from '../../../protos/common_pb'
 import { ItemData } from './types'
 import { useResolve } from '../../../hooks/container'
 import RegListItem from './regListItem'
-import { useAutorun, useReaction } from '../../../hooks/mobx'
-
-const sampleAccountIds: string[] = _.times(4, genAccountId)
-
-function genItem(resolved?: boolean, error?: boolean): ItemData {
-  const item = {
-    value: { accountId: _.sample(sampleAccountIds), clusterName: genClusterName() },
-    payload: {
-      resolved,
-      response: {
-        resultCode: error ? ResultCode.FAILED : ResultCode.SUCCESS,
-        message: error ? 'error message' : 'OK',
-      },
-    },
-  }
-
-  return item as ItemData
-}
-
-const sampleData: ItemData[] = [
-  ..._.times(4, () => genItem(true)),
-  ..._.times(2, () => genItem(true, true)),
-  genItem(false),
-  ..._.times(7, () => genItem()),
-]
+import { useReaction } from '../../../hooks/mobx'
 
 const RegListView = observer(({ items }: { items: ItemData[] }) => {
   const hash = (item: ItemData) => `${item.value.accountId}#${item.value.clusterName}`
