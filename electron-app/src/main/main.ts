@@ -117,8 +117,9 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    center: true,
+    width: 1440,
+    height: 900,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -135,6 +136,7 @@ const createWindow = async () => {
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize()
     } else {
+      mainWindow.maximize()
       mainWindow.show()
     }
   })
