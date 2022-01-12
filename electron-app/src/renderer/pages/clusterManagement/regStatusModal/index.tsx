@@ -35,7 +35,9 @@ export default observer(function RegStatusModal() {
   const canClose = store.processedCount === store.length
 
   const onClose = () => {
-    setOpen(false)
+    if (canClose) {
+      setOpen(false)
+    }
   }
 
   const items = [...store.items]
