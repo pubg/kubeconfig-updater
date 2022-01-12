@@ -58,7 +58,7 @@ export default observer(function TopBar() {
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
-  const [showRegistered, setShowRegistered] = useState(false)
+  const [showRegistered, setShowRegistered] = useState(true)
   const [showReloadDropdown, setShowReloadDropdown] = useState(false)
   const reloadDropdownRef = useRef(null)
 
@@ -119,7 +119,10 @@ export default observer(function TopBar() {
             <TextField {...params} label="Group with Tag" />
           )}
         />
-        <FormControlLabel control={<Switch onChange={onShowRegisteredToggled} />} label="Show Registered" />
+        <FormControlLabel
+          control={<Switch checked={showRegistered} onChange={onShowRegisteredToggled} />}
+          label="Show Registered"
+        />
       </FormGroup>
       <Stack>
         <ButtonGroup variant="outlined" ref={reloadDropdownRef}>
