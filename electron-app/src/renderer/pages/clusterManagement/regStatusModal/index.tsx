@@ -30,6 +30,8 @@ export default observer(function RegStatusModal() {
     () => setOpen(true)
   )
 
+  // NOTE: re-rendering list happens due to here
+  // but I'm not going to memoize each list item before unless rendering is laggy (YAGNI?)
   const canClose = store.processedCount === store.length
 
   const onClose = () => {
