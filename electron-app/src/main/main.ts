@@ -136,6 +136,7 @@ const createWindow = async () => {
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize()
     } else {
+      mainWindow.focus()
       mainWindow.maximize()
       mainWindow.show()
     }
