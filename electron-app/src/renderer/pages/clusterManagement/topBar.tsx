@@ -119,7 +119,10 @@ export default observer(function TopBar() {
             <TextField {...params} label="Group with Tag" />
           )}
         />
-        <FormControlLabel control={<Switch onChange={onShowRegisteredToggled} />} label="Show Registered" />
+        <FormControlLabel
+          control={<Switch checked={showRegistered} onChange={onShowRegisteredToggled} />}
+          label="Show Registered"
+        />
       </FormGroup>
       <Stack>
         <ButtonGroup variant="outlined" ref={reloadDropdownRef}>
