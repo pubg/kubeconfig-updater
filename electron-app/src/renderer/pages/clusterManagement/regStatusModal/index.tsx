@@ -48,7 +48,7 @@ export default observer(function RegStatusModal() {
       </DialogContent>
       <DialogActions>
         <Button disabled={!canClose} onClick={onClose}>
-          OK
+          Close
         </Button>
       </DialogActions>
     </Dialog>
