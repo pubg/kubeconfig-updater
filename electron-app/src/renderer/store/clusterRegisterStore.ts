@@ -3,7 +3,7 @@ import { singleton } from 'tsyringe'
 import { OBSERVED } from '../../types/mobx'
 import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
-import { ResultCode } from '../protos/common_pb'
+import { CommonRes, ResultCode } from '../protos/common_pb'
 import ClusterRepository from '../repositories/clusterRepository'
 import { PayloadMap, ValueWithPayload } from '../types/payloadMap'
 
@@ -31,8 +31,7 @@ export default class ClusterRegisterStore {
   @observable
   private _state: 'ready' | 'processing' = 'ready'
 
-  @observable
-  private _registerMap = new PayloadMap<Item, Payload>(keySelector)
+  private readonly _registerMap = new PayloadMap<Item, Payload>(keySelector)
 
   get state() {
     return this._state
@@ -74,44 +73,38 @@ export default class ClusterRegisterStore {
     const parallelRun = false
 
     if (parallelRun) {
-      this.requestParallel()
+      // this.requestParallel()
     } else {
-      this.requestSync()
-    }
-
-    for (const [, itemWithPayload] of this._registerMap) {
-      yield this.requestRegister(itemWithPayload)
+      yield this.requestSync()
     }
 
     this._state = 'ready'
     this.logger.info('finished cluster register request')
   })
 
+  /*
   private async requestParallel() {
     const promises: Promise<unknown>[] = [...this._registerMap.values()].map((p) => this.requestRegister(p))
 
     await Promise.all(promises)
   }
+  */
 
   private async requestSync() {
     for (const [, itemWithPayload] of this._registerMap) {
       // eslint-disable-next-line no-await-in-loop
       await this.requestRegister(itemWithPayload)
-
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve, reject) => setTimeout(resolve, 1000))
     }
   }
 
-  private async requestRegister(
-    itemWithPayload: ValueWithPayload<Item, Payload>
-  ): Promise<ValueWithPayload<Item, Payload>> {
+  @flow
+  private *requestRegister(itemWithPayload: ValueWithPayload<Item, Payload>) {
     const { accountId, clusterName } = itemWithPayload.value
     itemWithPayload.payload = observable({ resolved: false }) as Payload
 
     this.logger.info(`request cluster register, clusterName: ${clusterName}, accountId: ${accountId}`)
 
-    const response = await this.clusterRepository.RegisterCluster(clusterName, accountId)
+    const response: CommonRes = yield this.clusterRepository.RegisterCluster(clusterName, accountId)
 
     itemWithPayload.payload.resolved = true
     itemWithPayload.payload.response = {
