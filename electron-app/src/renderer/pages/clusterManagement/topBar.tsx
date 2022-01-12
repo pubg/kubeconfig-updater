@@ -58,7 +58,7 @@ export default observer(function TopBar() {
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
-  const [showRegistered, setShowRegistered] = useState(false)
+  const [showRegistered, setShowRegistered] = useState(true)
   const [showReloadDropdown, setShowReloadDropdown] = useState(false)
   const reloadDropdownRef = useRef(null)
 
