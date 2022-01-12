@@ -10,7 +10,7 @@ import ThemeStore from '../../store/themeStore'
 import ClusterInfoList from './clusterList'
 import ClusterMetadataStore from '../../store/clusterMetadataStore'
 import ErrorNotification from './errorNotification'
-import RegistrationProgressModal from './regStatusModal'
+import RegStatusModal from './regStatusModal'
 
 export default observer(function ClusterManagement() {
   const clusterMetadataStore = useResolve(ClusterMetadataStore)
@@ -25,7 +25,7 @@ export default observer(function ClusterManagement() {
     <ContainerContextProvider>
       {/* background */}
       <Paper sx={{ width: '100%', height: '100%' }} square>
-        <RegistrationProgressModal />
+        <RegStatusModal />
         <ErrorNotification />
 
         {/* actual container */}

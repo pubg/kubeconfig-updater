@@ -47,7 +47,7 @@ const RegListView = observer(({ items }: { items: ItemData[] }) => {
   )
 })
 
-export default observer(function RegistrationProgressModal() {
+export default observer(function RegStatusModal() {
   const store = useResolve(ClusterRegisterStore)
 
   const [open, setOpen] = useState(false)
