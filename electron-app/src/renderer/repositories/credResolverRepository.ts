@@ -8,8 +8,8 @@ import {
   CredResolverConfig,
   DeleteCredResolverReq,
 } from '../protos/kubeconfig_service_pb'
-
-type Req = Pick<CredResolverConfig.AsObject, 'accountid' | 'infravendor'>
+import { getDefaultMetadata } from './grpcMetadata'
+import { createErrorResponse } from './error'
 
 export type OtherCredResolverRegisterReq = Omit<CredentialResolverKind, CredentialResolverKind.PROFILE>
 
@@ -18,11 +18,15 @@ export default class CredResolverRepository {
   constructor(private readonly client: KubeconfigClient) {}
 
   async SyncAvailableCredResolvers(): Promise<CommonRes> {
-    return this.client.syncAvailableCredResolvers(new CommonReq(), null)
+    try {
+      return await this.client.syncAvailableCredResolvers(new CommonReq(), getDefaultMetadata())
+    } catch (e) {
+      return createErrorResponse(e)
+    }
   }
 
   async getCredResolvers() {
-    return this.client.getAvailableCredResolvers(new CommonReq(), null)
+    return this.client.getAvailableCredResolvers(new CommonReq(), getDefaultMetadata())
   }
 
   // do I have to make this function overload?? WHY???
@@ -43,13 +47,21 @@ export default class CredResolverRepository {
       resolverAttrMap.set(key, value)
     }
 
-    return this.client.setCredResolver(req, null)
+    try {
+      return await this.client.setCredResolver(req, getDefaultMetadata())
+    } catch (e) {
+      return createErrorResponse(e)
+    }
   }
 
-  async deleteCredResolver(accountId: string) {
+  async deleteCredResolver(accountId: string): Promise<CommonRes> {
     const req = new DeleteCredResolverReq()
     req.setAccountid(accountId)
 
-    return this.client.deleteCredResolver(req, null)
+    try {
+      return await this.client.deleteCredResolver(req, getDefaultMetadata())
+    } catch (e) {
+      return createErrorResponse(e)
+    }
   }
 }

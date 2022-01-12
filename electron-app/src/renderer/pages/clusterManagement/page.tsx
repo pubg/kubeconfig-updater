@@ -18,7 +18,7 @@ export default observer(function ClusterManagement() {
 
   // invoke on mount
   useEffect(() => {
-    clusterMetadataStore.fetchMetadata()
+    clusterMetadataStore.fetchMetadata(true)
   }, [clusterMetadataStore])
 
   return (
