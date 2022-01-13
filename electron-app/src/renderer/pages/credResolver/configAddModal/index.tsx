@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import {
+  Autocomplete,
   Button,
   ClickAwayListener,
   Fade,
@@ -82,15 +83,14 @@ export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: Confi
                 </TextField>
 
                 {/* account input */}
-                <TextField
-                  error={!validateAccount()}
-                  id="account"
-                  label="account"
-                  variant="outlined"
+                <Autocomplete
+                  autoHighlight
+                  freeSolo
+                  renderInput={(params) => <TextField {...params} label="accountId" />}
                   size="small"
                   value={account}
-                  onChange={(e) => setAccount(e.target.value)}
-                  margin="normal"
+                  options={[]}
+                  onChange={(_, value) => setAccount(value ?? '')}
                 />
               </FormControl>
 
