@@ -13,6 +13,10 @@ import {
   TextField,
 } from '@mui/material'
 import { useState } from 'react'
+import LINQ from 'linq'
+import { useResolve } from '../../../hooks/container'
+import CredResolverStore from '../../../store/credResolverStore'
+import ProfileStore from '../../../store/profileStore'
 
 // TODO: refactor this hard-coded values
 const vendors = ['AWS', 'Azure', 'Tencent'] as const
@@ -30,8 +34,23 @@ export interface ConfigAddModalProps {
 
 // TODO: use memo?
 export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: ConfigAddModalProps) {
+  const profileStore = useResolve(ProfileStore)
+  const credResolverStore = useResolve(CredResolverStore)
+
   const [vendor, setVendor] = useState('')
   const [account, setAccount] = useState('')
+
+  const usedProfiles = LINQ.from(credResolverStore.credResolvers)
+    .where((config) => !!config.profile)
+    .select((config) => config.profile)
+    .distinct()
+    .toArray()
+
+  const profiles = LINQ.from(profileStore.profiles)
+    .where((profile) => profile.infravendor === vendor)
+    .where((profile) => !usedProfiles.includes(profile.profilename))
+    .select((profile) => profile.profilename)
+    .toArray()
 
   const validateVendor = () => {
     return vendor !== ''
@@ -89,7 +108,7 @@ export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: Confi
                   renderInput={(params) => <TextField {...params} label="accountId" />}
                   size="small"
                   value={account}
-                  options={[]}
+                  options={profiles}
                   onChange={(_, value) => setAccount(value ?? '')}
                 />
               </FormControl>
