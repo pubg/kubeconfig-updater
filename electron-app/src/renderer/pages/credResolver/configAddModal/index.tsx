@@ -40,16 +40,16 @@ export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: Confi
   const [vendor, setVendor] = useState('')
   const [account, setAccount] = useState('')
 
-  const usedProfiles = LINQ.from(credResolverStore.credResolvers)
-    .where((config) => !!config.profile)
-    .select((config) => config.profile)
+  const usedAccounts = LINQ.from(credResolverStore.credResolvers)
+    .select((config) => config.accountid)
     .distinct()
     .toArray()
 
   const profiles = LINQ.from(profileStore.profiles)
     .where((profile) => profile.infravendor === vendor)
-    .where((profile) => !usedProfiles.includes(profile.profilename))
-    .select((profile) => profile.profilename)
+    .where((profile) => !usedAccounts.includes(profile.accountid))
+    .select((profile) => profile.accountid)
+    .distinct()
     .toArray()
 
   const validateVendor = () => {
