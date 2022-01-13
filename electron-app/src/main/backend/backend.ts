@@ -49,8 +49,6 @@ export default class BackendManager {
 
   start() {
     const command = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`
-    this.backendLogger.info(`CommandLine: ${command}`)
-    this.backendLogger.info(`WorkingDir: ${this.cwd}`)
     this.process = this.exec(command)
 
     this.process.stdout?.on('data', (chunk: Buffer) => {
@@ -111,14 +109,20 @@ export default class BackendManager {
     const cmd = command.split(' ')[0]
     const args = command.split(' ').slice(1)
 
+    this.backendLogger.info('command: ', command)
+    this.backendLogger.info('cmd: ', cmd)
+    this.backendLogger.info('args: ', args)
+
     // when darwin platform production, it's launched under launchd
     // that has default $PATH env and it doesn't have /usr/local/bin
     if (process.platform === 'darwin') {
-      const PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin'
+      const paths = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin'
+      const PATH = `${process.env.PATH}:${paths}`
       return spawn(cmd, args, {
         cwd: this.cwd,
         shell: true,
         env: {
+          ...process.env,
           PATH,
         },
       })
