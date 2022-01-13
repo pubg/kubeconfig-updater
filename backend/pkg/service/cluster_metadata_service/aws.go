@@ -56,15 +56,17 @@ func (r *AwsResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	for _, future := range futures {
 		out := <-future
 		if out.err != nil {
-			return nil, out.err
+			fmt.Printf("failed to list clusters from region %s, error: %s", out.region, out.err)
+		} else {
+			clusters = append(clusters, out.clusters...)
 		}
-		clusters = append(clusters, out.clusters...)
 	}
 
 	return clusters, nil
 }
 
 type listEksFutureOut struct {
+	region   string
 	clusters []*protos.ClusterMetadata
 	err      error
 }
@@ -74,6 +76,7 @@ func (r *AwsResolver) listEksFuture(region string) <-chan listEksFutureOut {
 	go func() {
 		clusters, err := r.listEks(region)
 		c <- listEksFutureOut{
+			region:   region,
 			clusters: clusters,
 			err:      err,
 		}
