@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import _ from 'lodash'
-import { ChildProcess, exec, ExecException, execFile, ExecFileException } from 'child_process'
+import { ChildProcess, exec, ExecException, execFile, ExecFileException, spawn } from 'child_process'
 import { inject, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
@@ -53,23 +53,20 @@ export default class BackendManager {
     this.backendLogger.info(`WorkingDir: ${this.cwd}`)
     this.process = this.exec(command)
 
-    this.process.stdout?.on('data', (data: string) => {
-      data.split('\n').forEach((line) => {
-        if (line.trim() !== '') {
-          this.backendLogger.info(`StdOut: ${line}`)
-        }
-      })
+    this.process.stdout?.on('data', (chunk: Buffer) => {
+      this.backendLogger.info(chunk.toString())
     })
 
-    this.process.stderr?.on('data', (data: string) => {
-      data.split('\n').forEach((line) => {
-        if (line.trim() !== '') {
-          this.backendLogger.error(`StdErr: ${line}`)
-        }
-      })
+    this.process.stderr?.on('data', (chunk: Buffer) => {
+      this.backendLogger.error(chunk.toString())
     })
 
-    this.process.on('error', (e) => {})
+    this.process.on('error', (err) => {
+      // if backend tree-killed, it returns exit code 1 which is expected and normal.
+      if (err && this.status !== 'on-exit') {
+        this.backendLogger.error(err)
+      }
+    })
     this.process.on('exit', async (e) => {
       this.backendLogger.info(`recerived childprocess exit event, status:${this._status}`)
       if (this._status === 'running') {
@@ -111,19 +108,9 @@ export default class BackendManager {
   }
 
   private exec(command: string) {
-    const errHandler = (err: ExecFileException | ExecException | null) => {
-      // if backend tree-killed, it returns exit code 1 which is expected and normal.
-      if (err && this.status !== 'on-exit') {
-        this.backendLogger.error(err)
-      }
-    }
+    const cmd = command.split(' ')[0]
+    const args = command.split(' ').slice(1)
 
-    if (process.platform === 'win32') {
-      const cmd = command.split(' ')[0]
-      const args = command.split(' ').slice(1)
-      return execFile(cmd, args, { cwd: this.cwd }, errHandler)
-    }
-
-    return exec(command, { cwd: this.cwd }, errHandler)
+    return spawn(cmd, args, { cwd: this.cwd, shell: true })
   }
 }
