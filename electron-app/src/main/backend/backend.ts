@@ -1,6 +1,7 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import _ from 'lodash'
-import { ChildProcess, execFile } from 'child_process'
+import { ChildProcess, exec, ExecException, execFile, ExecFileException, spawn } from 'child_process'
 import { inject, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
@@ -47,33 +48,23 @@ export default class BackendManager {
   }
 
   start() {
-    const cmdArr = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`.split(' ')
-    this.backendLogger.info(`CommandLine: ${cmdArr}`)
-    this.backendLogger.info(`WorkingDir: ${this.cwd}`)
-    this.process = execFile(cmdArr[0], cmdArr.slice(1), { cwd: this.cwd }, (err) => {
+    const command = `${this.cmd} server --port=${this._grpcPort} --web-port=${this._grpcWebPort}`
+    this.process = this.exec(command)
+
+    this.process.stdout?.on('data', (chunk: Buffer) => {
+      this.backendLogger.info(chunk.toString())
+    })
+
+    this.process.stderr?.on('data', (chunk: Buffer) => {
+      this.backendLogger.error(chunk.toString())
+    })
+
+    this.process.on('error', (err) => {
       // if backend tree-killed, it returns exit code 1 which is expected and normal.
       if (err && this.status !== 'on-exit') {
         this.backendLogger.error(err)
       }
     })
-
-    this.process.stdout?.on('data', (data: string) => {
-      data.split('\n').forEach((line) => {
-        if (line.trim() !== '') {
-          this.backendLogger.info(`StdOut: ${line}`)
-        }
-      })
-    })
-
-    this.process.stderr?.on('data', (data: string) => {
-      data.split('\n').forEach((line) => {
-        if (line.trim() !== '') {
-          this.backendLogger.error(`StdErr: ${line}`)
-        }
-      })
-    })
-
-    this.process.on('error', (e) => {})
     this.process.on('exit', async (e) => {
       this.backendLogger.info(`recerived childprocess exit event, status:${this._status}`)
       if (this._status === 'running') {
@@ -112,5 +103,31 @@ export default class BackendManager {
     }
 
     this._status = 'exited'
+  }
+
+  private exec(command: string) {
+    const cmd = command.split(' ')[0]
+    const args = command.split(' ').slice(1)
+
+    this.backendLogger.info('command: ', command)
+    this.backendLogger.info('cmd: ', cmd)
+    this.backendLogger.info('args: ', args)
+
+    // when darwin platform production, it's launched under launchd
+    // that has default $PATH env and it doesn't have /usr/local/bin
+    if (process.platform === 'darwin') {
+      const paths = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin'
+      const PATH = `${process.env.PATH}:${paths}`
+      return spawn(cmd, args, {
+        cwd: this.cwd,
+        shell: true,
+        env: {
+          ...process.env,
+          PATH,
+        },
+      })
+    }
+
+    return spawn(cmd, args, { cwd: this.cwd, shell: true })
   }
 }
