@@ -111,6 +111,19 @@ export default class BackendManager {
     const cmd = command.split(' ')[0]
     const args = command.split(' ').slice(1)
 
+    // when darwin platform production, it's launched under launchd
+    // that has default $PATH env and it doesn't have /usr/local/bin
+    if (process.platform === 'darwin') {
+      const PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin'
+      return spawn(cmd, args, {
+        cwd: this.cwd,
+        shell: true,
+        env: {
+          PATH,
+        },
+      })
+    }
+
     return spawn(cmd, args, { cwd: this.cwd, shell: true })
   }
 }
