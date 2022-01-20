@@ -39,39 +39,12 @@ export default class UIStore {
       .toArray()
   }
 
-  @computed
-  get configOptions(): Option[] {
-    return []
-    /*
-    return (
-      LINQ.from(this.credResolverStore.credResolvers)
-        // BUG: accessing this attribute causes @computed to be re-evaluated
-        .selectMany((config) => config.resolverattributesMap)
-        .where(([key]) => key === 'profile')
-        .select(([_, value]) => value)
-        .distinct()
-        .select<Option>((profile) => ({
-          key: profile,
-          label: RESOLVER_PROFILE_FACTORY(profile),
-        }))
-        .toArray()
-    )
-    */
-  }
-
   /**
    * all possible option values (duplicate removed)
    */
   @computed
   get options(): Option[] {
-    // remove duplicates
-    const map = new Map<string, Option>()
-
-    for (const option of [...this.defaultOptions, ...this.profileOptions, ...this.configOptions]) {
-      map.set(option.key, option)
-    }
-
-    return [...map.values(), { key: RESOLVER_UNKNOWN, label: RESOLVER_UNKNOWN, inactive: true }]
+    return [...this.defaultOptions, ...this.profileOptions]
   }
 
   constructor(readonly credResolverStore: CredResolverStore, readonly profileStore: ProfileStore) {
