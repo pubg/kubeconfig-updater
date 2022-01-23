@@ -1,7 +1,7 @@
 package configs
 
 type ApplicationConfig struct {
-	DataStores                *DataStores
+	DataStores                *DataStores `yaml:"DataStores,omitempty" json:"DataStores,omitempty"`
 	AutoUpdate                bool
 	Extensions                *Extension
 	DefaultCredResolverConfig string
@@ -17,25 +17,30 @@ type DataStoreConfig struct {
 }
 
 type Extension struct {
-	Fox *FoxExtension
-	Eks *EksExtension
-	Aks *AksExtension
+	Fox              *FoxExt
+	EksAssumeRoles   []*EksAssumeRoleExt
+	AksBrowserLogins []*AksBrowserLogin
 }
 
-type FoxExtension struct {
+type EksAssumeRoleExt struct {
+	// StringExpression
+	RoleNameExpression      Expression
+	ClusterFilterExpression Expression
+}
+
+type AksBrowserLogin struct {
+	ClusterFilterExpression Expression
+}
+
+type FoxExt struct {
 	Enable  bool
 	Address string
-	//TODO
-	UseCache bool
 }
 
-//TODO
-type EksExtension struct {
-	UseEksRoleLogin    bool
-	EksRoleNamePattern string
-}
+// String Expression: String Format, GoText
+// Validation Expression: Regex, GoText, Glob
 
-//TODO
-type AksExtension struct {
-	UseKubelogin bool
+type Expression struct {
+	Type       string
+	Expression string
 }

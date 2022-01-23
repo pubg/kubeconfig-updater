@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
@@ -18,6 +19,8 @@ import (
 type ClusterRegisterService struct {
 	credService *cred_resolver_service.CredResolveService
 	metaService *cluster_metadata_service.ClusterMetadataService
+
+	registerMutex sync.Mutex
 }
 
 func NewClusterRegisterService(credService *cred_resolver_service.CredResolveService, metaService *cluster_metadata_service.ClusterMetadataService) *ClusterRegisterService {
@@ -25,6 +28,10 @@ func NewClusterRegisterService(credService *cred_resolver_service.CredResolveSer
 }
 
 func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterName string, credConf *protos.CredResolverConfig) error {
+	// aws, az, gcloud, tccli are not support concurrent register
+	s.registerMutex.Lock()
+	defer s.registerMutex.Unlock()
+
 	meta, exists := s.metaService.GetClusterMetadata(clusterName)
 	if !exists {
 		return fmt.Errorf("cannot find clusterRegion information in metadataResolver clusterName:%s", clusterName)

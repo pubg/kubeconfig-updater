@@ -4,10 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	awsTypes "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
@@ -46,43 +49,33 @@ func (r *AwsResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 		return nil, err
 	}
 
-	var futures []<-chan listEksFutureOut
-	for _, region := range regionsOut.Regions {
-		future := r.listEksFuture(*region.RegionName)
-		futures = append(futures, future)
-	}
+	clustersOut := concurrency.Parallel(common.ToInterfaceSlice(regionsOut.Regions), func(in interface{}) (output interface{}, err error) {
+		region, ok := in.(awsTypes.Region)
+		if !ok {
+			return nil, common.TypeCastError("ec2/types/Region")
+		}
+		return r.listEks(*region.RegionName)
+	})
 
 	var clusters []*protos.ClusterMetadata
-	for _, future := range futures {
-		out := <-future
-		if out.err != nil {
-			fmt.Printf("failed to list clusters from region %s, error: %s", out.region, out.err)
+	for _, out := range clustersOut {
+		region, ok := out.Input.(awsTypes.Region)
+		if !ok {
+			return nil, common.TypeCastError("ec2/types/Region")
+		}
+
+		if out.Err != nil {
+			fmt.Printf("failed to list clusters from region %s, error: %s", *region.RegionName, out.Err)
 		} else {
-			clusters = append(clusters, out.clusters...)
+			regionalClusters := out.Output.([]*protos.ClusterMetadata)
+			if !ok {
+				return nil, common.TypeCastError("ClusterMetadata")
+			}
+
+			clusters = append(clusters, regionalClusters...)
 		}
 	}
-
 	return clusters, nil
-}
-
-type listEksFutureOut struct {
-	region   string
-	clusters []*protos.ClusterMetadata
-	err      error
-}
-
-func (r *AwsResolver) listEksFuture(region string) <-chan listEksFutureOut {
-	c := make(chan listEksFutureOut, 1)
-	go func() {
-		clusters, err := r.listEks(region)
-		c <- listEksFutureOut{
-			region:   region,
-			clusters: clusters,
-			err:      err,
-		}
-		close(c)
-	}()
-	return c
 }
 
 func (r *AwsResolver) listEks(region string) ([]*protos.ClusterMetadata, error) {
