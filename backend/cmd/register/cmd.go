@@ -31,13 +31,16 @@ func eksCommand() *cobra.Command {
 		Long:  "",
 		Args:  cobra.ExactValidArgs(2),
 	}
+
 	var awsProfile string
+	var awsRole string
 	eksCmd.Flags().StringVar(&awsProfile, "profile", "", "aws profile name to use. (if empty, use default credential chain)")
+	eksCmd.Flags().StringVar(&awsRole, "role", "", "aws role name to use. (if empty, use iam user authentication)")
 
 	eksCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		region := args[0]
 		clusterName := args[1]
-		err := aws_service.RegisterEksWithIamUser(clusterName, region, awsProfile)
+		err := aws_service.RegisterEksWithIamUser(clusterName, region, awsRole, awsProfile)
 		if err != nil {
 			return err
 		}

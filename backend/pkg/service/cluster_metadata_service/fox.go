@@ -30,7 +30,7 @@ type FoxResolver struct {
 }
 
 func (f *FoxResolver) GetResolverDescription() string {
-	return "Pubg-Fox"
+	return "PUBG-Fox"
 }
 
 func (f *FoxResolver) GetCluster(clusterName string) (*protos.ClusterMetadata, bool, error) {

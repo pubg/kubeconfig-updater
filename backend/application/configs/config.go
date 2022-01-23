@@ -19,7 +19,13 @@ type DataStoreConfig struct {
 type Extension struct {
 	Fox              *FoxExt
 	EksAssumeRoles   []*EksAssumeRoleExt
-	AksBrowserLogins []*AksBrowserLogin
+	AksBrowserLogins []*AksBrowserLoginExt
+	LensRegister     []*LensRegisterExt
+}
+
+type FoxExt struct {
+	Enable  bool
+	Address string
 }
 
 type EksAssumeRoleExt struct {
@@ -28,17 +34,17 @@ type EksAssumeRoleExt struct {
 	ClusterFilterExpression Expression
 }
 
-type AksBrowserLogin struct {
+type AksBrowserLoginExt struct {
 	ClusterFilterExpression Expression
 }
 
-type FoxExt struct {
-	Enable  bool
-	Address string
+type LensRegisterExt struct {
+	ClusterFilterExpression Expression
+	PrometheusEndpoint      string
 }
 
-// String Expression: String Format, GoText
-// Validation Expression: Regex, GoText, Glob
+// String expression: Format, GoTemplate
+// Validation expression: Regex, GoTemplate, Glob
 
 type Expression struct {
 	Type       string

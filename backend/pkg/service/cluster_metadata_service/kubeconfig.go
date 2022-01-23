@@ -2,6 +2,7 @@ package cluster_metadata_service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
@@ -44,5 +45,5 @@ func (r *KubeconfigResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 }
 
 func (r *KubeconfigResolver) GetResolverDescription() string {
-	return fmt.Sprintf("Kubeconfig/%+v", r.kubeconfigFile)
+	return fmt.Sprintf("Kubeconfig/%+v", strings.Trim(r.kubeconfigFile, "/"))
 }
