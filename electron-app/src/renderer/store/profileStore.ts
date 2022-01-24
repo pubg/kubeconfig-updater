@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { computed, flow, makeObservable, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
 import EventStore from '../event/eventStore'
@@ -28,11 +29,21 @@ export default class ProfileStore {
 
   readonly errorEvent = new EventStore<Error>()
 
+  private lastUpdated = dayjs('1970-01-01')
+
+  private expiredMinute = 5
+
   constructor(private readonly profileRepository: ProfileRepository) {
     makeObservable(this)
   }
 
-  fetchProfiles = flow(function* (this: ProfileStore) {
+  fetchProfiles = flow(function* (this: ProfileStore, forceResync = false) {
+    const shouldFetch = forceResync || this.isCacheExpired()
+    if (!shouldFetch) {
+      this.logger.debug('fetching profiles prevented by cache policy')
+      return
+    }
+
     this._state = 'fetching'
     this.logger.debug('fetching profiles...')
 
@@ -61,8 +72,13 @@ export default class ProfileStore {
     profiles.push(...tencentProfilesResult.getProfilesList().map((profile) => profile.toObject()))
 
     this._profiles = profiles
+    this.lastUpdated = dayjs()
 
     this._state = 'ready'
     this.logger.debug(`fetched ${this.profiles.length} profiles: `, toJS(this.profiles))
   })
+
+  private isCacheExpired() {
+    return this.lastUpdated.add(this.expiredMinute, 'minute').isBefore(dayjs())
+  }
 }
