@@ -40,7 +40,7 @@ func eksCommand() *cobra.Command {
 	eksCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		region := args[0]
 		clusterName := args[1]
-		err := aws_service.RegisterEksWithIamUser(clusterName, region, awsRole, awsProfile)
+		err := aws_service.RegisterEks(clusterName, region, awsRole, awsProfile)
 		if err != nil {
 			return err
 		}

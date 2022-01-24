@@ -8,8 +8,8 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 )
 
-// RegisterEksWithIamUser role, profile is optional arguments
-func RegisterEksWithIamUser(clusterName, clusterRegion, role, profile string) error {
+// RegisterEks role, profile is optional arguments
+func RegisterEks(clusterName, clusterRegion, role, profile string) error {
 	command := fmt.Sprintf("aws eks update-kubeconfig --region %[1]s --name %[2]s --alias %[2]s", clusterRegion, clusterName)
 
 	if role != "" {

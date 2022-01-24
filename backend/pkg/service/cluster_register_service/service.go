@@ -100,8 +100,12 @@ func (s *ClusterRegisterService) registerEks(ctx context.Context, clusterName st
 			}
 
 			roleArn, err := roleExpr.StringEvaluate(inputMap, []interface{}{clusterName, clusterRegion})
+			if err != nil {
+				return err
+			}
+			return aws_service.RegisterEks(clusterName, clusterRegion, roleArn, profileOrEmpty)
 		}
 	}
 
-	return aws_service.RegisterEksWithIamUser(clusterName, clusterRegion, "", profileOrEmpty)
+	return aws_service.RegisterEks(clusterName, clusterRegion, "", profileOrEmpty)
 }
