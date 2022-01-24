@@ -12,11 +12,17 @@ import ThemeStore from './store/themeStore'
 import NotiSnackbar from './components/notiSnackbar'
 import browserLogger from './logger/browserLogger'
 import CredResolver from './pages/credResolver/page'
+import CredResolverStore from './store/credResolverStore'
+import ProfileStore from './store/profileStore'
 
 export default observer(function App() {
   const { muiTheme } = container.resolve(ThemeStore)
 
   browserLogger.debug('current theme: ', muiTheme)
+
+  // trigger sync on start to minimize loading
+  container.resolve(CredResolverStore).fetchCredResolver(true)
+  container.resolve(ProfileStore).fetchProfiles(true)
 
   return (
     <ThemeProvider theme={muiTheme}>
