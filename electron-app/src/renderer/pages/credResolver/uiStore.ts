@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { computed, flow, makeObservable, observable } from 'mobx'
-import { Lifecycle, scoped } from 'tsyringe'
+import { singleton } from 'tsyringe'
 import LINQ from 'linq'
 import CredResolverStore from '../../store/credResolverStore'
 import { ProfileSelectionOption } from './configList/profileSelection'
@@ -9,7 +9,7 @@ import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY
 
 type Option = ProfileSelectionOption
 
-@scoped(Lifecycle.ContainerScoped)
+@singleton()
 export default class UIStore {
   @observable
   private _initLoading = true
