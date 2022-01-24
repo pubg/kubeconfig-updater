@@ -27,6 +27,52 @@ Linux: /home/<username>/.kubeconfig-updater-gui
 MacOS: /Users/<username>/.kubeconfig-updater-gui
 ```
 
+## Requirement Permission
+```yaml
+# AWS Policy 
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeRegions",
+        "eks:ListClusters",
+        "eks:DescribeCluster",
+        "eks:AccessKubernetesApi"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+```yaml
+# Azure Role
+BuiltinRole: Azure Kubernetes Service Cluster User Role
+```
+
+```yaml
+# TencentCloud Policy
+# You can use Preset Policy That Named 'QcloudTKEReadOnlyAccessPreset' or Custom Policy
+{
+  "version": "2.0",
+  "statement": [
+    {
+      "action": [
+        "cvm:DescribeRegions",
+        "tke:DescribeClusters",
+        "tke:DescribeClusterKubeconfig"
+      ],
+      "resource": "*",
+      "effect": "allow"
+    }
+  ]
+}
+                 
+
+```
+
 ## Other Documents
 [Update History](./Update-history.md)
 
