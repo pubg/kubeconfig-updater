@@ -4,25 +4,24 @@ import DoneIcon from '@mui/icons-material/Done'
 import ErrorIcon from '@mui/icons-material/ErrorOutline'
 import ObservedCredResolverConfig from '../credResolverConfig'
 import { ResultCode } from '../../../protos/common_pb'
+import { Payload } from '../../../store/credResolverStore'
 
 interface ConfigStatusViewProps {
-  config: ObservedCredResolverConfig
+  payload: Payload | null
   size: string
 }
 
-export default observer(function ConfigStatusView({ config, size }: ConfigStatusViewProps) {
-  const { response } = config
-
-  if (!response) {
+export default observer(function ConfigStatusView({ payload, size }: ConfigStatusViewProps) {
+  if (!payload) {
     return <></>
   }
 
   const icon = (() => {
-    if (!response.resolved) {
+    if (!payload.resolved) {
       return <CircularProgress size={size} />
     }
 
-    switch (response.data?.resultCode) {
+    switch (payload.data?.resultCode) {
       case ResultCode.SUCCESS:
         return <DoneIcon color="success" />
 
@@ -33,10 +32,10 @@ export default observer(function ConfigStatusView({ config, size }: ConfigStatus
 
   let tooltipTitle = ''
 
-  if (response.data?.resultCode === ResultCode.SUCCESS) {
+  if (payload.data?.resultCode === ResultCode.SUCCESS) {
     tooltipTitle = 'OK'
   } else {
-    tooltipTitle = response.data?.message ?? 'unknown error'
+    tooltipTitle = payload.data?.message ?? 'unknown error'
   }
 
   return (

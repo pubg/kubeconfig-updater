@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import LINQ from 'linq'
 import { useResolve } from '../../../hooks/container'
-import ObservedCredResolverConfig from '../credResolverConfig'
 import UIStore from '../uiStore'
 import CredResolverConfigList from './credResolverConfigList'
 import CredResolverConfigListItem from './credResolverConfigListItem'
@@ -16,12 +15,13 @@ export default observer(() => {
   // it's updated by mobx
   const getOptions = () => options
 
-  const groups = useMemo<{ vendor: string; configs: ObservedCredResolverConfig[] }[]>(() => {
+  const groups = useMemo(() => {
+    // group all credResolvers by vendor (AWS, Azure, Tencent ...)
     const grouped = LINQ.from(credResolverStore.credResolvers)
-      .groupBy((credResolver) => credResolver.infravendor)
+      .groupBy((credResolver) => credResolver.value.infravendor)
       .select((g) => ({
         vendor: g.key(),
-        configs: g.toArray().sort((a, b) => a.accountid.localeCompare(b.accountid)),
+        configs: g.toArray().sort((a, b) => a.value.accountid.localeCompare(b.value.accountid)),
       }))
       .orderBy(({ vendor }) => vendor)
       .toArray()
@@ -37,7 +37,7 @@ export default observer(() => {
           // list by each config item
           <CredResolverConfigList key={vendor} vendor={vendor}>
             {configs.map((config) => (
-              <CredResolverConfigListItem config={config} key={config.accountid} getOptions={getOptions} />
+              <CredResolverConfigListItem config={config} key={config.value.accountid} getOptions={getOptions} />
             ))}
           </CredResolverConfigList>
         ))}

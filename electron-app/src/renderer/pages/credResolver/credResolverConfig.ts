@@ -7,14 +7,6 @@ import {
   CredResolverConfig,
 } from '../../protos/kubeconfig_service_pb'
 
-interface Response {
-  resolved?: boolean
-  data?: {
-    resultCode: ResultCode
-    message: string
-  }
-}
-
 export default class ObservedCredResolverConfig implements CredResolverConfig.AsObject {
   readonly accountid: string = ''
 
@@ -53,10 +45,6 @@ export default class ObservedCredResolverConfig implements CredResolverConfig.As
   get statusdetail() {
     return this._statusdetail
   }
-
-  // stores response of update request of this single config data
-  @observable
-  response?: Response = undefined
 
   @computed
   get profile(): string | undefined {

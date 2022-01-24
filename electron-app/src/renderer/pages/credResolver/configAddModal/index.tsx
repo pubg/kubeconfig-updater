@@ -41,7 +41,7 @@ export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: Confi
   const [account, setAccount] = useState('')
 
   const usedAccounts = LINQ.from(credResolverStore.credResolvers)
-    .select((config) => config.accountid)
+    .select((config) => config.value.accountid)
     .distinct()
     .toArray()
 
