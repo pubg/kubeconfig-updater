@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+import dayjs from 'dayjs'
 import _ from 'lodash'
 import { action, computed, flow, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
@@ -6,6 +8,15 @@ import ObservedCredResolverConfig from '../pages/credResolver/credResolverConfig
 import { CommonRes, ResultCode } from '../protos/common_pb'
 import { CredResolverConfig, GetCredResolversRes } from '../protos/kubeconfig_service_pb'
 import CredResolverRepository from '../repositories/credResolverRepository'
+import { PayloadMap } from '../types/payloadMap'
+
+export interface Payload {
+  resolved?: boolean
+  data?: {
+    resultCode: ResultCode
+    message: string
+  }
+}
 
 /**
  * CredResolverStore provides CRUD functionality to application.
@@ -14,11 +25,9 @@ import CredResolverRepository from '../repositories/credResolverRepository'
 export default class CredResolverStore {
   private readonly logger = browserLogger
 
-  // NOTE: every object in array is also a observable object
-  // object is actually ES6 Map, not mobx observable converted, because of @observable.ref
-  // don't use toJS() on this property
-  @observable.ref
-  private _credResolverMap: Map<string, ObservedCredResolverConfig> = new Map()
+  private readonly _credResolverMap: PayloadMap<ObservedCredResolverConfig, Payload> = new PayloadMap(
+    (object) => object.accountid
+  )
 
   /**
    * updated when array length is changed
@@ -30,6 +39,10 @@ export default class CredResolverStore {
     return [...this._credResolverMap.values()]
   }
 
+  private lastUpdated = dayjs('1970-01-01')
+
+  private readonly expiredMinute = 5
+
   constructor(private readonly credResolverRepository: CredResolverRepository) {
     makeObservable(this)
   }
@@ -37,65 +50,79 @@ export default class CredResolverStore {
   /**
    * update resolvers to match backend state.
    */
-  fetchCredResolver = flow(function* (this: CredResolverStore, reload = false) {
-    if (reload) {
-      // this._credResolverMap.clear() // NOTE: should I do this? no memory leak?
-      this._credResolverMap = new Map()
-    }
+  fetchCredResolver = flow(function* (this: CredResolverStore, forceSync = false) {
+    if (forceSync || this.isCacheExpired()) {
+      this.logger.debug('sync cred resolvers...')
+      yield this.credResolverRepository.SyncAvailableCredResolvers()
 
-    this.logger.debug('fetching cred resolvers...')
-    const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
+      this.logger.debug('fetching cred resolvers...')
+      const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
 
-    if (res.getCommonres()?.getStatus() === ResultCode.SUCCESS) {
-      const objects = res.getConfigsList().map((c) => c.toObject())
-      this.updateCredResolvers(objects)
-      // TODO: fix this logging error
-      // this.logger.debug(`fetched ${this.credResolvers.length} resolvers: `, JSON.stringify(this._credResolverMap))
+      if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
+        this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
+        return
+      }
+
+      this.syncCredResolvers(res.getConfigsList())
+      this.lastUpdated = dayjs()
     } else {
-      this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
+      this.clearPayloads()
     }
   })
 
-  // TODO: break down this function
+  @action
+  private clearPayloads() {
+    this.credResolvers.forEach((value) => {
+      value.payload = null
+    })
+  }
+
+  private isCacheExpired() {
+    return this.lastUpdated.add(this.expiredMinute, 'minute').isBefore(dayjs())
+  }
+
   setCredResolver = flow(function* (this: CredResolverStore, value: ObservedCredResolverConfig) {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
 
-    value.response = {
-      resolved: false,
-    }
+    this.setPayloadResolving(value.accountid)
 
-    // TODO: refactor this
     const res: CommonRes = yield this.credResolverRepository.setCredResolver(value)
-
-    this.logger.debug('response: ', res.toObject())
-
-    yield this.fetchCredResolver()
-
-    const newConfig = this._credResolverMap.get(value.accountid)
-    if (!newConfig) {
-      // WTF?
-      this.logger.error('failed setting new config: ', value)
-      return
-    }
-
-    if (newConfig.response) {
-      const { response } = newConfig
-      runInAction(() => {
-        response.resolved = true
-        response.data = {
-          resultCode: res.getStatus(),
-          message: res.getMessage(),
-        }
-      })
-    } else {
-      // value is added (not update)
-    }
-
     if (res.getStatus() !== ResultCode.SUCCESS) {
       this.logger.error('failed to set cred resolver. err: ', res.getMessage())
     }
+
+    this.setPayloadResolved(value.accountid, res)
   })
+
+  @action
+  private setPayloadResolving(accountId: string) {
+    const credResolver = this._credResolverMap.get(accountId)
+    if (!credResolver) {
+      return
+    }
+
+    credResolver.payload = {
+      resolved: false,
+      data: undefined,
+    }
+  }
+
+  @action
+  private setPayloadResolved(accountId: string, res: CommonRes) {
+    const credResolver = this._credResolverMap.get(accountId)
+    if (!credResolver) {
+      throw new Error(`credResolver is not exist on map, accountId: ${accountId}`)
+    }
+
+    credResolver.payload = {
+      resolved: true,
+      data: {
+        message: res.getMessage(),
+        resultCode: res.getStatus(),
+      },
+    }
+  }
 
   deleteCredResolver = flow(function* (this: CredResolverStore, accountId: string) {
     this.logger.info(`delete cred resolver key: ${accountId}`)
@@ -106,49 +133,41 @@ export default class CredResolverStore {
       this.logger.error('failed to delete cred resolver. err: ', res.getMessage())
     }
 
-    yield this.fetchCredResolver()
+    this._credResolverMap.deleteWithKey(accountId)
   })
 
-  // TODO: refactor this to use payloadStore<T, P>
+  // reset internal state and sync to backend state
   @action
-  private updateCredResolvers(newArray: CredResolverConfig.AsObject[]) {
-    this.logger.debug('init updating cred resolvers, value: ', toJS(newArray))
-    const comparator = (v1: CredResolverConfig.AsObject, v2: CredResolverConfig.AsObject) =>
-      v1.accountid === v2.accountid
+  private syncCredResolvers(configs: CredResolverConfig[]) {
+    this._credResolverMap.clear()
 
-    const added = _.differenceWith(newArray, this.credResolvers, comparator)
-    const updated = _.intersectionWith(newArray, this.credResolvers, comparator)
-    const deleted = _.differenceWith(this.credResolvers, newArray, comparator)
-    this.logger.debug(`added: ${added.length}, updated: ${updated.length}, deleted: ${deleted.length}`)
-
-    const needToUpdateArray = added.length > 0 || deleted.length > 0
-
-    for (const newValue of updated) {
-      const config = this._credResolverMap.get(newValue.accountid)
-      if (!config) {
-        throw new Error()
-      }
-
-      // this.logger.debug('updating old credResolverConfig to new value')
-      // this.logger.debug('old: ', toJS(config))
-      // this.logger.debug('new: ', toJS(newValue))
-
-      // update to new values
-      config.updateConfigFromObject(newValue)
+    for (const config of configs) {
+      this.upsertCredResolver(config.toObject())
     }
+  }
 
-    for (const value of added) {
-      this._credResolverMap.set(value.accountid, new ObservedCredResolverConfig(value))
+  /**
+   * upsert credResolverConfig with given arguments, creates default config if value not exists
+   * @param accountId
+   * @param config if provided, instead of creation, it will shallow-copy object
+   */
+  @action
+  private upsertCredResolver(config: CredResolverConfig.AsObject) {
+    const observedConfig = this._credResolverMap.get(config.accountid)
+    if (observedConfig) {
+      this.updateCredResolver(observedConfig.value, config)
+    } else {
+      this.addCredResolver(config)
     }
+  }
 
-    for (const value of deleted) {
-      this._credResolverMap.delete(value.accountid)
-    }
+  @action
+  private addCredResolver(config: CredResolverConfig.AsObject) {
+    this._credResolverMap.add(new ObservedCredResolverConfig(config))
+  }
 
-    if (needToUpdateArray) {
-      // allocate a new array to invoke mobx autoruns, etc...
-      this._credResolverMap = new Map(this._credResolverMap)
-      // this.logger.debug('updating internal map to a new instance, value: ', this._credResolverMap)
-    }
+  @action
+  private updateCredResolver(observed: ObservedCredResolverConfig, value: CredResolverConfig.AsObject) {
+    observed.updateConfigFromObject(value)
   }
 }

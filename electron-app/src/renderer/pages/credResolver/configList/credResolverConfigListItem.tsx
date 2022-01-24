@@ -3,10 +3,11 @@ import { ClearOutlined } from '@mui/icons-material'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { useResolve } from '../../../hooks/container'
-import CredResolverStore from '../../../store/credResolverStore'
+import CredResolverStore, { Payload } from '../../../store/credResolverStore'
 import ObservedCredResolverConfig from '../credResolverConfig'
 import CredResolverConfigStatusIndicator from './credResolverConfigStatusIndicator'
 import ProfileSelection, { ProfileSelectionOption } from './profileSelection'
+import { ValueWithPayload } from '../../../types/payloadMap'
 
 const Container = styled(ListItem)(({ theme }) => {
   return {
@@ -18,15 +19,19 @@ const Container = styled(ListItem)(({ theme }) => {
 })
 
 export interface CredResolverListItemProps {
-  config: ObservedCredResolverConfig
+  config: ValueWithPayload<ObservedCredResolverConfig, Payload>
   getOptions: () => ProfileSelectionOption[]
 }
 
-export default observer(function CredResolverConfigListItem({ config, getOptions }: CredResolverListItemProps) {
+export default observer(function CredResolverConfigListItem({
+  config: configWithPayload,
+  getOptions,
+}: CredResolverListItemProps) {
   const credResolverStore = useResolve(CredResolverStore)
 
+  const { payload, value: config } = configWithPayload
+
   const accountId = config.accountid
-  const value = config.currentValue
 
   // do I have to use useMemo and useCallback for option + filtering?
 
@@ -71,10 +76,10 @@ export default observer(function CredResolverConfigListItem({ config, getOptions
     <Container>
       <Typography>{accountId}</Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <CredResolverConfigStatusIndicator config={config} size="32px" />
+        <CredResolverConfigStatusIndicator payload={payload} size="32px" />
         <Tooltip title={selectionTooltip} placement="top" enterDelay={1000}>
           <div>
-            <ProfileSelection value={value} options={options} onChange={onChange} />
+            <ProfileSelection value={config.currentValue} options={options} onChange={onChange} />
           </div>
         </Tooltip>
         {/* delete item button (X) */}

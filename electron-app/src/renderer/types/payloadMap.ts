@@ -96,6 +96,10 @@ export class PayloadMap<T, Payload = any> {
     return !!this.get(key)
   }
 
+  deleteWithKey(key: string): boolean {
+    return this._map.delete(key)
+  }
+
   delete(value: T): boolean {
     const key = this.keySelector(value)
     const success = this._map.delete(key)

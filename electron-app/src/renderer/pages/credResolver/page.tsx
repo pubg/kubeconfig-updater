@@ -13,8 +13,7 @@ export default observer(function CredResolver() {
 
   // only calls one time on mount
   useEffect(() => {
-    uiStore.fetchCredResolvers(true)
-    uiStore.fetchProfiles()
+    uiStore.fetchAll()
   }, [uiStore])
 
   const [anchorEl, setAnchorEl] = useState<Element | null>()
@@ -38,6 +37,10 @@ export default observer(function CredResolver() {
     config.infravendor = data.vendor
 
     uiStore.credResolverStore.setCredResolver(new ObservedCredResolverConfig(config))
+  }
+
+  const onReloadClick = () => {
+    uiStore.fetchAll(true)
   }
 
   return (
@@ -68,7 +71,10 @@ export default observer(function CredResolver() {
       {uiStore.state === 'ready' && (
         <>
           {/* header (including menus) */}
-          <Box display="flex" alignItems="center" justifyContent="right">
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Button variant="outlined" onClick={onReloadClick}>
+              Reload
+            </Button>
             <Button variant="outlined" onClick={onAddConfigClicked}>
               Add new config
             </Button>

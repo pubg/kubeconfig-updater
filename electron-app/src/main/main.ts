@@ -18,6 +18,7 @@ import { app, BrowserWindow, ipcMain, nativeTheme, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { container } from 'tsyringe'
+import _ from 'lodash'
 import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
@@ -120,6 +121,8 @@ const createWindow = async () => {
     center: true,
     width: 1440,
     height: 900,
+    minWidth: 900,
+    minHeight: 400,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -170,6 +173,25 @@ const createWindow = async () => {
       },
     })
   })
+
+  if (isDevelopment) {
+    mainWindow.on(
+      'resized',
+      _.throttle(() => {
+        if (!mainWindow) {
+          return
+        }
+
+        const size = mainWindow?.getSize()
+        if (!size) {
+          return
+        }
+
+        const [width, height] = size
+        mainWindow.title = `kubeconfig-updater (size: ${width}x${height})`
+      }, 100)
+    )
+  }
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

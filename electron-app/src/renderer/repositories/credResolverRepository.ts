@@ -29,7 +29,6 @@ export default class CredResolverRepository {
     return this.client.getAvailableCredResolvers(new CommonReq(), getDefaultMetadata())
   }
 
-  // do I have to make this function overload?? WHY???
   async setCredResolver(config: CredResolverConfig.AsObject): Promise<CommonRes> {
     const req = new CredResolverConfig()
 
