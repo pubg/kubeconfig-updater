@@ -54,18 +54,28 @@ export default class CredResolverStore {
     if (forceSync || this.isCacheExpired()) {
       this.logger.debug('sync cred resolvers...')
       yield this.credResolverRepository.SyncAvailableCredResolvers()
+
+      this.logger.debug('fetching cred resolvers...')
+      const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
+
+      if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
+        this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
+        return
+      }
+
+      this.syncCredResolvers(res.getConfigsList())
+      this.lastUpdated = dayjs()
+    } else {
+      this.clearPayloads()
     }
-
-    this.logger.debug('fetching cred resolvers...')
-    const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
-
-    if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
-      return
-    }
-
-    this.syncCredResolvers(res.getConfigsList())
   })
+
+  @action
+  private clearPayloads() {
+    this.credResolvers.forEach((value) => {
+      value.payload = null
+    })
+  }
 
   private isCacheExpired() {
     return this.lastUpdated.add(this.expiredMinute, 'minute').isBefore(dayjs())
