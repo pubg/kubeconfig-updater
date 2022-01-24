@@ -13,7 +13,7 @@ export default observer(function CredResolver() {
 
   // only calls one time on mount
   useEffect(() => {
-    uiStore.fetchCredResolvers(true)
+    uiStore.fetchCredResolvers()
     uiStore.fetchProfiles()
   }, [uiStore])
 

@@ -52,8 +52,8 @@ export default class UIStore {
   }
 
   // reload local entity state to match backend's state
-  fetchCredResolvers = flow(function* (this: UIStore, reload = false) {
-    yield this.credResolverStore.fetchCredResolver(reload)
+  fetchCredResolvers = flow(function* (this: UIStore) {
+    yield this.credResolverStore.fetchCredResolver()
     this._initLoading = false
   })
 

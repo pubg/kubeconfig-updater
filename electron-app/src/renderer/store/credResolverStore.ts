@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import _ from 'lodash'
 import { action, computed, flow, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
@@ -30,6 +31,10 @@ export default class CredResolverStore {
     return [...this._credResolverMap.values()]
   }
 
+  private lastUpdated = dayjs('1970-01-01')
+
+  private readonly expiredMinute = 5
+
   constructor(private readonly credResolverRepository: CredResolverRepository) {
     makeObservable(this)
   }
@@ -37,10 +42,10 @@ export default class CredResolverStore {
   /**
    * update resolvers to match backend state.
    */
-  fetchCredResolver = flow(function* (this: CredResolverStore, reload = false) {
-    if (reload) {
-      // this._credResolverMap.clear() // NOTE: should I do this? no memory leak?
-      this._credResolverMap = new Map()
+  fetchCredResolver = flow(function* (this: CredResolverStore, forceSync = false) {
+    if (forceSync || this.isCacheExpired()) {
+      this.logger.debug('sync cred resolvers...')
+      yield this.credResolverRepository.SyncAvailableCredResolvers()
     }
 
     this.logger.debug('fetching cred resolvers...')
@@ -55,6 +60,10 @@ export default class CredResolverStore {
       this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
     }
   })
+
+  private isCacheExpired() {
+    return this.lastUpdated.add(this.expiredMinute, 'minute').isBefore(dayjs())
+  }
 
   // TODO: break down this function
   setCredResolver = flow(function* (this: CredResolverStore, value: ObservedCredResolverConfig) {
