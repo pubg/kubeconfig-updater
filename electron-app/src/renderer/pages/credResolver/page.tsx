@@ -13,8 +13,7 @@ export default observer(function CredResolver() {
 
   // only calls one time on mount
   useEffect(() => {
-    uiStore.fetchCredResolvers()
-    uiStore.fetchProfiles()
+    uiStore.fetchAll()
   }, [uiStore])
 
   const [anchorEl, setAnchorEl] = useState<Element | null>()

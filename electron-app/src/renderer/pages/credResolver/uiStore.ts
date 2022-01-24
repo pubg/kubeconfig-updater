@@ -5,7 +5,7 @@ import LINQ from 'linq'
 import CredResolverStore from '../../store/credResolverStore'
 import { ProfileSelectionOption } from './configList/profileSelection'
 import ProfileStore from '../../store/profileStore'
-import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY, RESOLVER_UNKNOWN } from './const'
+import { RESOLVER_DEFAULT, RESOLVER_IMDS, RESOLVER_ENV, RESOLVER_PROFILE_FACTORY } from './const'
 
 type Option = ProfileSelectionOption
 
@@ -51,13 +51,20 @@ export default class UIStore {
     makeObservable(this)
   }
 
+  @flow
+  *fetchAll() {
+    yield Promise.all([this.fetchCredResolvers(), this.fetchProfiles()])
+  }
+
   // reload local entity state to match backend's state
-  fetchCredResolvers = flow(function* (this: UIStore) {
+  @flow
+  *fetchCredResolvers() {
     yield this.credResolverStore.fetchCredResolver()
     this._initLoading = false
-  })
+  }
 
-  fetchProfiles = flow(function* (this: UIStore) {
+  @flow
+  *fetchProfiles() {
     yield this.profileStore.fetchProfiles()
-  })
+  }
 }
