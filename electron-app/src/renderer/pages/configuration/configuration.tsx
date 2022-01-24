@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FormControlLabel, Paper, Radio, RadioGroup, Stack, styled, Typography } from '@mui/material'
+import { Container, FormControlLabel, Paper, Radio, RadioGroup, Stack, styled, Typography } from '@mui/material'
 import { useResolve } from '../../hooks/container'
 import browserLogger from '../../logger/browserLogger'
 import ThemeStore from '../../store/themeStore'
@@ -19,28 +19,19 @@ export default function Configuration() {
   }
 
   return (
-    <div style={{ width: '100%' }}>
-      <Stack spacing={2} padding={3} paddingTop={7} sx={{ display: 'flex' }}>
-        <Stack direction="row" justifyContent="end">
-          <Typography variant="h3">Settings</Typography>
-        </Stack>
-        <Stack direction="column">
-          <Typography variant="h6">Theme</Typography>
-          <RadioGroup row aria-label="theme" defaultValue="system" name="theme-radio-groups" onChange={OnChangeTheme}>
-            <FormControlLabel value="system" control={<Radio />} label="System" />
-            <FormControlLabel value="light" control={<Radio />} label="Light" />
-            <FormControlLabel value="dark" control={<Radio />} label="Dark" />
-          </RadioGroup>
-        </Stack>
-        {/* <Divider variant="middle" /> */}
-        {/* <Stack direction="row"> */}
-        {/*  <Button variant="contained">Item 1</Button> */}
-        {/* </Stack> */}
-        {/* <Button variant="contained">Item 1</Button> */}
-        {/* <Button variant="contained">Item 2</Button> */}
-        {/* <Item>Item 3</Item> */}
-        {/* <Item>Item 4</Item> */}
+    <Container
+      maxWidth="md"
+      sx={{ pt: '64px', pb: '64px', height: '100%', display: 'flex', flexDirection: 'column', gap: '64px' }}
+    >
+      <Typography variant="h3">Settings</Typography>
+      <Stack direction="column">
+        <Typography variant="h6">Theme</Typography>
+        <RadioGroup row aria-label="theme" defaultValue="system" name="theme-radio-groups" onChange={OnChangeTheme}>
+          <FormControlLabel value="system" control={<Radio />} label="System" />
+          <FormControlLabel value="light" control={<Radio />} label="Light" />
+          <FormControlLabel value="dark" control={<Radio />} label="Dark" />
+        </RadioGroup>
       </Stack>
-    </div>
+    </Container>
   )
 }
