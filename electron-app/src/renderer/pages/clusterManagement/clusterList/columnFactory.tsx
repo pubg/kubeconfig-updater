@@ -1,7 +1,11 @@
 import { IColumn } from '@fluentui/react'
-import { Tooltip, Typography } from '@mui/material'
+import { Box, Tooltip, Typography } from '@mui/material'
+import { Image } from '@mui/icons-material'
 import { ClusterInformationStatus } from '../../../protos/kubeconfig_service_pb'
 import { ClusterMetadataItem } from '../UIStore/types'
+import AWSImage from '../../../../../assets/product-icons/aws.png'
+import AKSImage from '../../../../../assets/product-icons/aks.png'
+import TencentImage from '../../../../../assets/product-icons/tencent.png'
 
 function columnBase(): Partial<IColumn> & { minWidth: number } {
   return {
@@ -29,11 +33,11 @@ const dataSourceColumn: IColumn = {
     }
 
     const tooltipString = item.data.dataresolversList.join('\n')
-    const previewString = formatDatasourceString(item.data.dataresolversList[0])
+    const label = item.data.dataresolversList[0].split('/')[0]
 
     return (
       <Tooltip title={tooltipString}>
-        <Typography>{previewString}</Typography>
+        <Typography>{label}</Typography>
       </Tooltip>
     )
   },
@@ -45,7 +49,26 @@ const clusterNameColumn: IColumn = {
   name: 'Cluster Name',
   // maxWidth: 960,
   onRender: (item: ClusterMetadataItem) => {
-    return <Typography>{item.data.metadata.clustername}</Typography>
+    const vendorRegexp = /AWS.*|Azure.*|Tencent.*/
+    const vendor = item.data.dataresolversList.find((str) => !!vendorRegexp.exec(str))
+
+    let iconSource: string | null = null
+
+    if (vendor?.startsWith('AWS')) {
+      iconSource = AWSImage
+    }
+    if (vendor?.startsWith('Azure')) {
+      iconSource = AKSImage
+    } else if (vendor?.startsWith('Tencent')) {
+      iconSource = TencentImage
+    }
+
+    return (
+      <Box display="flex" alignItems="center" gap="8px">
+        {iconSource && <img src={iconSource} alt="" style={{ height: '2em' }} />}
+        <Typography>{item.data.metadata.clustername}</Typography>
+      </Box>
+    )
   },
 }
 
