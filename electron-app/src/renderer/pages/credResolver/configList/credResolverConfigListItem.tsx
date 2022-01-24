@@ -79,7 +79,7 @@ export default observer(function CredResolverConfigListItem({
         <CredResolverConfigStatusIndicator payload={payload} size="32px" />
         <Tooltip title={selectionTooltip} placement="top" enterDelay={1000}>
           <div>
-            <ProfileSelection value={config.accountid} options={options} onChange={onChange} />
+            <ProfileSelection value={config.currentValue} options={options} onChange={onChange} />
           </div>
         </Tooltip>
         {/* delete item button (X) */}
