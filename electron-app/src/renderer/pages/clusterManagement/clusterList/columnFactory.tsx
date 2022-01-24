@@ -91,19 +91,19 @@ const statusColumn: IColumn = {
         return <Typography>Registered</Typography>
 
       case ClusterInformationStatus.SUGGESTION_OK:
-        return <Typography>(Suggested) Not Registered</Typography>
+        return <Typography>Suggested (Not Registered)</Typography>
 
       case ClusterInformationStatus.REGISTERED_NOTOK_CRED_RES_NOTOK:
-        return <Typography>(Registered) Credential Resolver invalid</Typography>
+        return <Typography>Registered (Credential Resolver invalid)</Typography>
 
       case ClusterInformationStatus.SUGGESTION_NOTOK_CRED_RES_NOTOK:
-        return <Typography>(Suggested) Credential Resolver invalid</Typography>
+        return <Typography>Suggested (Credential Resolver invalid)</Typography>
 
       case ClusterInformationStatus.REGISTERED_NOTOK_NO_CRED_RESOLVER:
-        return <Typography>(Registered) Credential Resolver not set</Typography>
+        return <Typography>Registered (Credential Resolver not set)</Typography>
 
       case ClusterInformationStatus.SUGGESTION_NOTOK_NO_CRED_RESOLVER:
-        return <Typography>(Suggested) Credential Resolver not set</Typography>
+        return <Typography>Suggested (Credential Resolver not set)</Typography>
 
       case ClusterInformationStatus.REGISTERED_UNKNOWN:
         return <Typography>Unknown</Typography>
