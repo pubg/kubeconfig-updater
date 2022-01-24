@@ -39,6 +39,10 @@ export default observer(function CredResolver() {
     uiStore.credResolverStore.setCredResolver(new ObservedCredResolverConfig(config))
   }
 
+  const onReloadClick = () => {
+    uiStore.fetchAll(true)
+  }
+
   return (
     <Container
       maxWidth="md"
@@ -67,7 +71,10 @@ export default observer(function CredResolver() {
       {uiStore.state === 'ready' && (
         <>
           {/* header (including menus) */}
-          <Box display="flex" alignItems="center" justifyContent="right">
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Button variant="outlined" onClick={onReloadClick}>
+              Reload
+            </Button>
             <Button variant="outlined" onClick={onAddConfigClicked}>
               Add new config
             </Button>

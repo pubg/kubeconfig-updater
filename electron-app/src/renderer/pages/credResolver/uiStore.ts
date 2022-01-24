@@ -12,11 +12,11 @@ type Option = ProfileSelectionOption
 @singleton()
 export default class UIStore {
   @observable
-  private _initLoading = true
+  private _loading = true
 
   @computed
   get state(): 'ready' | 'fetching' {
-    return this.profileStore.state !== 'ready' || this._initLoading ? 'fetching' : 'ready'
+    return this.profileStore.state !== 'ready' || this._loading ? 'fetching' : 'ready'
   }
 
   @computed
@@ -52,19 +52,20 @@ export default class UIStore {
   }
 
   @flow
-  *fetchAll() {
-    yield Promise.all([this.fetchCredResolvers(), this.fetchProfiles()])
+  *fetchAll(forceSync = false) {
+    yield Promise.all([this.fetchCredResolvers(forceSync), this.fetchProfiles(forceSync)])
   }
 
   // reload local entity state to match backend's state
   @flow
-  *fetchCredResolvers() {
-    yield this.credResolverStore.fetchCredResolver()
-    this._initLoading = false
+  *fetchCredResolvers(forceSync = false) {
+    this._loading = true
+    yield this.credResolverStore.fetchCredResolver(forceSync)
+    this._loading = false
   }
 
   @flow
-  *fetchProfiles() {
-    yield this.profileStore.fetchProfiles()
+  *fetchProfiles(forceSync = false) {
+    yield this.profileStore.fetchProfiles(forceSync)
   }
 }
