@@ -2,12 +2,22 @@
 
 This is GUI kuberentes config file manager app. It automatically resolve your cloud profiles and suggest registable clusters.
 
-## Support Platforms
-|OS|Architecture|Package Type|
-|---|---|---|
-|Windows|x86-64 / Arm64|Portable Zip, Installer|
-|Linux|x86-64 / Arm64|AppImage|
-|MacOS|x86-64 / Arm64 / Universal|App, Dmg|
+## Downloads
+[Github Releases](https://github.com/pubg/kubeconfig-updater/releases)
+
+| FileName             | Kind         | OS      | Architecture |
+|----------------------|--------------|---------|--------------|
+| win-x64.zip          | Portable Zip | Windows | x86-64       |
+| win-x64.exe          | Installer    | Windows | x86-64       |
+| win-arm64.zip        | Portable Zip | Windows | Arm64        |
+| win-arm64.exe        | Installer    | Windows | Arm64        |
+| linux-x64.AppImage   | AppImage     | Linux   | x86-64       |
+| linux-x64.tar.gz     | tar.gz       | Linux   | x86-64       |
+| linux-arm64.AppImage | AppImage     | Linux   | Arm64        |
+| linux-arm64.tar.gz   | tar.gz       | Linux   | Arm64        |
+| mac-universal.zip    | App          | MacOS   | Universal    |
+| mac-x64.zip          | App          | MacOS   | x86-64       |
+| mac-arm64.zip        | App          | MacOS   | Arm64        |
 
 ## Config Store Path
 Config stored under your HOME directory.
@@ -17,26 +27,62 @@ Linux: /home/<username>/.kubeconfig-updater-gui
 MacOS: /Users/<username>/.kubeconfig-updater-gui
 ```
 
+## Requirement Permission
+```yaml
+# AWS Policy 
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeRegions",
+        "eks:ListClusters",
+        "eks:DescribeCluster",
+        "eks:AccessKubernetesApi"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+```yaml
+# Azure Role
+BuiltinRole: Azure Kubernetes Service Cluster User Role
+```
+
+```yaml
+# TencentCloud Policy
+# You can use Preset Policy That Named 'QcloudTKEReadOnlyAccessPreset' or Custom Policy
+{
+  "version": "2.0",
+  "statement": [
+    {
+      "action": [
+        "cvm:DescribeRegions",
+        "tke:DescribeClusters",
+        "tke:DescribeClusterKubeconfig"
+      ],
+      "resource": "*",
+      "effect": "allow"
+    }
+  ]
+}
+                 
+
+```
+
 ## Other Documents
 [Update History](./Update-history.md)
+
 [Roadmap](./Roadmap.md)
-
-## Organization Customized Feature
-This program will support organization specific customized options.
-We are under discussion how to get policy file in organization.
-
-Below is candidate get policy method. 
-1. Get Policy from [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) -able HTTP server. (Like public wifi web authentication)
-2. Get Policy from predefined urls, locate in company's private network.
-3. Publish Artifact with policy file.
-   - Locate to installer inside
-   - Locate to installer nearby
 
 # Develop Requirements
 
 ### Frontend
 1. Node.js 16 LTS
-2. npm (or pnpm)
+2. pnpm
 
 ### Backend
 3. Golang 1.17
@@ -49,7 +95,7 @@ Below is candidate get policy method.
 
 ## Frontend
 
-```commandline
+```bash
 # Init Project
 cd electron-app
 npm install
@@ -58,7 +104,7 @@ npm run start
 
 ## Backend
 
-```commandline
+```bash
 # Build with goreleaser
 cd backend
 goreleaser build --rm-dist --snapshot
@@ -77,7 +123,7 @@ kubeconfig-updater register tke ap-hongkong tc-test-cluster
 ```
 
 ## Package
-```commandline
+```bash
 # Full Packging
 cd electron-app
 make package-all

@@ -3,11 +3,11 @@ package cluster_metadata_service
 import (
 	"fmt"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
@@ -53,41 +53,26 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		return err
 	}
 
-	wg := sync.WaitGroup{}
-	returnChan := make(chan listClustersOut, len(resolvers))
-	defer close(returnChan)
-	for _, resolver := range resolvers {
-		fmt.Printf("MetadataResolver Description: %s\n", resolver.GetResolverDescription())
-
-		wg.Add(1)
-		newRefResolver := resolver
-		go func() {
-			start := time.Now()
-			metadatas, err := newRefResolver.ListClusters()
-			duration := time.Since(start)
-			returnChan <- listClustersOut{
-				resolver:  newRefResolver,
-				metadatas: metadatas,
-				err:       err,
-				duration:  duration,
-			}
-			wg.Done()
-		}()
-	}
-	wg.Wait()
+	listClustersOuts := concurrency.Parallel(common.ToInterfaceSlice(resolvers), func(in interface{}) (output interface{}, err error) {
+		resolver, ok := in.(ClusterMetadataResolver)
+		if !ok {
+			return nil, fmt.Errorf("cannot cast input to ClusterMetadataResolver")
+		}
+		return resolver.ListClusters()
+	})
 
 	regedMetaMap := map[string]bool{}
 	availMetaMap := map[string]*protos.AggregatedClusterMetadata{}
-	for i := 0; i < len(resolvers); i++ {
-		listClusterReturn := <-returnChan
-		resolver := listClusterReturn.resolver
-		if listClusterReturn.err != nil {
-			fmt.Printf("List cluster metadata occurred error, resolver desc:%s, err:%s\n", resolver.GetResolverDescription(), listClusterReturn.err.Error())
+	for _, out := range listClustersOuts {
+		resolver := out.Input.(ClusterMetadataResolver)
+		if out.Err != nil {
+			fmt.Printf("List cluster metadata occurred error, resolver desc:%s, err:%s\n", resolver.GetResolverDescription(), out.Err.Error())
 			continue
 		}
 
-		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters, duration: %.2fs\n", resolver.GetResolverDescription(), len(listClusterReturn.metadatas), listClusterReturn.duration.Seconds())
-		for _, metadata := range listClusterReturn.metadatas {
+		metadatas := out.Output.([]*protos.ClusterMetadata)
+		fmt.Printf("Cluster Metadata Resolver %s resolved %d clusters, duration: %.2fs\n", resolver.GetResolverDescription(), len(metadatas), out.Duration.Seconds())
+		for _, metadata := range metadatas {
 			if aggrMeta, exists := availMetaMap[metadata.ClusterName]; exists {
 				aggrMeta.Metadata = mergeMetadata(aggrMeta.Metadata, metadata)
 				aggrMeta.DataResolvers = append(aggrMeta.DataResolvers, resolver.GetResolverDescription())
@@ -136,13 +121,6 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 		return err
 	}
 	return nil
-}
-
-type listClustersOut struct {
-	resolver  ClusterMetadataResolver
-	metadatas []*protos.ClusterMetadata
-	err       error
-	duration  time.Duration
 }
 
 func getClusterInfoStatus(credStoreService *cred_resolver_service.CredResolverStoreService, credResolverId string) string {

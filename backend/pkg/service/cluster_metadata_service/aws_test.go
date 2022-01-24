@@ -9,8 +9,10 @@ import (
 )
 
 func TestAwsResolver_ListClusters(t *testing.T) {
+	accountId := "2222"
+
 	resolver, err := NewAwsResolver(&protos.CredResolverConfig{
-		AccountId:    "548322143865",
+		AccountId:    accountId,
 		InfraVendor:  "AWS",
 		AccountAlias: "pubg-xtrm",
 		Kind:         protos.CredentialResolverKind_PROFILE,
@@ -18,7 +20,7 @@ func TestAwsResolver_ListClusters(t *testing.T) {
 			"profile": "mfa",
 		},
 		Status: protos.CredentialResolverStatus_CRED_REGISTERED_OK,
-	}, "548322143865", &cred_resolver_service.CredResolveService{})
+	}, accountId, &cred_resolver_service.CredResolveService{})
 	if err != nil {
 		t.Error(err)
 	}

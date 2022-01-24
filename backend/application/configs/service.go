@@ -110,16 +110,10 @@ func resolveFromInMemory(targetAbsPath string) error {
 		},
 		AutoUpdate: false,
 		Extensions: &Extension{
-			Fox: &FoxExtension{
-				Enable:   false,
-				Address:  "",
-				UseCache: false,
+			Fox: &FoxExt{
+				Enable:  false,
+				Address: "",
 			},
-			Eks: &EksExtension{
-				UseEksRoleLogin:    false,
-				EksRoleNamePattern: "",
-			},
-			Aks: &AksExtension{UseKubelogin: true},
 		},
 		DefaultCredResolverConfig: "",
 	}

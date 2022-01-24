@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"runtime/debug"
 	"strings"
 	"syscall"
@@ -75,4 +76,28 @@ func GetItemOrError(m map[string]string, key string) (string, error) {
 func ExistsFile(absPath string) bool {
 	_, err := os.Stat(absPath)
 	return !errors.Is(err, os.ErrNotExist)
+}
+
+func ToInterfaceSlice(slice interface{}) []interface{} {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("InterfaceSlice() given a non-slice type")
+	}
+
+	// Keep the distinction between nil and empty slice input
+	if s.IsNil() {
+		return nil
+	}
+
+	ret := make([]interface{}, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		ret[i] = s.Index(i).Interface()
+	}
+
+	return ret
+}
+
+func TypeCastError(typeName string) error {
+	return fmt.Errorf("failed cast value to %s", typeName)
 }

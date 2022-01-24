@@ -170,7 +170,7 @@ func (s *ServerApplication) initServiceLayer() {
 	s.CredStoreService = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
 	s.CredService = cred_resolver_service.NewCredResolveService(s.CredStoreService)
 	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
-	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService)
+	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService, s.Config.Extensions)
 }
 
 func (s *ServerApplication) initPersistLayer(credResolverConfig *configs.DataStoreConfig, aggrClstMetaConfig *configs.DataStoreConfig) error {

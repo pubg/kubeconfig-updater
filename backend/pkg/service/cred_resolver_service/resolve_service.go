@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
@@ -14,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	tcCommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
 type CredResolveService struct {
@@ -76,14 +78,14 @@ func (s *CredResolveService) GetAzureSdkConfig(ctx context.Context, credConf *pr
 	}
 }
 
-func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (common.Provider, error) {
+func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverConfig) (tcCommon.Provider, error) {
 	switch credConf.GetKind() {
 	case protos.CredentialResolverKind_DEFAULT:
-		return common.NewProviderChain([]common.Provider{common.DefaultEnvProvider(), common.DefaultProfileProvider(), common.DefaultCvmRoleProvider(), tencent_service.NewTencentIntlProfileProvider("default")}), nil
+		return tcCommon.NewProviderChain([]tcCommon.Provider{tcCommon.DefaultEnvProvider(), tcCommon.DefaultProfileProvider(), tcCommon.DefaultCvmRoleProvider(), tencent_service.NewTencentIntlProfileProvider("default")}), nil
 	case protos.CredentialResolverKind_ENV:
-		return common.DefaultEnvProvider(), nil
+		return tcCommon.DefaultEnvProvider(), nil
 	case protos.CredentialResolverKind_IMDS:
-		return common.DefaultCvmRoleProvider(), nil
+		return tcCommon.DefaultCvmRoleProvider(), nil
 	case protos.CredentialResolverKind_PROFILE:
 		attributes := credConf.GetResolverAttributes()
 		if attributes == nil {
@@ -175,18 +177,31 @@ func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Pro
 		if err != nil {
 			return nil, err
 		}
-		var profiles []*protos.Profile
-		for _, profileName := range profileNames {
+
+		parallelOuts := concurrency.Parallel(common.ToInterfaceSlice(profileNames), func(in interface{}) (output interface{}, err error) {
+			profileName, ok := in.(string)
+			if !ok {
+				return nil, fmt.Errorf("cannot cast input to string")
+			}
+
 			cfg, err := config.LoadDefaultConfig(context.Background(), config.WithSharedConfigProfile(profileName))
 			if err != nil {
 				return nil, err
 			}
 			accountIdOrEmpty, _, _ := aws_service.GetConfigInfo(&cfg)
-			profiles = append(profiles, &protos.Profile{
+			return &protos.Profile{
 				ProfileName: profileName,
 				AccountId:   accountIdOrEmpty,
 				InfraVendor: types.InfraVendor_AWS.String(),
-			})
+			}, nil
+		})
+
+		var profiles []*protos.Profile
+		for _, out := range parallelOuts {
+			if out.Err != nil {
+				return nil, out.Err
+			}
+			profiles = append(profiles, out.Output.(*protos.Profile))
 		}
 		return profiles, nil
 	} else if strings.EqualFold(infraVendor, types.InfraVendor_Azure.String()) {
@@ -208,15 +223,28 @@ func (s *CredResolveService) GetLocalProfiles(infraVendor string) ([]*protos.Pro
 		if err != nil {
 			return nil, err
 		}
-		var profiles []*protos.Profile
-		for _, profileName := range profileNames {
+
+		parallelOuts := concurrency.Parallel(common.ToInterfaceSlice(profileNames), func(in interface{}) (output interface{}, err error) {
+			profileName, ok := in.(string)
+			if !ok {
+				return nil, fmt.Errorf("cannot cast input to string")
+			}
+
 			provider := tencent_service.NewTencentIntlProfileProvider(profileName)
 			accountIdOrEmpty, _, _ := tencent_service.GetConfigInfo(provider)
-			profiles = append(profiles, &protos.Profile{
+			return &protos.Profile{
 				ProfileName: profileName,
 				AccountId:   accountIdOrEmpty,
 				InfraVendor: types.InfraVendor_Tencent.String(),
-			})
+			}, nil
+		})
+
+		var profiles []*protos.Profile
+		for _, out := range parallelOuts {
+			if out.Err != nil {
+				return nil, out.Err
+			}
+			profiles = append(profiles, out.Output.(*protos.Profile))
 		}
 		return profiles, nil
 	}
