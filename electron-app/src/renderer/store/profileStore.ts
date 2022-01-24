@@ -37,7 +37,7 @@ export default class ProfileStore {
     makeObservable(this)
   }
 
-  fetchProfiles = flow(function* (this: ProfileStore, forceResync = false) {
+  fetchProfiles = flow(async function* (this: ProfileStore, forceResync = false) {
     const shouldFetch = forceResync || this.isCacheExpired()
     if (!shouldFetch) {
       this.logger.debug('fetching profiles prevented by cache policy')
@@ -47,36 +47,28 @@ export default class ProfileStore {
     this._state = 'fetching'
     this.logger.debug('fetching profiles...')
 
-    const profiles: Profile.AsObject[] = []
+    const profiles: Profile.AsObject[][] = yield Promise.all([
+      this.fetchVendorProfile('AWS'),
+      this.fetchVendorProfile('Azure'),
+      this.fetchVendorProfile('Tencent'),
+    ])
 
-    // should I check this error in here? doesn't it belongs to repository layer?
-    const awsProfilesResult: GetRegisteredProfilesRes = yield this.profileRepository.getProfiles('AWS')
-    if (awsProfilesResult.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      this.errorEvent.emit(new Error(awsProfilesResult.getCommonres()?.getMessage()))
-    }
-
-    profiles.push(...awsProfilesResult.getProfilesList().map((profile) => profile.toObject()))
-
-    const azureProfilesResult: GetRegisteredProfilesRes = yield this.profileRepository.getProfiles('Azure')
-    if (azureProfilesResult.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      this.errorEvent.emit(new Error(azureProfilesResult.getCommonres()?.getMessage()))
-    }
-
-    profiles.push(...azureProfilesResult.getProfilesList().map((profile) => profile.toObject()))
-
-    const tencentProfilesResult: GetRegisteredProfilesRes = yield this.profileRepository.getProfiles('Tencent')
-    if (tencentProfilesResult.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      this.errorEvent.emit(new Error(tencentProfilesResult.getCommonres()?.getMessage()))
-    }
-
-    profiles.push(...tencentProfilesResult.getProfilesList().map((profile) => profile.toObject()))
-
-    this._profiles = profiles
+    this._profiles = profiles.flat()
     this.lastUpdated = dayjs()
 
     this._state = 'ready'
     this.logger.debug(`fetched ${this.profiles.length} profiles: `, toJS(this.profiles))
   })
+
+  private async fetchVendorProfile(vendor: 'AWS' | 'Azure' | 'Tencent') {
+    const result: GetRegisteredProfilesRes = await this.profileRepository.getProfiles(vendor)
+    if (result.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
+      this.errorEvent.emit(new Error(result.getCommonres()?.getMessage()))
+      return []
+    }
+
+    return result.getProfilesList().map((profile) => profile.toObject())
+  }
 
   private isCacheExpired() {
     return this.lastUpdated.add(this.expiredMinute, 'minute').isBefore(dayjs())
