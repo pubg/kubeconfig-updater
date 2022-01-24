@@ -51,7 +51,7 @@ func NewFromConfig(expr configs.Expression) (*Expression, error) {
 
 func (e *Expression) StringEvaluate(inputMap map[string]string, inputs []interface{}) (string, error) {
 	if e.exprType == Format {
-		return e.EvalStringFormat(inputs), nil
+		return e.EvalStringFormat(inputs...), nil
 	} else if e.exprType == GoTemplate {
 		return e.EvalGoTemplate(inputMap)
 	} else {
@@ -87,7 +87,7 @@ func (e *Expression) EvalGoTemplate(input map[string]string) (string, error) {
 }
 
 func (e *Expression) EvalStringFormat(inputs ...interface{}) string {
-	return fmt.Sprintf(e.expression, inputs)
+	return fmt.Sprintf(e.expression, inputs...)
 }
 
 func (e *Expression) MatchGoTemplate(input map[string]string) (bool, error) {

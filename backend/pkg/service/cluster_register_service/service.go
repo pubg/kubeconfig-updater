@@ -26,8 +26,8 @@ type ClusterRegisterService struct {
 	registerMutex sync.Mutex
 }
 
-func NewClusterRegisterService(credService *cred_resolver_service.CredResolveService, metaService *cluster_metadata_service.ClusterMetadataService) *ClusterRegisterService {
-	return &ClusterRegisterService{credService: credService, metaService: metaService}
+func NewClusterRegisterService(credService *cred_resolver_service.CredResolveService, metaService *cluster_metadata_service.ClusterMetadataService, extension *configs.Extension) *ClusterRegisterService {
+	return &ClusterRegisterService{credService: credService, metaService: metaService, extension: extension}
 }
 
 func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterName string, credConf *protos.CredResolverConfig) error {
