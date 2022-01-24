@@ -36,7 +36,7 @@ export default observer(function BottomBar() {
   return (
     <Stack direction="row" width="100%" alignItems="center" gap="16px" marginLeft="32px">
       <Button variant="outlined" disabled={isProcessing} onClick={onRegisterAllClicked}>
-        Register ALL
+        Register Selected
       </Button>
       {/* on ready (selecting items...) */}
       <Typography>{store.selection.count} Clusters Selected.</Typography>
