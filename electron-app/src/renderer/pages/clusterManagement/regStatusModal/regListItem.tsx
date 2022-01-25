@@ -15,6 +15,7 @@ import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { ResultCode } from '../../../protos/common_pb'
 import { ItemData } from './types'
 
@@ -34,6 +35,9 @@ const Icon = observer(({ item }: RegListItemProps) => {
 
   if (payload.response?.resultCode === ResultCode.SUCCESS) {
     return <CheckIcon width="100%" height="100%" color="success" />
+  }
+  if (payload.response?.resultCode === ResultCode.CANCELED) {
+    return <WarningAmberIcon width="100%" height="100%" color="warning" />
   }
 
   return <ClearIcon width="100%" height="100%" color="error" />
