@@ -92,55 +92,86 @@ func (s *kubeconfigServiceMock) RegisterCluster(ctx context.Context, req *protos
 func NewMockController() protos.KubeconfigServer {
 	controller := &kubeconfigServiceMock{}
 	controller.credResolvers = []*protos.CredResolverConfig{
-		{AccountId: "418047124903", InfraVendor: "AWS", AccountAlias: "xtrm-newstate", Kind: protos.CredentialResolverKind_DEFAULT, Status: protos.CredentialResolverStatus_CRED_RESOLVER_UNKNOWN},
-		{AccountId: "200019689895", InfraVendor: "Tencent", AccountAlias: "xtrm-newstate", Kind: protos.CredentialResolverKind_PROFILE, Status: protos.CredentialResolverStatus_CRED_REGISTERED_OK},
-		{AccountId: "350993443303", InfraVendor: "AWS", AccountAlias: "xtrm-playground", Kind: protos.CredentialResolverKind_IMDS, Status: protos.CredentialResolverStatus_CRED_SUGGESTION_OK},
-		{AccountId: "f073f292-7255-416f-adaf-34b476e050be", InfraVendor: "Azure", AccountAlias: "xtrm-newstate", Kind: protos.CredentialResolverKind_PROFILE, ResolverAttributes: map[string]string{"profile": "mfa"}, Status: protos.CredentialResolverStatus_CRED_REGISTERED_OK},
+		{AccountId: "418047124903", InfraVendor: "AWS", AccountAlias: "myaccount1", Kind: protos.CredentialResolverKind_DEFAULT, Status: protos.CredentialResolverStatus_CRED_RESOLVER_UNKNOWN},
+		{AccountId: "200019689895", InfraVendor: "Tencent", AccountAlias: "myaccount2", Kind: protos.CredentialResolverKind_PROFILE, Status: protos.CredentialResolverStatus_CRED_REGISTERED_OK},
+		{AccountId: "350993443303", InfraVendor: "AWS", AccountAlias: "myaccount3", Kind: protos.CredentialResolverKind_IMDS, Status: protos.CredentialResolverStatus_CRED_SUGGESTION_OK},
+		{AccountId: "f073f292-7255-416f-adaf-34b476e050be", InfraVendor: "Azure", AccountAlias: "myaccount4", Kind: protos.CredentialResolverKind_PROFILE, ResolverAttributes: map[string]string{"profile": "mfa"}, Status: protos.CredentialResolverStatus_CRED_REGISTERED_OK},
 	}
 	controller.clusterInfors = []*protos.AggregatedClusterMetadata{
 		{
 			Metadata: &protos.ClusterMetadata{
-				ClusterName:    "dev-main-aws-apne2-i01",
-				CredResolverId: "548322143865",
-				ClusterTags: map[string]string{
-					"ServicePhase":  "dev",
-					"ClusterGroup":  "dev-main",
-					"ServiceTag":    "main",
-					"InfraVendor":   "AWS",
-					"ClusterRegion": "ap-northeast-2",
-				},
-			},
-			DataResolvers: []string{"kubeconfig"},
-			Status:        protos.ClusterInformationStatus_REGISTERED_OK,
-		},
-		{
-			Metadata: &protos.ClusterMetadata{
-				ClusterName:    "dev-main-aws-apne2-o01",
-				CredResolverId: "548322143865",
-				ClusterTags: map[string]string{
-					"ServicePhase":  "dev",
-					"ClusterGroup":  "dev-main",
-					"ServiceTag":    "main",
-					"InfraVendor":   "AWS",
-					"ClusterRegion": "ap-northeast-2",
-				},
-			},
-			DataResolvers: []string{"kubeconfig"},
-			Status:        protos.ClusterInformationStatus_REGISTERED_OK,
-		},
-		{
-			Metadata: &protos.ClusterMetadata{
-				ClusterName:    "central-ap",
+				ClusterName:    "dev-asia-web-cluster1",
 				CredResolverId: "418047124903",
 				ClusterTags: map[string]string{
-					"ServicePhase":  "central",
-					"ClusterGroup":  "central-root",
-					"ServiceTag":    "central-ap",
+					"ServiceTag":    "main",
 					"InfraVendor":   "AWS",
-					"ClusterRegion": "ap-southeast-1",
+					"ClusterRegion": "ap-northeast-2",
+					"ClusterEngine": "EKS",
 				},
 			},
-			DataResolvers: []string{"Pubg-Fox"},
+			DataResolvers: []string{"KubeConfig/22", "AWS/33"},
+			Status:        protos.ClusterInformationStatus_REGISTERED_NOTOK_CRED_RES_NOTOK,
+		},
+		{
+			Metadata: &protos.ClusterMetadata{
+				ClusterName:    "dev-asia-web-cluster2",
+				CredResolverId: "548322143865",
+				ClusterTags: map[string]string{
+					"ServiceTag":    "main",
+					"InfraVendor":   "AWS",
+					"ClusterRegion": "us-east-1",
+					"ClusterEngine": "EKS",
+				},
+			},
+			DataResolvers: []string{"AWS/33"},
+			Status:        protos.ClusterInformationStatus_SUGGESTION_OK,
+		},
+		{
+			Metadata: &protos.ClusterMetadata{
+				ClusterName:    "dev-eu-db-cluster1",
+				CredResolverId: "418047124903",
+				ClusterTags: map[string]string{
+					"ServiceTag":    "main",
+					"InfraVendor":   "AWS",
+					"ClusterRegion": "us-east-1",
+					"ClusterEngine": "AKS",
+				},
+			},
+			DataResolvers: []string{"Azure/33"},
+			Status:        protos.ClusterInformationStatus_REGISTERED_NOTOK_CRED_RES_NOTOK,
+		},
+		{
+			Metadata: &protos.ClusterMetadata{
+				ClusterName:    "prod-na-web-cluster1",
+				CredResolverId: "418047124903",
+				ClusterTags: map[string]string{
+					"ServiceTag":    "main",
+					"ClusterEngine": "AKS",
+				},
+			},
+			DataResolvers: []string{"Azure/33"},
+			Status:        protos.ClusterInformationStatus_SUGGESTION_OK,
+		},
+		{
+			Metadata: &protos.ClusterMetadata{
+				ClusterName:    "prod-eu-db-cluster1",
+				CredResolverId: "418047124903",
+				ClusterTags: map[string]string{
+					"ClusterEngine": "TKE",
+				},
+			},
+			DataResolvers: []string{"Tencent/33"},
+			Status:        protos.ClusterInformationStatus_REGISTERED_OK,
+		},
+		{
+			Metadata: &protos.ClusterMetadata{
+				ClusterName:    "prod-na-db-cluster1",
+				CredResolverId: "418047124903",
+				ClusterTags: map[string]string{
+					"ClusterEngine": "GKE",
+				},
+			},
+			DataResolvers: []string{"Google/33"},
 			Status:        protos.ClusterInformationStatus_REGISTERED_NOTOK_CRED_RES_NOTOK,
 		},
 	}
