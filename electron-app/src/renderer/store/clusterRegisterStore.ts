@@ -83,11 +83,12 @@ export default class ClusterRegisterStore {
     this._registerMap.clear()
     this._registerMap.update(items)
 
-    // NOTE: parallel run is not supported yet.
+    // backend allows parallelRun but we're still using blocking request
+    // because we cannot cancel during parallelRun
     const parallelRun = false
 
     if (parallelRun) {
-      // this.requestParallel()
+      yield this.requestParallel(cancelToken)
     } else {
       yield this.requestSync(cancelToken)
     }
@@ -96,31 +97,34 @@ export default class ClusterRegisterStore {
     this.logger.info('finished cluster register request')
   })
 
-  /*
-  private async requestParallel() {
-    const promises: Promise<unknown>[] = [...this._registerMap.values()].map((p) => this.requestRegister(p))
+  private async requestParallel(cancelToken: CancellationToken) {
+    const promises = [...this._registerMap.values()].map((p) => this.requestRegister(p, cancelToken))
 
     await Promise.all(promises)
   }
-  */
 
   private async requestSync(cancelToken: CancellationToken) {
     for (const [, itemWithPayload] of this._registerMap) {
-      if (cancelToken.canceled) {
-        break
-      }
-
       // eslint-disable-next-line no-await-in-loop
-      await this.requestRegister(itemWithPayload)
+      await this.requestRegister(itemWithPayload, cancelToken)
     }
   }
 
   @flow
-  private *requestRegister(itemWithPayload: ValueWithPayload<Item, Payload>) {
+  private *requestRegister(itemWithPayload: ValueWithPayload<Item, Payload>, cancelToken: CancellationToken) {
     const { accountId, clusterName } = itemWithPayload.value
     itemWithPayload.payload = observable({ resolved: false }) as Payload
 
     this.logger.info(`request cluster register, clusterName: ${clusterName}, accountId: ${accountId}`)
+
+    if (cancelToken.canceled) {
+      itemWithPayload.payload.resolved = true
+      itemWithPayload.payload.response = {
+        resultCode: ResultCode.CANCELED,
+        message: 'request canceled by client',
+      }
+      return itemWithPayload
+    }
 
     const response: CommonRes = yield this.clusterRepository.RegisterCluster(clusterName, accountId)
 
