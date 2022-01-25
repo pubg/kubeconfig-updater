@@ -20,13 +20,13 @@ function ProgressSnackbar() {
   const title = useMemo(() => {
     switch (clusterStore.state) {
       case 'fetch':
-        return 'fetching cluster in progress...'
+        return 'Fetching Clusters in Progress...'
 
       case 'in-sync':
-        return 'cluster sync in progress...'
+        return 'Sync Clusters in Progress...'
 
       default:
-        return 'placeholder'
+        return 'Undefined SwitchCase Return'
     }
   }, [clusterStore.state])
 
