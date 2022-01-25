@@ -1,5 +1,3 @@
-//go:generate protoc --go_out=./ --go_opt=paths=source_relative ./enums.proto
-
 package types
 
 import "strings"
@@ -49,10 +47,11 @@ const (
 	KnownClusterTag_ClusterRegion KnownClusterTag = 0
 	KnownClusterTag_ClusterId     KnownClusterTag = 1
 	KnownClusterTag_ResourceGroup KnownClusterTag = 2
+	KnownClusterTag_ClusterEngine KnownClusterTag = 3
 )
 
-var _KnownClusterTagsNames = []string{"ClusterRegion", "ClusterId", "ResourceGroup"}
-var _KnownClusterTagsValues = []KnownClusterTag{KnownClusterTag_ClusterRegion, KnownClusterTag_ClusterId, KnownClusterTag_ResourceGroup}
+var _KnownClusterTagsNames = []string{"ClusterRegion", "ClusterId", "ResourceGroup", "ClusterEngine"}
+var _KnownClusterTagsValues = []KnownClusterTag{KnownClusterTag_ClusterRegion, KnownClusterTag_ClusterId, KnownClusterTag_ResourceGroup, KnownClusterTag_ClusterEngine}
 
 func (v KnownClusterTag) String() string {
 	return _KnownClusterTagsNames[v]
@@ -116,5 +115,47 @@ func ToKnownCredAttributesIgnoreCase(tag string) (KnownCredAttribute, bool) {
 func KnownCredAttributes() []KnownCredAttribute {
 	slice := make([]KnownCredAttribute, len(_KnownCredAttributesValues))
 	copy(slice, _KnownCredAttributesValues)
+	return slice
+}
+
+type KnownClusterEngine int32
+
+const (
+	KnownClusterEngine_EKS       KnownClusterEngine = 0
+	KnownClusterEngine_AKS       KnownClusterEngine = 1
+	KnownClusterEngine_TKE       KnownClusterEngine = 2
+	KnownClusterEngine_GKE       KnownClusterEngine = 3
+	KnownClusterEngine_RKE       KnownClusterEngine = 4
+	KnownClusterEngine_Openshift KnownClusterEngine = 5
+)
+
+var _KnownClusterEngineNames = []string{"EKS", "AKS", "TKE", "GKE", "RKE", "Openshift"}
+var _KnownClusterEngineValues = []KnownClusterEngine{KnownClusterEngine_EKS, KnownClusterEngine_AKS, KnownClusterEngine_TKE, KnownClusterEngine_GKE, KnownClusterEngine_RKE, KnownClusterEngine_Openshift}
+
+func (v KnownClusterEngine) String() string {
+	return _KnownClusterEngineNames[v]
+}
+
+func IsKnownClusterEngineIgnoreCase(tag string) bool {
+	for _, name := range _KnownClusterEngineNames {
+		if strings.EqualFold(name, tag) {
+			return true
+		}
+	}
+	return false
+}
+
+func ToKnownClusterEngineIgnoreCase(tag string) (KnownClusterEngine, bool) {
+	for index, name := range _KnownClusterEngineNames {
+		if strings.EqualFold(name, tag) {
+			return _KnownClusterEngineValues[index], true
+		}
+	}
+	return _KnownClusterEngineValues[0], false
+}
+
+func KnownClusterEngines() []KnownClusterEngine {
+	slice := make([]KnownClusterEngine, len(_KnownClusterEngineValues))
+	copy(slice, _KnownClusterEngineValues)
 	return slice
 }

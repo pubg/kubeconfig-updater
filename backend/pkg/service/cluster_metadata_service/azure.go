@@ -68,6 +68,9 @@ func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 		for key, value := range cluster.Tags {
 			meta.ClusterTags[key] = *value
 		}
+		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterEngine.String()]; !ok {
+			meta.ClusterTags[types.KnownClusterTag_ClusterEngine.String()] = types.KnownClusterEngine_AKS.String()
+		}
 		clusters = append(clusters, meta)
 	}
 	return clusters, nil
