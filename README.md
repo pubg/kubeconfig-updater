@@ -1,6 +1,8 @@
 # Kubeconfig-Updater
 
-This is GUI kuberentes config file manager app. It automatically resolve your cloud profiles and suggest registable clusters.
+GUI Kuberentes config file manager app. It automatically suggests your cloud profiles and available clusters.
+
+![Front Image](./front.png)
 
 ## Downloads
 [Github Releases](https://github.com/pubg/kubeconfig-updater/releases)
