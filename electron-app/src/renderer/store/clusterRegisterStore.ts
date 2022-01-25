@@ -5,6 +5,7 @@ import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
 import { CommonRes, ResultCode } from '../protos/common_pb'
 import ClusterRepository from '../repositories/clusterRepository'
+import { CancellationToken, CancellationTokenSource } from '../types/cancellationToken'
 import { PayloadMap, ValueWithPayload } from '../types/payloadMap'
 
 type Item = {
@@ -55,13 +56,26 @@ export default class ClusterRegisterStore {
     return length
   }
 
+  private _cancelSource = new CancellationTokenSource()
+
+  get isRequestCanceled() {
+    return this._cancelSource.isCancelRequested
+  }
+
   readonly errorEvent = new EventStore<Error>()
 
   constructor(private readonly clusterRepository: ClusterRepository) {
     makeObservable(this)
   }
 
+  cancelRequest() {
+    this._cancelSource.cancel()
+  }
+
   request = flow(function* (this: ClusterRegisterStore, items: Item[]) {
+    this._cancelSource = new CancellationTokenSource()
+    const cancelToken = this._cancelSource.token
+
     this.logger.info(`requesting cluster register ${items.length} items`)
 
     this._state = 'processing'
@@ -75,7 +89,7 @@ export default class ClusterRegisterStore {
     if (parallelRun) {
       // this.requestParallel()
     } else {
-      yield this.requestSync()
+      yield this.requestSync(cancelToken)
     }
 
     this._state = 'ready'
@@ -90,8 +104,12 @@ export default class ClusterRegisterStore {
   }
   */
 
-  private async requestSync() {
+  private async requestSync(cancelToken: CancellationToken) {
     for (const [, itemWithPayload] of this._registerMap) {
+      if (cancelToken.canceled) {
+        break
+      }
+
       // eslint-disable-next-line no-await-in-loop
       await this.requestRegister(itemWithPayload)
     }
