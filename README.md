@@ -1,6 +1,6 @@
 # Kubeconfig-Updater
 
-GUI Kuberentes config file manager app. It automatically suggests your cloud profiles and available clusters.
+GUI Kuberentes config file manager app. It suggests your cloud profiles and available clusters.
 
 ![Front Image](./front.png)
 
