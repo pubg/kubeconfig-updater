@@ -102,7 +102,7 @@ export default observer(function TopBar() {
       <FormGroup row sx={{ gap: '16px', alignItems: 'center', flexWrap: 'nowrap' }}>
         <TextField
           size="small"
-          label="filter by name"
+          label="Filter by Name"
           variant="outlined"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
@@ -116,7 +116,7 @@ export default observer(function TopBar() {
           onChange={onTagSelectChanged}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
-            <TextField {...params} label="Group with Tag" />
+            <TextField {...params} label="Group by Tag" />
           )}
         />
         <FormControlLabel

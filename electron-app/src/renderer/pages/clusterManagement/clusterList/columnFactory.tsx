@@ -22,7 +22,7 @@ function columnBase(): Partial<IColumn> & { minWidth: number } {
 const dataSourceColumn: IColumn = {
   ...columnBase(),
   key: 'dataSource',
-  name: 'Data Source',
+  name: 'Data Sources',
   minWidth: 240,
   onRender: (item: ClusterMetadataItem) => {
     if (item.data.dataresolversList.length === 0) {
