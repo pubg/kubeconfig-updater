@@ -1,25 +1,22 @@
 import { IColumn } from '@fluentui/react'
-import { Box, Tooltip, Typography } from '@mui/material'
-import { Image } from '@mui/icons-material'
+import { Box, Chip, Stack, Tooltip, Typography } from '@mui/material'
 import { ClusterInformationStatus } from '../../../protos/kubeconfig_service_pb'
 import { ClusterMetadataItem } from '../UIStore/types'
-import AWSImage from '../../../../../assets/product-icons/aws.png'
+import EKSImage from '../../../../../assets/product-icons/eks.svg'
 import AKSImage from '../../../../../assets/product-icons/aks.png'
 import TencentImage from '../../../../../assets/product-icons/tencent.png'
+import GkeImage from '../../../../../assets/product-icons/gke.png'
+import RancherImage from '../../../../../assets/product-icons/rancher.png'
+import OpenshiftImage from '../../../../../assets/product-icons/openshift.png'
+import NcpImage from '../../../../../assets/product-icons/ncp.png'
+import KubeImage from '../../../../../assets/product-icons/kubernetes.svg'
+import ArgoImage from '../../../../../assets/product-icons/argo.png'
 
 function columnBase(): Partial<IColumn> & { minWidth: number } {
   return {
     minWidth: 0,
     isResizable: true,
   }
-}
-
-function formatDatasourceString(sources: string): string {
-  const sliced = sources.split('/')
-
-  const string = sliced.slice(-2).join('/')
-
-  return sliced.length > 2 ? `...${string}` : string
 }
 
 const dataSourceColumn: IColumn = {
@@ -32,12 +29,20 @@ const dataSourceColumn: IColumn = {
       return <Typography>NOT EXISTS</Typography>
     }
 
-    const tooltipString = item.data.dataresolversList.join('\n')
-    const label = item.data.dataresolversList[0].split('/')[0]
+    const resolverDescs = item.data.dataresolversList
+    resolverDescs.sort()
+
+    const tooltipString = resolverDescs.join('\n')
 
     return (
       <Tooltip title={tooltipString}>
-        <Typography>{label}</Typography>
+        <Stack direction="row" spacing={1}>
+          {resolverDescs.map((resolverDesc) => {
+            return (
+              <Chip color="default" style={{ borderRadius: '4px' }} size="small" label={resolverDesc.split('/')[0]} />
+            )
+          })}
+        </Stack>
       </Tooltip>
     )
   },
@@ -49,23 +54,34 @@ const clusterNameColumn: IColumn = {
   name: 'Cluster Name',
   // maxWidth: 960,
   onRender: (item: ClusterMetadataItem) => {
-    const vendorRegexp = /AWS.*|Azure.*|Tencent.*/
-    const vendor = item.data.dataresolversList.find((str) => !!vendorRegexp.exec(str))
-
     let iconSource: string | null = null
 
-    if (vendor?.startsWith('AWS')) {
-      iconSource = AWSImage
-    }
-    if (vendor?.startsWith('Azure')) {
-      iconSource = AKSImage
-    } else if (vendor?.startsWith('Tencent')) {
-      iconSource = TencentImage
+    if (item.tags.has('ClusterEngine')) {
+      const engineName = item.tags.get('ClusterEngine')
+      if (engineName === 'EKS') {
+        iconSource = EKSImage
+      } else if (engineName === 'AKS') {
+        iconSource = AKSImage
+      } else if (engineName === 'TKE') {
+        iconSource = TencentImage
+      } else if (engineName === 'GKE') {
+        iconSource = GkeImage
+      } else if (engineName === 'RKE') {
+        iconSource = RancherImage
+      } else if (engineName === 'Openshift') {
+        iconSource = OpenshiftImage
+      } else if (engineName === 'NCP' || engineName === 'NKE') {
+        iconSource = NcpImage
+      } else if (engineName?.includes('Argo')) {
+        iconSource = ArgoImage
+      } else {
+        iconSource = KubeImage
+      }
     }
 
     return (
       <Box display="flex" alignItems="center" gap="8px">
-        {iconSource && <img src={iconSource} alt="" style={{ height: '2em' }} />}
+        {iconSource && <img src={iconSource} alt="" style={{ height: 'auto', width: '2em' }} />}
         <Typography>{item.data.metadata.clustername}</Typography>
       </Box>
     )
