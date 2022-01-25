@@ -7,6 +7,7 @@ import { ItemData } from './types'
 import { useResolve } from '../../../hooks/container'
 import RegListItem from './regListItem'
 import { useReaction } from '../../../hooks/mobx'
+import SnackbarStore from '../../../store/snackbarStore'
 
 const RegListView = observer(({ items }: { items: ItemData[] }) => {
   const hash = (item: ItemData) => `${item.value.accountId}#${item.value.clusterName}`
@@ -22,17 +23,21 @@ const RegListView = observer(({ items }: { items: ItemData[] }) => {
 
 export default observer(function RegStatusModal() {
   const store = useResolve(ClusterRegisterStore)
+  const snackbarStore = useResolve(SnackbarStore)
 
   const [open, setOpen] = useState(false)
+  const [canceled, setCanceled] = useState(false)
 
-  useReaction(
-    () => store.items,
-    () => setOpen(true)
-  )
+  const onOpen = () => {
+    setOpen(true)
+    setCanceled(false)
+  }
+
+  useReaction(() => store.items, onOpen)
 
   // NOTE: re-rendering list happens due to here
   // but I'm not going to memoize each list item before unless rendering is laggy (YAGNI?)
-  const canClose = store.processedCount === store.length
+  const canClose = store.state === 'ready'
 
   const onClose = () => {
     if (canClose) {
@@ -41,7 +46,18 @@ export default observer(function RegStatusModal() {
   }
 
   const onCanceled = () => {
-    store.cancelRequest()
+    if (!canceled) {
+      store.cancelRequest()
+      snackbarStore.push({
+        key: 'cluster-regsiter-cancel',
+        message: 'cluster regstration canceled',
+        options: {
+          variant: 'warning',
+        },
+      })
+
+      setCanceled(true)
+    }
   }
 
   const items = [...store.items]
