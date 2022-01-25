@@ -40,6 +40,10 @@ export default observer(function RegStatusModal() {
     }
   }
 
+  const onCanceled = () => {
+    store.cancelRequest()
+  }
+
   const items = [...store.items]
 
   return (
@@ -49,6 +53,7 @@ export default observer(function RegStatusModal() {
         <RegListView items={items} />
       </DialogContent>
       <DialogActions>
+        <Button onClick={onCanceled}>Cancel</Button>
         <Button disabled={!canClose} onClick={onClose}>
           Close
         </Button>
