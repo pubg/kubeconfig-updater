@@ -28,6 +28,7 @@ specifiers:
   '@types/uuid': ^8.3.3
   '@types/webpack-env': ^1.16.3
   '@typescript-eslint/eslint-plugin': ^5.2.0
+  axios: ^0.25.0
   browserify: ^17.0.0
   browserslist-config-erb: ^0.0.3
   chalk: ^4.1.2
@@ -90,6 +91,7 @@ specifiers:
   rimraf: ^3.0.2
   sass: ^1.43.4
   sass-loader: ^12.3.0
+  semver: ^7.3.5
   source-map-support: ^0.5.21
   sprintf-js: ^1.1.2
   style-loader: ^3.3.1
@@ -116,6 +118,7 @@ dependencies:
   '@fluentui/react': 8.47.1_d5c215a71cdc3853e6673ca67dc4c091
   '@mui/icons-material': 5.2.1_5ba8d2bfb1b4f0e067f3951fb85359cb
   '@mui/material': 5.2.3_e775e23d77fc33f172a6bda0cd692c92
+  axios: 0.25.0
   dayjs: 1.10.7
   electron-debug: 3.2.0
   electron-log: 4.4.1
@@ -135,6 +138,7 @@ dependencies:
   react-router-dom: 5.3.0_react@17.0.2
   reflect-metadata: 0.1.13
   regenerator-runtime: 0.13.9
+  semver: 7.3.5
   source-map-support: 0.5.21
   sprintf-js: 1.1.2
   tree-kill: 1.2.2
@@ -2945,6 +2949,14 @@ packages:
     resolution: {integrity: sha512-WKTW1+xAzhMS5dJsxWkliixlO/PqC4VhmO9T4juNYcaTg9jzWiJsou6m5pxWYGfigWbwzJWeFY6z47a+4neRXA==}
     engines: {node: '>=4'}
     dev: true
+
+  /axios/0.25.0:
+    resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
+    dependencies:
+      follow-redirects: 1.14.7
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /axobject-query/2.2.0:
     resolution: {integrity: sha512-Td525n+iPOOyUQIeBfcASuG6uJsDOITl7Mds5gFyerkWiX7qhUTdYUBlSgNMyVqtSJqwpt1kXGLdUt6SykLMRA==}
@@ -6000,15 +6012,14 @@ packages:
       react: 17.0.2
     dev: false
 
-  /follow-redirects/1.14.5:
-    resolution: {integrity: sha512-wtphSXy7d4/OR+MvIFbCVBDzZ5520qV8XfPklSN5QtxuMUJZ+b0Wnst1e1lCDocfzuCkHqj8k0FpZqO+UIaKNA==}
+  /follow-redirects/1.14.7:
+    resolution: {integrity: sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
 
   /foreach/2.0.5:
     resolution: {integrity: sha1-C+4AUBiusmDQo6865ljdATbsG5k=}
@@ -6580,7 +6591,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.14.5
+      follow-redirects: 1.14.7
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
