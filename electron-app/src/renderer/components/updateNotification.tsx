@@ -15,6 +15,35 @@ declare global {
 const API_URL = 'https://api.github.com/repos/pubg/kubeconfig-updater/releases/latest'
 const LATEST_PAGE_URL = 'https://github.com/pubg/kubeconfig-updater/releases/latest'
 
+interface NotificationHistory {
+  latestVersion: string
+}
+
+const notificationHistoryLocalStorageKey = 'notification'
+
+function canNotifyUpdate(latestVersion: semver.SemVer): boolean {
+  const raw = localStorage.getItem(notificationHistoryLocalStorageKey)
+  if (!raw) {
+    return true
+  }
+
+  try {
+    const data: NotificationHistory = JSON.parse(raw)
+
+    return data.latestVersion !== latestVersion.format()
+  } catch (err) {
+    browserLogger.error(err)
+    return false
+  }
+}
+
+function saveCurrentVersionNotificated(latestVersion: semver.SemVer) {
+  const data: NotificationHistory = { latestVersion: latestVersion.format() }
+  const raw = JSON.stringify(data)
+
+  localStorage.setItem(notificationHistoryLocalStorageKey, raw)
+}
+
 async function getLatestVersion(): Promise<semver.SemVer | null> {
   try {
     const { data } = await axios.get(API_URL)
@@ -51,6 +80,11 @@ export default function UpdateNotification() {
 
       browserLogger.info(`current version: ${currentVersion.format()}`)
 
+      if (!canNotifyUpdate(latestVersion)) {
+        browserLogger.debug(`skip notifying update (it's not first run), version: ${latestVersion.format()}`)
+        return
+      }
+
       let updateNotiSnackbarKey: SnackbarKey | null = null
 
       const onOpenReleaseWebpage = () => {
@@ -61,6 +95,8 @@ export default function UpdateNotification() {
         if (updateNotiSnackbarKey) {
           snackbar.closeSnackbar(updateNotiSnackbarKey)
         }
+
+        saveCurrentVersionNotificated(latestVersion)
       }
 
       if (latestVersion.compare(currentVersion) > 0) {
