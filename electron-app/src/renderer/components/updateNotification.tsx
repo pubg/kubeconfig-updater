@@ -2,7 +2,7 @@ import { SnackbarKey, useSnackbar } from 'notistack'
 import semver from 'semver'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { Box, Button } from '@mui/material'
+import { Box, Button, emphasize, Theme, useTheme } from '@mui/material'
 import browserLogger from '../logger/browserLogger'
 import { version } from '../../../package.json'
 
@@ -104,15 +104,15 @@ export default function UpdateNotification() {
       }
 
       if (latestVersion.compare(currentVersion) > 0) {
-        updateNotiSnackbarKey = snackbar.enqueueSnackbar(`new version ${latestVersion.format()} released`, {
+        updateNotiSnackbarKey = snackbar.enqueueSnackbar(`New Version ${latestVersion.format()} Released`, {
           variant: 'info',
           action: (
-            <Box display="flex">
-              <Button variant="text" sx={{ color: 'white' }} onClick={onOpenReleaseWebpage}>
-                Open
+            <Box display="flex" gap="1em">
+              <Button variant="text" size="small" sx={{ color: 'white' }} onClick={onOpenReleaseWebpage}>
+                OPEN PAGE
               </Button>
-              <Button variant="text" sx={{ color: 'white' }} onClick={onSkip}>
-                Skip
+              <Button variant="text" size="small" sx={{ color: 'white' }} onClick={onSkip}>
+                DISMISS
               </Button>
             </Box>
           ),
