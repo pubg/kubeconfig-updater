@@ -14,6 +14,7 @@ import browserLogger from './logger/browserLogger'
 import CredResolver from './pages/credResolver/page'
 import CredResolverStore from './store/credResolverStore'
 import ProfileStore from './store/profileStore'
+import UpdateNotification from './components/updateNotification'
 
 export default observer(function App() {
   const { muiTheme } = container.resolve(ThemeStore)
@@ -28,6 +29,7 @@ export default observer(function App() {
     <ThemeProvider theme={muiTheme}>
       <SnackbarProvider maxSnack={10} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
         <NotiSnackbar />
+        <UpdateNotification />
         <Router>
           <Paper
             square
