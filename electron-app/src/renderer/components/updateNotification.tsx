@@ -88,6 +88,10 @@ export default function UpdateNotification() {
       let updateNotiSnackbarKey: SnackbarKey | null = null
 
       const onOpenReleaseWebpage = () => {
+        if (updateNotiSnackbarKey) {
+          snackbar.closeSnackbar(updateNotiSnackbarKey)
+        }
+
         window.openURL(LATEST_PAGE_URL)
       }
 
