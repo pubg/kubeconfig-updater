@@ -6,7 +6,7 @@ declare global {
     type IPCThemeType = 'theme' | 'theme:getTheme'
   }
 
-  type IPCType = IPCType.IPCPortRequestType | IPCType.IPCThemeType | 'ipc-test' | 'themeFunc'
+  type IPCType = IPCType.IPCPortRequestType | IPCType.IPCThemeType | 'ipc-test' | 'themeFunc' | 'openURL'
 
   namespace Electron {
     interface ContextBridge {

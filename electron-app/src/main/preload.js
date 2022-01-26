@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron')
+const { contextBridge, ipcRenderer, shell } = require('electron')
 const electronLogger = require('electron-log').create('renderer')
 
 electronLogger.transports.console.format = '[{level}]{scope} {text}'
@@ -36,3 +36,7 @@ contextBridge.exposeInMainWorld('themeSetPreferredTheme', (preferredTheme) => {
 })
 
 contextBridge.exposeInMainWorld('managedFromElectron', true)
+
+contextBridge.exposeInMainWorld('openURL', (url) => {
+  shell.openExternal(url)
+})

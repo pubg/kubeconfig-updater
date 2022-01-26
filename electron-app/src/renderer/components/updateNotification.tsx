@@ -1,15 +1,23 @@
-import { useSnackbar } from 'notistack'
+import { SnackbarKey, useSnackbar } from 'notistack'
 import semver from 'semver'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { Button } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import browserLogger from '../logger/browserLogger'
 import { version } from '../../../package.json'
 
+declare global {
+  interface Window {
+    openURL(url: string): void
+  }
+}
+
+const API_URL = 'https://api.github.com/repos/pubg/kubeconfig-updater/releases/latest'
+const LATEST_PAGE_URL = 'https://github.com/pubg/kubeconfig-updater/releases/latest'
+
 async function getLatestVersion(): Promise<semver.SemVer | null> {
-  const URL = 'https://api.github.com/repos/pubg/kubeconfig-updater/releases/latest'
   try {
-    const { data } = await axios.get(URL)
+    const { data } = await axios.get(API_URL)
 
     let parsedSemver = semver.parse(data.tag_name, true)
     if (parsedSemver === null) {
@@ -43,14 +51,32 @@ export default function UpdateNotification() {
 
       browserLogger.info(`current version: ${currentVersion.format()}`)
 
+      let updateNotiSnackbarKey: SnackbarKey | null = null
+
+      const onOpenReleaseWebpage = () => {
+        window.openURL(LATEST_PAGE_URL)
+      }
+
+      const onSkip = () => {
+        if (updateNotiSnackbarKey) {
+          snackbar.closeSnackbar(updateNotiSnackbarKey)
+        }
+      }
+
       if (latestVersion.compare(currentVersion) > 0) {
-        snackbar.enqueueSnackbar(`new version ${latestVersion.format()} released`, {
+        updateNotiSnackbarKey = snackbar.enqueueSnackbar(`new version ${latestVersion.format()} released`, {
           variant: 'info',
           action: (
-            <Button variant="text" sx={{ color: 'white' }}>
-              Open Release
-            </Button>
+            <Box display="flex">
+              <Button variant="text" sx={{ color: 'white' }} onClick={onOpenReleaseWebpage}>
+                Open
+              </Button>
+              <Button variant="text" sx={{ color: 'white' }} onClick={onSkip}>
+                Skip
+              </Button>
+            </Box>
           ),
+          persist: true,
         })
       }
     })()
