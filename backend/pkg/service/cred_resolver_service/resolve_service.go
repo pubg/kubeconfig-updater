@@ -10,6 +10,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/rancher_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"golang.org/x/oauth2/google"
@@ -18,6 +19,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
+	rancherCfg "github.com/rancher/cli/config"
 	tcCommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 )
 
@@ -139,6 +141,40 @@ func (s *CredResolveService) GetGcpSdkConfig(ctx context.Context, credConf *prot
 		return cred, profile, nil
 	default:
 		return nil, "", fmt.Errorf("unknown kind value %s", credConf.GetKind())
+	}
+}
+
+func (s *CredResolveService) GetRancherSdkConfig(credConf *protos.CredResolverConfig) (*rancherCfg.ServerConfig, error) {
+	switch credConf.GetKind() {
+	case protos.CredentialResolverKind_DEFAULT:
+		cfg, err := rancher_service.LoadConfig()
+		if err != nil {
+			return nil, err
+		}
+		return cfg.FocusedServer(), nil
+	case protos.CredentialResolverKind_ENV:
+		return nil, fmt.Errorf("NotSupportedCredType: ENV")
+	case protos.CredentialResolverKind_IMDS:
+		return nil, fmt.Errorf("NotSupportedCredType: IMDS")
+	case protos.CredentialResolverKind_PROFILE:
+		attributes := credConf.GetResolverAttributes()
+		if attributes == nil {
+			return nil, fmt.Errorf("attribute should not null")
+		}
+		profile, exists := attributes[types.KnownCredAttribute_profile.String()]
+		if !exists {
+			return nil, fmt.Errorf("profile attribute should be exist")
+		}
+		cfg, err := rancher_service.LoadConfig()
+		if err != nil {
+			return nil, err
+		}
+		if server, ok := cfg.Servers[profile]; ok {
+			return server, nil
+		}
+		return nil, fmt.Errorf("NotFoundTargetServerConfig: %s", profile)
+	default:
+		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
 	}
 }
 
