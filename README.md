@@ -21,6 +21,13 @@ GUI Kuberentes config file manager app. It suggests your cloud profiles and avai
 | mac-x64.zip          | App          | MacOS   | x86-64       |
 | mac-arm64.zip        | App          | MacOS   | Arm64        |
 
+## Run Requirements
+- (Option) AWS CLI
+- (Option) Azure CLI
+- (Option) Gcloud SDK
+- (Option) TencentCloud Cli (Intl or China)
+- (Option) Rancher CLI
+
 ## Config Store Path
 Config stored under your HOME directory.
 ```
