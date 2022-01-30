@@ -202,6 +202,12 @@ func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResol
 				return nil, err
 			}
 			metaResolvers = append(metaResolvers, tcResolver)
+		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_GCP.String()) {
+			gcpResolver, err := NewGcpResolver(cr, cr.AccountId, s.credService)
+			if err != nil {
+				return nil, err
+			}
+			metaResolvers = append(metaResolvers, gcpResolver)
 		}
 	}
 	return metaResolvers, nil

@@ -12,6 +12,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/expressions"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/gcp_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
@@ -63,6 +64,16 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTag_ClusterId.String())
 		}
 		return tencent_service.RegisterTkeCluster0(clusterRegion, clusterId, clusterName, credProvider)
+	} else if strings.EqualFold(vendor, types.InfraVendor_GCP.String()) {
+		_, configurationName, err := s.credService.GetGcpSdkConfig(ctx, credConf)
+		if err != nil {
+			return err
+		}
+		clusterRegion, err := common.GetItemOrError(meta.Metadata.ClusterTags, types.KnownClusterTag_ClusterRegion.String())
+		if err != nil {
+			return fmt.Errorf("clusterMetadata should have %s tag, but not exists", types.KnownClusterTag_ClusterRegion.String())
+		}
+		return gcp_service.RegisterGkeCluster(clusterRegion, clusterName, configurationName)
 	}
 	return fmt.Errorf("not supported infraVendor value %s", credConf.GetInfraVendor())
 }

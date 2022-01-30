@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/binxio/gcloudconfig"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/azure_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
+	"golang.org/x/oauth2/google"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -98,6 +100,45 @@ func (s *CredResolveService) GetTencentSdkConfig(credConf *protos.CredResolverCo
 		return tencent_service.NewTencentIntlProfileProvider(profile), nil
 	default:
 		return nil, fmt.Errorf("unknown kind value %s", credConf.GetKind())
+	}
+}
+
+func (s *CredResolveService) GetGcpSdkConfig(ctx context.Context, credConf *protos.CredResolverConfig) (*google.Credentials, string, error) {
+	switch credConf.GetKind() {
+	case protos.CredentialResolverKind_DEFAULT:
+		cred, err := gcloudconfig.GetCredentials("")
+		if err != nil {
+			return nil, "", err
+		}
+		return cred, "", nil
+	case protos.CredentialResolverKind_ENV:
+		cred, err := google.FindDefaultCredentials(ctx)
+		if err != nil {
+			return nil, "", err
+		}
+		return cred, "", nil
+	case protos.CredentialResolverKind_IMDS:
+		cred, err := google.FindDefaultCredentials(ctx)
+		if err != nil {
+			return nil, "", err
+		}
+		return cred, "", nil
+	case protos.CredentialResolverKind_PROFILE:
+		attributes := credConf.GetResolverAttributes()
+		if attributes == nil {
+			return nil, "", fmt.Errorf("attribute should not null")
+		}
+		profile, exists := attributes[types.KnownCredAttribute_profile.String()]
+		if !exists {
+			return nil, "", fmt.Errorf("profile attribute should be exist")
+		}
+		cred, err := gcloudconfig.GetCredentials(profile)
+		if err != nil {
+			return nil, "", err
+		}
+		return cred, profile, nil
+	default:
+		return nil, "", fmt.Errorf("unknown kind value %s", credConf.GetKind())
 	}
 }
 

@@ -1,7 +1,6 @@
 package azure_service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -18,7 +17,7 @@ func RegisterAksCluster(resourceGroup, clusterName string) error {
 		fmt.Println("STDERR: " + strings.Trim(*stderr, "\n"))
 	}
 	if exitCode != 0 {
-		return errors.New("register cluster failed")
+		return fmt.Errorf("RegisterClusterFailed: %s", *stderr)
 	}
 
 	if common.IsBinaryExists("kubelogin") {
@@ -30,7 +29,7 @@ func RegisterAksCluster(resourceGroup, clusterName string) error {
 			fmt.Println("STDERR: " + strings.Trim(*stderr, "\n"))
 		}
 		if exitCode != 0 {
-			return errors.New("convert kubeconfig failed")
+			return fmt.Errorf("ConvertKubeconfigFailed: %s", *stderr)
 		}
 	}
 	return nil
