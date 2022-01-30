@@ -17,7 +17,7 @@ type GcpResolver struct {
 	cred      *google.Credentials
 }
 
-func NewGcpResolver(credCfg *protos.CredResolverConfig, projectId string, credService *cred_resolver_service.CredResolveService) (*GcpResolver, error) {
+func NewGcpResolver(credCfg *protos.CredResolverConfig, projectId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
 	cred, _, err := credService.GetGcpSdkConfig(context.TODO(), credCfg)
 	if err != nil {
 		return nil, fmt.Errorf("GetGcpSdkConfig: %v", err)

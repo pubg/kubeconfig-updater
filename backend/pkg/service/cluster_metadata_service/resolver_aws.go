@@ -16,7 +16,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAwsResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (*AwsResolver, error) {
+func NewAwsResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
 	awsCfg, _, err := credService.GetAwsSdkConfig(context.Background(), credCfg)
 	if err != nil {
 		return nil, err

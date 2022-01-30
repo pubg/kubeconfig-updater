@@ -13,7 +13,7 @@ import (
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 )
 
-func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (*TencentResolver, error) {
+func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
 	credProvider, err := credService.GetTencentSdkConfig(credCfg)
 	if err != nil {
 		return nil, err

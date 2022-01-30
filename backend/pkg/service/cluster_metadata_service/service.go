@@ -10,13 +10,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
-
-type ClusterMetadataResolver interface {
-	ListClusters() ([]*protos.ClusterMetadata, error)
-	GetResolverDescription() string
-}
 
 type ClusterMetadataService struct {
 	credService      *cred_resolver_service.CredResolveService
@@ -184,31 +178,26 @@ func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResol
 
 	credResolvers := s.credStoreService.ListCredResolvers()
 	for _, cr := range credResolvers {
-		if strings.EqualFold(cr.InfraVendor, types.InfraVendor_AWS.String()) {
-			awsResolver, err := NewAwsResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, awsResolver)
-		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_Azure.String()) {
-			authorizer, err := NewAzureResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, authorizer)
-		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_Tencent.String()) {
-			tcResolver, err := NewTencentResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, tcResolver)
-		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_GCP.String()) {
-			gcpResolver, err := NewGcpResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, gcpResolver)
+		factory := s.getTargetResolverFactory(cr.InfraVendor)
+		resolver, err := factory.FactoryFunc(cr, cr.AccountId, s.credService)
+		if err != nil {
+			return nil, err
 		}
+		metaResolvers = append(metaResolvers, resolver)
 	}
 	return metaResolvers, nil
+}
+
+func (s *ClusterMetadataService) getTargetResolverFactory(vendor string) *CloudMetaResolverFactory {
+	for _, factory := range resolverFactories {
+		// TODO: Deprecated resolve method
+		if strings.EqualFold(factory.InfraVendor.String(), vendor) {
+			return factory
+		}
+
+		if strings.EqualFold(factory.ClusterEngine.String(), vendor) {
+			return factory
+		}
+	}
+	return nil
 }

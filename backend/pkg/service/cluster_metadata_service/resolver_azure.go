@@ -13,7 +13,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAzureResolver(credCfg *protos.CredResolverConfig, subscriptionId string, credService *cred_resolver_service.CredResolveService) (*AzureResolver, error) {
+func NewAzureResolver(credCfg *protos.CredResolverConfig, subscriptionId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
 	authConfig, err := credService.GetAzureSdkConfig(context.Background(), credCfg)
 	if err != nil {
 		return nil, err
