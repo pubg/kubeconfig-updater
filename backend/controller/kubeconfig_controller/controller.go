@@ -25,7 +25,7 @@ func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverSt
 }
 
 func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.GetCredResolversRes, error) {
-	resolvers := s.credStoreService.ListCredResolvers()
+	resolvers := s.credStoreService.ListCredResolverConfigs()
 
 	res := &protos.GetCredResolversRes{
 		CommonRes: &protos.CommonRes{
@@ -37,7 +37,7 @@ func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.C
 }
 
 func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.CredResolverConfig) (*protos.CommonRes, error) {
-	err := s.credStoreService.SetCredResolver(req)
+	err := s.credStoreService.SetCredResolverConfig(req)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -53,7 +53,7 @@ func (s *kubeconfigService) SetCredResolver(ctx context.Context, req *protos.Cre
 func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.CredResolversReq) (*protos.CommonRes, error) {
 	cfgs := req.GetConfigs()
 	for _, cfg := range cfgs {
-		err := s.credStoreService.SetCredResolver(cfg)
+		err := s.credStoreService.SetCredResolverConfig(cfg)
 		if err != nil {
 			return &protos.CommonRes{
 				Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -67,7 +67,7 @@ func (s *kubeconfigService) SetCredResolvers(ctx context.Context, req *protos.Cr
 }
 
 func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.DeleteCredResolverReq) (*protos.CommonRes, error) {
-	_, exists, err := s.credStoreService.GetCredResolver(cfg.AccountId)
+	_, exists, err := s.credStoreService.GetCredResolverConfig(cfg.AccountId)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -81,7 +81,7 @@ func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.
 		}, nil
 	}
 
-	err = s.credStoreService.DeleteCredResolver(cfg.AccountId)
+	err = s.credStoreService.DeleteCredResolverConfig(cfg.AccountId)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -154,7 +154,7 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
-	cfg, exists, err := s.credStoreService.GetCredResolver(req.AccountId)
+	cfg, exists, err := s.credStoreService.GetCredResolverConfig(req.AccountId)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,

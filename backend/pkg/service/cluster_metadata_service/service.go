@@ -121,7 +121,7 @@ func getClusterInfoStatus(credStoreService *cred_resolver_service.CredResolverSt
 	if credResolverId == "" {
 		return "not_exists"
 	}
-	credResolver, exists, err := credStoreService.GetCredResolver(credResolverId)
+	credResolver, exists, err := credStoreService.GetCredResolverConfig(credResolverId)
 	if err != nil {
 		return "not_ok"
 	}
@@ -176,7 +176,7 @@ func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResol
 		metaResolvers = append(metaResolvers, resolver)
 	}
 
-	credResolvers := s.credStoreService.ListCredResolvers()
+	credResolvers := s.credStoreService.ListCredResolverConfigs()
 	for _, cr := range credResolvers {
 		factory := s.getTargetResolverFactory(cr.InfraVendor)
 		resolver, err := factory.FactoryFunc(cr, cr.AccountId, s.credService)

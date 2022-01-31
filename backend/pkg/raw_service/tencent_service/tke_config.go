@@ -49,26 +49,24 @@ func GetProfiles() ([]string, error) {
 }
 
 func getCredentialsDirectoryPath() (string, error) {
-	path, err := common.ResolvePathToAbs("~/.tccli")
-	return path, err
+	return common.ResolvePathToAbs(filepath.Join("~", ".tccli"))
 }
 
-// GetConfigInfo returns: AccountId, CredIsNotValid, error
-// CredIsNotValid => config is not valid tencent credential
-func GetConfigInfo(credProvider tcCommon.Provider) (string, bool, error) {
+// GetConfigInfo returns: AccountId, error
+func GetConfigInfo(credProvider tcCommon.Provider) (string, error) {
 	cred, err := credProvider.GetCredential()
 	if err != nil {
-		return "", false, err
+		return "", err
 	}
 	stsClient, err := sts.NewClient(cred, types.TENCENT_DEFAULT_REGION, profile.NewClientProfile())
 	if err != nil {
-		return "", false, err
+		return "", err
 	}
 	res, err := stsClient.GetCallerIdentity(sts.NewGetCallerIdentityRequest())
 	if err != nil {
-		return "", false, err
+		return "", err
 	}
-	return *res.Response.AccountId, true, nil
+	return *res.Response.AccountId, nil
 }
 
 // TencentIntlProfileProvider China mainland and international cloud's credential file formats are difference
