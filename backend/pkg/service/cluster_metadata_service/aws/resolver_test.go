@@ -1,4 +1,4 @@
-package cluster_metadata_service
+package aws
 
 import (
 	"fmt"

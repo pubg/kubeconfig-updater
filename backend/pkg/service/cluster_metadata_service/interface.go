@@ -1,8 +1,10 @@
 package cluster_metadata_service
 
 import (
+	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
@@ -11,42 +13,42 @@ type ClusterMetadataResolver interface {
 	GetResolverDescription() string
 }
 
+var cloudResolverFactories = map[types.InfraVendor]*CloudMetaResolverFactory{}
+
 type CloudMetaResolverFactory struct {
-	FactoryFunc   NewMetadataResolver
-	ClusterEngine types.KnownClusterEngine
-	InfraVendor   types.InfraVendor
+	FactoryFunc NewCloudMetaResolver
 }
 
-type NewMetadataResolver func(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error)
+type NewCloudMetaResolver func(cred credentials.CredResolver, accountId string) (ClusterMetadataResolver, error)
 
-var resolverFactories []*CloudMetaResolverFactory
-
-func init() {
-	resolverFactories = []*CloudMetaResolverFactory{
-		{
-			FactoryFunc:   NewAwsResolver,
-			ClusterEngine: types.KnownClusterEngine_EKS,
-			InfraVendor:   types.InfraVendor_AWS,
-		},
-		{
-			FactoryFunc:   NewAzureResolver,
-			ClusterEngine: types.KnownClusterEngine_AKS,
-			InfraVendor:   types.InfraVendor_Azure,
-		},
-		{
-			FactoryFunc:   NewTencentResolver,
-			ClusterEngine: types.KnownClusterEngine_TKE,
-			InfraVendor:   types.InfraVendor_Tencent,
-		},
-		{
-			FactoryFunc:   NewGcpResolver,
-			ClusterEngine: types.KnownClusterEngine_GKE,
-			InfraVendor:   types.InfraVendor_GCP,
-		},
-		{
-			FactoryFunc:   NewRancherResolver,
-			ClusterEngine: types.KnownClusterEngine_RKE,
-			InfraVendor:   types.InfraVendor_Rancher,
-		},
+func RegisterCloudResolverFactory(vendor types.InfraVendor, factory *CloudMetaResolverFactory) error {
+	if _, exists := cloudResolverFactories[vendor]; exists {
+		return fmt.Errorf("DuplicatedFactory: Try to Register %s Twice", vendor.String())
 	}
+	cloudResolverFactories[vendor] = factory
+	return nil
+}
+
+func GetCloudResolverFactory(vendor types.InfraVendor) (*CloudMetaResolverFactory, bool) {
+	fac, exists := cloudResolverFactories[vendor]
+	return fac, exists
+}
+
+var basicResolverFactories = []*BasicMetaResolverFactory{}
+
+type BasicMetaResolverFactory struct {
+	FactoryFunc NewBasicMetaResolver
+}
+
+// NewBasicMetaResolver Can Returns nil Slice with no Error
+type NewBasicMetaResolver func(ext *configs.Extension) ([]ClusterMetadataResolver, error)
+
+func RegisterBasicResolverFactories(factoryFunc *BasicMetaResolverFactory)  {
+	basicResolverFactories = append(basicResolverFactories, factoryFunc)
+}
+
+func GetBasicResolverFactories() []*BasicMetaResolverFactory {
+	copySlice := make([]*BasicMetaResolverFactory, len(basicResolverFactories))
+	copy(copySlice, basicResolverFactories)
+	return copySlice
 }

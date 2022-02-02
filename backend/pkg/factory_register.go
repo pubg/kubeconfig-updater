@@ -1,4 +1,4 @@
-package importer
+package pkg
 
 import (
 	_ "github.com/pubg/kubeconfig-updater/backend/pkg/credentials/aws"

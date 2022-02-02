@@ -1,7 +1,9 @@
-package cluster_metadata_service
+package fox
 
 import (
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/application/configs"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"strconv"
 	"strings"
 
@@ -12,7 +14,27 @@ import (
 	"github.krafton.com/xtrm/fox/source/pkg/document"
 )
 
-func NewFoxResolver(addr string) (*FoxResolver, error) {
+func init() {
+	foxFactory := &cluster_metadata_service.BasicMetaResolverFactory{FactoryFunc: NewFoxAdapter}
+	cluster_metadata_service.RegisterBasicResolverFactories(foxFactory)
+}
+
+type Resolver struct {
+	foxClient *client.FoxClient
+}
+
+func NewFoxAdapter(ext *configs.Extension) ([]cluster_metadata_service.ClusterMetadataResolver, error) {
+	if ext.Fox.Enable {
+		resolver, err := NewFoxResolver(ext.Fox.Address)
+		if err != nil {
+			return nil, err
+		}
+		return []cluster_metadata_service.ClusterMetadataResolver{resolver}, err
+	}
+	return nil, nil
+}
+
+func NewFoxResolver(addr string) (*Resolver, error) {
 	foxClient, err := client.NewClient(&client.FoxClientConfig{
 		APIUrl: addr,
 	})
@@ -20,20 +42,16 @@ func NewFoxResolver(addr string) (*FoxResolver, error) {
 		return nil, err
 	}
 
-	return &FoxResolver{
+	return &Resolver{
 		foxClient: foxClient,
 	}, nil
 }
 
-type FoxResolver struct {
-	foxClient *client.FoxClient
-}
-
-func (f *FoxResolver) GetResolverDescription() string {
+func (f *Resolver) GetResolverDescription() string {
 	return "PUBG-Fox"
 }
 
-func (f *FoxResolver) GetCluster(clusterName string) (*protos.ClusterMetadata, bool, error) {
+func (f *Resolver) GetCluster(clusterName string) (*protos.ClusterMetadata, bool, error) {
 	docId := fmt.Sprintf("%[1]s-common", clusterName)
 	exists, err := f.foxClient.ExistDocument(docId)
 	if err != nil {
@@ -55,7 +73,7 @@ func (f *FoxResolver) GetCluster(clusterName string) (*protos.ClusterMetadata, b
 	return metadata, true, nil
 }
 
-func (f *FoxResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+func (f *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	perPageSize := 100
 	pageIndex := 1
 

@@ -1,36 +1,45 @@
-package cluster_metadata_service
+package gcp
 
 import (
 	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"log"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/container/v1"
 	"google.golang.org/api/option"
 )
 
-type GcpResolver struct {
+func init() {
+	factory := &cluster_metadata_service.CloudMetaResolverFactory{FactoryFunc: NewGcpResolver}
+	if err := cluster_metadata_service.RegisterCloudResolverFactory(types.InfraVendor_GCP, factory); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+type Resolver struct {
 	projectId string
 	cred      *google.Credentials
 }
 
-func NewGcpResolver(credCfg *protos.CredResolverConfig, projectId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
-	cred, _, err := credService.GetGcpSdkConfig(context.TODO(), credCfg)
+func NewGcpResolver(cred credentials.CredResolver, projectId string) (cluster_metadata_service.ClusterMetadataResolver, error) {
+	gcpCred, _, err := cred.GetSdkConfig(context.TODO())
 	if err != nil {
 		return nil, fmt.Errorf("GetGcpSdkConfig: %v", err)
 	}
 
-	resolver := &GcpResolver{
+	resolver := &Resolver{
+		cred:      gcpCred.(*google.Credentials),
 		projectId: projectId,
-		cred:      cred,
 	}
 	return resolver, nil
 }
 
-func (g *GcpResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+func (g *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	ctx := context.Background()
 	containerService, err := container.NewService(ctx, option.WithCredentials(g.cred))
 	if err != nil {
@@ -67,6 +76,6 @@ func (g *GcpResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	return clusters, nil
 }
 
-func (g *GcpResolver) GetResolverDescription() string {
+func (g *Resolver) GetResolverDescription() string {
 	return fmt.Sprintf("GCP/%s", g.projectId)
 }

@@ -1,38 +1,49 @@
-package cluster_metadata_service
+package rancher
 
 import (
+	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"github.com/rancher/cli/config"
+	"log"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"github.com/rancher/cli/cliclient"
 	rancherTypes "github.com/rancher/norman/types"
 )
 
-type RancherResolver struct {
+func init() {
+	factory := &cluster_metadata_service.CloudMetaResolverFactory{FactoryFunc: NewRancherResolver}
+	if err := cluster_metadata_service.RegisterCloudResolverFactory(types.InfraVendor_Rancher, factory); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+type Resolver struct {
 	masterClient *cliclient.MasterClient
 	serverName   string
 }
 
-func NewRancherResolver(credCfg *protos.CredResolverConfig, serverName string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
-	cfg, err := credService.GetRancherSdkConfig(credCfg)
+func NewRancherResolver(cred credentials.CredResolver, serverName string) (cluster_metadata_service.ClusterMetadataResolver, error) {
+	rawCfg, _, err := cred.GetSdkConfig(context.TODO())
 	if err != nil {
 		return nil, fmt.Errorf("GetRancherSdkConfig: %v", err)
 	}
-	mc, err := cliclient.NewMasterClient(cfg)
+	mc, err := cliclient.NewMasterClient(rawCfg.(*config.ServerConfig))
 	if err != nil {
 		return nil, fmt.Errorf("NewMasterClient: %v", err)
 	}
 
-	resolver := &RancherResolver{
+	resolver := &Resolver{
 		masterClient: mc,
 		serverName:   serverName,
 	}
 	return resolver, nil
 }
 
-func (r *RancherResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	option := &rancherTypes.ListOpts{Filters: map[string]interface{}{
 		"filter": true,
 		"limit":  -1,
@@ -62,6 +73,6 @@ func (r *RancherResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	return clusters, nil
 }
 
-func (r *RancherResolver) GetResolverDescription() string {
+func (r *Resolver) GetResolverDescription() string {
 	return fmt.Sprintf("Rancher/%s", r.serverName)
 }

@@ -1,10 +1,13 @@
-package cluster_metadata_service
+package tencent
 
 import (
+	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"log"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
@@ -13,27 +16,35 @@ import (
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 )
 
-func NewTencentResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
-	credProvider, err := credService.GetTencentSdkConfig(credCfg)
-	if err != nil {
-		return nil, err
+func init() {
+	factory := &cluster_metadata_service.CloudMetaResolverFactory{FactoryFunc: NewTencentResolver}
+	if err := cluster_metadata_service.RegisterCloudResolverFactory(types.InfraVendor_Tencent, factory); err != nil {
+		log.Fatalln(err)
 	}
-	return &TencentResolver{
-		credProvider: credProvider,
-		tcAccountId:  accountId,
-	}, nil
 }
 
-type TencentResolver struct {
+type Resolver struct {
 	credProvider common.Provider
 	tcAccountId  string
 }
 
-func (r *TencentResolver) GetResolverDescription() string {
+func NewTencentResolver(cred credentials.CredResolver, accountId string) (cluster_metadata_service.ClusterMetadataResolver, error) {
+	rawProvider, _, err := cred.GetSdkConfig(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	return &Resolver{
+		credProvider: rawProvider.(common.Provider),
+		tcAccountId:  accountId,
+	}, nil
+}
+
+func (r *Resolver) GetResolverDescription() string {
 	return fmt.Sprintf("Tencent/%s", r.tcAccountId)
 }
 
-func (r *TencentResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	cred, err := r.credProvider.GetCredential()
 	if err != nil {
 		return nil, err
@@ -72,7 +83,7 @@ type listTkeFutureOut struct {
 	err      error
 }
 
-func (r *TencentResolver) listTkeFuture(region string) <-chan listTkeFutureOut {
+func (r *Resolver) listTkeFuture(region string) <-chan listTkeFutureOut {
 	c := make(chan listTkeFutureOut, 1)
 	go func() {
 		clusters, err := r.listTke(region)
@@ -85,7 +96,7 @@ func (r *TencentResolver) listTkeFuture(region string) <-chan listTkeFutureOut {
 	return c
 }
 
-func (r *TencentResolver) listTke(region string) ([]*protos.ClusterMetadata, error) {
+func (r *Resolver) listTke(region string) ([]*protos.ClusterMetadata, error) {
 	cred, err := r.credProvider.GetCredential()
 	if err != nil {
 		return nil, err

@@ -1,8 +1,11 @@
-package cluster_metadata_service
+package aws
 
 import (
 	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"log"
 
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
@@ -13,30 +16,36 @@ import (
 	awsTypes "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAwsResolver(credCfg *protos.CredResolverConfig, accountId string, credService *cred_resolver_service.CredResolveService) (ClusterMetadataResolver, error) {
-	awsCfg, _, err := credService.GetAwsSdkConfig(context.Background(), credCfg)
-	if err != nil {
-		return nil, err
+func init() {
+	factory := &cluster_metadata_service.CloudMetaResolverFactory{FactoryFunc: NewAwsResolver}
+	if err := cluster_metadata_service.RegisterCloudResolverFactory(types.InfraVendor_AWS, factory); err != nil {
+		log.Fatalln(err)
 	}
-	return &AwsResolver{
-		awsConfig:    awsCfg,
-		awsAccountId: accountId,
-	}, nil
 }
 
-type AwsResolver struct {
+type Resolver struct {
 	awsConfig    *aws.Config
 	awsAccountId string
 }
 
-func (r *AwsResolver) GetResolverDescription() string {
+func NewAwsResolver(cred credentials.CredResolver, accountId string) (cluster_metadata_service.ClusterMetadataResolver, error) {
+	awsCfg, _, err := cred.GetSdkConfig(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	return &Resolver{
+		awsConfig:    awsCfg.(*aws.Config),
+		awsAccountId: accountId,
+	}, nil
+}
+
+func (r *Resolver) GetResolverDescription() string {
 	return fmt.Sprintf("AWS/%s", r.awsAccountId)
 }
 
-func (r *AwsResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	copiedCfg := r.awsConfig.Copy()
 	copiedCfg.Region = types.AWS_DEFAULT_REGION
 	ec2Client := ec2.NewFromConfig(copiedCfg)
@@ -78,7 +87,7 @@ func (r *AwsResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	return clusters, nil
 }
 
-func (r *AwsResolver) listEks(region string) ([]*protos.ClusterMetadata, error) {
+func (r *Resolver) listEks(region string) ([]*protos.ClusterMetadata, error) {
 	copiedCfg := r.awsConfig.Copy()
 	copiedCfg.Region = region
 	eksClient := eks.NewFromConfig(copiedCfg)
