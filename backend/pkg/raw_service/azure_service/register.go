@@ -7,8 +7,13 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 )
 
-func RegisterAksCluster(resourceGroup, clusterName string) error {
+func RegisterAksCluster(resourceGroup, clusterName string, subscriptionOrEmpty string) error {
 	command := fmt.Sprintf("az aks get-credentials --resource-group=%s --name=%s --overwrite-existing", resourceGroup, clusterName)
+
+	if subscriptionOrEmpty != "" {
+		command = fmt.Sprintf("%s --subscription=%s", command, subscriptionOrEmpty)
+	}
+
 	stdout, stderr, exitCode := common.Execute(command)
 	if *stdout != "" {
 		fmt.Println("STDOUT: " + strings.Trim(*stdout, "\n"))

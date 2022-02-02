@@ -102,7 +102,7 @@ type SubscriptionResolver struct {
 
 func (r *SubscriptionResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
 	cfg, err := azure_service.NewCliAuthConfig(r.subscription)
-	return cfg, "", err
+	return cfg, r.subscription, err
 }
 
 func (r *SubscriptionResolver) SupportIdentityType() types.InfraVendor {

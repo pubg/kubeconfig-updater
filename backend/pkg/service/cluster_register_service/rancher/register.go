@@ -1,4 +1,4 @@
-package cluster_register_service
+package rancher
 
 import (
 	"context"
@@ -6,21 +6,23 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/rancher_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
-type RancherRegister struct {
-	credService *cred_resolver_service.CredResolveService
+type Register struct {
+	credResolver credentials.CredResolver
 	extension   *configs.Extension
 }
 
-func NewRancherResolver(credService *cred_resolver_service.CredResolveService, extension *configs.Extension) ClusterRegister {
-	return &RancherRegister{credService: credService, extension: extension}
+func NewRancherResolver(credResolver credentials.CredResolver, extension *configs.Extension) cluster_register_service.ClusterRegister {
+	return &Register{credResolver: credResolver, extension: extension}
 }
 
-func (r *RancherRegister) RegisterCluster(ctx context.Context, credConf *protos.CredResolverConfig, meta *protos.AggregatedClusterMetadata) error {
+func (r *Register) RegisterCluster(ctx context.Context, meta *protos.AggregatedClusterMetadata) error {
 	cfg, err := r.credService.GetRancherSdkConfig(credConf)
 	if err != nil {
 		return err

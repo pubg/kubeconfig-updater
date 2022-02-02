@@ -1,8 +1,10 @@
-package cluster_register_service
+package gke
 
 import (
 	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
@@ -12,16 +14,16 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
-type GkeRegister struct {
-	credService *cred_resolver_service.CredResolveService
+type Register struct {
+	credResolver credentials.CredResolver
 	extension   *configs.Extension
 }
 
-func NewGkeRegister(credService *cred_resolver_service.CredResolveService, extension *configs.Extension) ClusterRegister {
-	return &GkeRegister{credService: credService, extension: extension}
+func NewGkeRegister(credResolver credentials.CredResolver, extension *configs.Extension) cluster_register_service.ClusterRegister {
+	return &Register{credResolver: credResolver, extension: extension}
 }
 
-func (r *GkeRegister) RegisterCluster(ctx context.Context, credConf *protos.CredResolverConfig, meta *protos.AggregatedClusterMetadata) error {
+func (r *Register) RegisterCluster(ctx context.Context, meta *protos.AggregatedClusterMetadata) error {
 	clusterName := meta.Metadata.ClusterName
 
 	_, configurationName, err := r.credService.GetGcpSdkConfig(ctx, credConf)

@@ -1,29 +1,36 @@
-package cluster_register_service
+package eks
 
 import (
 	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/expressions"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
-type EksRegister struct {
-	credService *cred_resolver_service.CredResolveService
-	extension   *configs.Extension
+type Register struct {
+	profile string
+	exts []*configs.EksAssumeRoleExt
 }
 
-func NewEksRegister(credService *cred_resolver_service.CredResolveService, extension *configs.Extension) ClusterRegister {
-	return &EksRegister{credService: credService, extension: extension}
+func NewEksRegister(credResolver credentials.CredResolver,extension *configs.Extension) cluster_register_service.ClusterRegister {
+	credResolver.GetSdkConfig(context.TODO())
+	return &Register{credResolver: credResolver, extension: extension}
 }
 
-func (r *EksRegister) RegisterCluster(ctx context.Context, credConf *protos.CredResolverConfig, meta *protos.AggregatedClusterMetadata) error {
+func (r *Register) RegisterCluster(ctx context.Context, meta *protos.AggregatedClusterMetadata) error {
 	clusterName := meta.Metadata.ClusterName
+
+	_, profileOrEmpty, err := cred.GetSdkConfig(context.TODO())
+	if err != nil {
+		return nil, err
+	}
 
 	_, profileOrEmpty, err := r.credService.GetAwsSdkConfig(ctx, credConf)
 	if err != nil {

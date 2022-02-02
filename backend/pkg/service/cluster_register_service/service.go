@@ -3,7 +3,7 @@ package cluster_register_service
 import (
 	"context"
 	"fmt"
-	"strings"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"sync"
 
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
@@ -30,7 +30,7 @@ func NewClusterRegisterService(credService *cred_resolver_service.CredResolveSer
 }
 
 func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterName string, credConf *protos.CredResolverConfig) error {
-	// aws, az, gcloud, tccli are not support concurrent register
+	// some vendors are not support concurrent register
 	s.registerMutex.Lock()
 	defer s.registerMutex.Unlock()
 
@@ -39,9 +39,14 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 		return fmt.Errorf("NotFoundMetadataInCache: %s", clusterName)
 	}
 
-	factory := s.getTargetRegisterFactory(credConf.GetInfraVendor())
-	if factory == nil {
-		return fmt.Errorf("NotSupportedVendor: %s", credConf.GetInfraVendor())
+	vendor, ok := types.ToInfraVendorIgnoreCase(credConf.InfraVendor)
+	if !ok {
+		return fmt.Errorf("InfraVendorNotFound: '%s'", credConf.InfraVendor)
+	}
+
+	factory, exists := GetFactory(vendor)
+	if !exists {
+		return fmt.Errorf("NotSupportedVendor: '%s'", vendor.String())
 	}
 
 	register := factory.FactoryFunc(s.credService, s.extension)
@@ -53,16 +58,3 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 	return nil
 }
 
-func (s *ClusterRegisterService) getTargetRegisterFactory(vendor string) *RegisterFactory {
-	for _, factory := range registerFactories {
-		// TODO: Deprecated resolve method
-		if strings.EqualFold(factory.InfraVendor.String(), vendor) {
-			return factory
-		}
-
-		if strings.EqualFold(factory.ClusterEngine.String(), vendor) {
-			return factory
-		}
-	}
-	return nil
-}
