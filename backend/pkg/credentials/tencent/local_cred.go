@@ -11,7 +11,7 @@ import (
 	"log"
 )
 
-func init()  {
+func init() {
 	if err := credentials.RegisterLocalCred(types.InfraVendor_Tencent, &LocalCred{}); err != nil {
 		log.Fatalln(err)
 	}

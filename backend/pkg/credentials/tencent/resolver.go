@@ -116,7 +116,7 @@ func (r *ProfileResolver) GetStatus(ctx context.Context) (protos.CredentialResol
 }
 
 func getStatus(ctx context.Context, resolver credentials.CredResolver) (protos.CredentialResolverStatus, error, error) {
-	credProvider,_, err := resolver.GetSdkConfig(ctx)
+	credProvider, _, err := resolver.GetSdkConfig(ctx)
 	if err != nil {
 		return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err, nil
 	}

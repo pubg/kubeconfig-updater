@@ -13,14 +13,13 @@ import (
 	"log"
 )
 
-func init()  {
+func init() {
 	if err := credentials.RegisterLocalCred(types.InfraVendor_AWS, &LocalCred{}); err != nil {
 		log.Fatalln(err)
 	}
 }
 
 type LocalCred struct {
-
 }
 
 func (a *LocalCred) GetLocalProfiles() ([]*protos.Profile, error) {

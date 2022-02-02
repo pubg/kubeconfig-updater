@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func init()  {
+func init() {
 	if err := credentials.RegisterLocalCred(types.InfraVendor_Rancher, &LocalCred{}); err != nil {
 		log.Fatalln(err)
 	}

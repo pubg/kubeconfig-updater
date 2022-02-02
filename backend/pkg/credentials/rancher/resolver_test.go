@@ -9,10 +9,10 @@ import (
 
 func TestNewRancherResolver(t *testing.T) {
 	cfg := &protos.CredResolverConfig{
-		AccountId:          "asdf",
-		InfraVendor:        "rancher",
-		AccountAlias:       "rrrr",
-		Kind:               protos.CredentialResolverKind_DEFAULT,
+		AccountId:    "asdf",
+		InfraVendor:  "rancher",
+		AccountAlias: "rrrr",
+		Kind:         protos.CredentialResolverKind_DEFAULT,
 	}
 
 	res, err := NewRancherResolver(cfg)

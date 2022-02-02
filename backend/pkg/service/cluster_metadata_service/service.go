@@ -7,9 +7,9 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service/kubeconfig"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
+	"strings"
 )
 
 type ClusterMetadataService struct {
@@ -78,7 +78,8 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 				}
 			}
 
-			if _, ok := resolver.(*kubeconfig.Resolver); ok {
+			// TODO: string말고 컴파일 되는 타입으로 판단해야 함
+			if strings.HasPrefix(resolver.GetResolverDescription(), "Kubeconfig") {
 				regedMetaMap[metadata.ClusterName] = true
 			}
 		}

@@ -46,9 +46,9 @@ func init() {
 			InfraVendor:   types.InfraVendor_GCP,
 		},
 		{
-			FactoryFunc: NewRancherResolver,
+			FactoryFunc:   NewRancherResolver,
 			ClusterEngine: types.KnownClusterEngine_RKE,
-			InfraVendor: types.InfraVendor_Rancher,
+			InfraVendor:   types.InfraVendor_Rancher,
 		},
 	}
 }
