@@ -15,13 +15,12 @@ type kubeconfigService struct {
 	protos.UnimplementedKubeconfigServer
 
 	credStoreService    *cred_resolver_service.CredResolverStoreService
-	credResolverService *cred_resolver_service.CredResolveService
 	registerService     *cluster_register_service.ClusterRegisterService
 	metadataService     *cluster_metadata_service.ClusterMetadataService
 }
 
-func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverStoreService, credResolverService *cred_resolver_service.CredResolveService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
-	return &kubeconfigService{credStoreService: credStoreService, credResolverService: credResolverService, registerService: registerService, metadataService: metadataService}
+func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverStoreService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {
+	return &kubeconfigService{credStoreService: credStoreService, registerService: registerService, metadataService: metadataService}
 }
 
 func (s *kubeconfigService) GetAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.GetCredResolversRes, error) {
@@ -94,7 +93,7 @@ func (s *kubeconfigService) DeleteCredResolver(ctx context.Context, cfg *protos.
 }
 
 func (s *kubeconfigService) SyncAvailableCredResolvers(context.Context, *protos.CommonReq) (*protos.CommonRes, error) {
-	err := s.credResolverService.SyncCredResolversStatus()
+	err := s.credStoreService.SyncCredResolversStatus()
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,
@@ -117,7 +116,7 @@ func (s *kubeconfigService) GetRegisteredProfiles(ctx context.Context, req *prot
 		}, nil
 	}
 
-	profiles, err := s.credResolverService.GetLocalProfiles(req.InfraVendor)
+	profiles, err := s.credStoreService.GetLocalProfiles(req.InfraVendor)
 	if err != nil {
 		return &protos.GetRegisteredProfilesRes{
 			CommonRes: &protos.CommonRes{
@@ -154,13 +153,7 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
-	cfg, exists, err := s.credStoreService.GetCredResolverConfig(req.AccountId)
-	if err != nil {
-		return &protos.CommonRes{
-			Status:  protos.ResultCode_SERVER_INTERNAL,
-			Message: err.Error(),
-		}, nil
-	}
+	credResolver, exists := s.credStoreService.GetCredResolverInstance(req.AccountId)
 	if !exists {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_INVALID_ARGUMENT,
@@ -168,7 +161,7 @@ func (s *kubeconfigService) RegisterCluster(ctx context.Context, req *protos.Reg
 		}, nil
 	}
 
-	err = s.registerService.RegisterCluster(ctx, req.ClusterName, cfg)
+	err := s.registerService.RegisterCluster(ctx, req.ClusterName, credResolver)
 	if err != nil {
 		return &protos.CommonRes{
 			Status:  protos.ResultCode_SERVER_INTERNAL,

@@ -40,7 +40,7 @@ func NewAzureResolver(credConf *protos.CredResolverConfig) (credentials.CredReso
 type DefaultResolver struct {
 }
 
-func (r *DefaultResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *DefaultResolver) GetSdkConfig(ctx context.Context) (cred interface{}, subscriptionId string, err error) {
 	cfg, err := azure_service.NewCliAuthConfig("")
 	return cfg, "", err
 }
@@ -60,7 +60,7 @@ func (r *DefaultResolver) GetStatus(ctx context.Context) (protos.CredentialResol
 type EnvResolver struct {
 }
 
-func (r *EnvResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *EnvResolver) GetSdkConfig(ctx context.Context) (cred interface{}, subscriptionId string, err error) {
 	cfg, err := azure_service.NewEnvAuthConfig()
 	return cfg, "", err
 }
@@ -80,7 +80,7 @@ func (r *EnvResolver) GetStatus(ctx context.Context) (protos.CredentialResolverS
 type ImdsResolver struct {
 }
 
-func (r *ImdsResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *ImdsResolver) GetSdkConfig(ctx context.Context) (cred interface{}, subscriptionId string, err error) {
 	return auth.NewMSIConfig(), "", nil
 }
 
@@ -100,7 +100,7 @@ type SubscriptionResolver struct {
 	subscription string
 }
 
-func (r *SubscriptionResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *SubscriptionResolver) GetSdkConfig(ctx context.Context) (cred interface{}, subscriptionId string, err error) {
 	cfg, err := azure_service.NewCliAuthConfig(r.subscription)
 	return cfg, r.subscription, err
 }

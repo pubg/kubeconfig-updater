@@ -13,14 +13,13 @@ import (
 )
 
 type ClusterMetadataService struct {
-	credService      *cred_resolver_service.CredResolveService
 	credStoreService *cred_resolver_service.CredResolverStoreService
 	cache            *cluster_metadata_persist.AggregatedClusterMetadataStorage
 	cfg              *configs.ApplicationConfig
 }
 
-func NewClusterMetadataService(credService *cred_resolver_service.CredResolveService, credStoreService *cred_resolver_service.CredResolverStoreService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage, cfg *configs.ApplicationConfig) *ClusterMetadataService {
-	return &ClusterMetadataService{credService: credService, credStoreService: credStoreService, cache: cache, cfg: cfg}
+func NewClusterMetadataService(credStoreService *cred_resolver_service.CredResolverStoreService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage, cfg *configs.ApplicationConfig) *ClusterMetadataService {
+	return &ClusterMetadataService{credStoreService: credStoreService, cache: cache, cfg: cfg}
 }
 
 func (s *ClusterMetadataService) ListClusterMetadatas() []*protos.AggregatedClusterMetadata {

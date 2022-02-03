@@ -40,7 +40,7 @@ func NewTencentResolver(credConf *protos.CredResolverConfig) (credentials.CredRe
 type DefaultResolver struct {
 }
 
-func (r *DefaultResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *DefaultResolver) GetSdkConfig(ctx context.Context) (cred interface{}, profile string, err error) {
 	provider, err := common.NewProviderChain([]common.Provider{common.DefaultEnvProvider(), common.DefaultProfileProvider(), common.DefaultCvmRoleProvider(), tencent_service.NewTencentIntlProfileProvider("default")}), nil
 	return provider, "", err
 }
@@ -60,7 +60,7 @@ func (r *DefaultResolver) GetStatus(ctx context.Context) (protos.CredentialResol
 type EnvResolver struct {
 }
 
-func (r *EnvResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *EnvResolver) GetSdkConfig(ctx context.Context) (cred interface{}, profile string, err error) {
 	return common.DefaultEnvProvider(), "", nil
 }
 
@@ -79,7 +79,7 @@ func (r *EnvResolver) GetStatus(ctx context.Context) (protos.CredentialResolverS
 type ImdsResolver struct {
 }
 
-func (r *ImdsResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *ImdsResolver) GetSdkConfig(ctx context.Context) (cred interface{}, profile string, err error) {
 	return common.DefaultCvmRoleProvider(), "", nil
 }
 
@@ -99,7 +99,7 @@ type ProfileResolver struct {
 	profile string
 }
 
-func (r *ProfileResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *ProfileResolver) GetSdkConfig(ctx context.Context) (cred interface{}, profile string, err error) {
 	return tencent_service.NewTencentIntlProfileProvider(r.profile), r.profile, nil
 }
 

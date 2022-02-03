@@ -8,7 +8,8 @@ import (
 )
 
 type CredResolver interface {
-	GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error)
+	// GetSdkConfig Returns sdk credential, cli profile or empty, error
+	GetSdkConfig(ctx context.Context) (cred interface{}, profile string, err error)
 	SupportIdentityType() types.InfraVendor
 	Description() string
 

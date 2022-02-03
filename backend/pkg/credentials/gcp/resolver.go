@@ -40,12 +40,13 @@ func NewGcpResolver(credConf *protos.CredResolverConfig) (credentials.CredResolv
 type DefaultCliResolver struct {
 }
 
-func (r *DefaultCliResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
-	cred, err = gcloudconfig.GetCredentials("")
+func (r *DefaultCliResolver) GetSdkConfig(ctx context.Context) (cred interface{}, projectId string, err error) {
+	cfg, err := gcloudconfig.GetCredentials("")
 	if err != nil {
 		return nil, "", err
 	}
-	return cred, "", nil
+
+	return cfg, cfg.ProjectID, nil
 }
 
 func (r *DefaultCliResolver) SupportIdentityType() types.InfraVendor {
@@ -63,7 +64,7 @@ func (r *DefaultCliResolver) GetStatus(ctx context.Context) (protos.CredentialRe
 type DefaultChainResolver struct {
 }
 
-func (r *DefaultChainResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *DefaultChainResolver) GetSdkConfig(ctx context.Context) (cred interface{}, projectId string, err error) {
 	cred, err = google.FindDefaultCredentials(ctx)
 	if err != nil {
 		return nil, "", err
@@ -87,12 +88,12 @@ type ConfigurationResolver struct {
 	configuration string
 }
 
-func (r *ConfigurationResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
-	cred, err = gcloudconfig.GetCredentials(r.configuration)
+func (r *ConfigurationResolver) GetSdkConfig(ctx context.Context) (cred interface{}, projectId string, err error) {
+	cfg, err := gcloudconfig.GetCredentials(r.configuration)
 	if err != nil {
 		return nil, "", err
 	}
-	return cred, r.configuration, nil
+	return cfg, r.configuration, nil
 }
 
 func (r *ConfigurationResolver) SupportIdentityType() types.InfraVendor {

@@ -32,7 +32,7 @@ func GetProfiles() ([]string, error) {
 		} else {
 			_, err = fmt.Sscanf(profile, "profile %s", &actualProfileName)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("ReadAwsConfigError: err='%s'", err.Error())
 			}
 		}
 

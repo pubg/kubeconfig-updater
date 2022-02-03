@@ -5,16 +5,10 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/rancher/cli/cliclient"
-	rancherCfg "github.com/rancher/cli/config"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func RegisterRancherCluster(cfg *rancherCfg.ServerConfig, clusterId string) error {
-	mc, err := cliclient.NewMasterClient(cfg)
-	if err != nil {
-		return err
-	}
-
+func RegisterRancherCluster(mc *cliclient.MasterClient, clusterId string) error {
 	cluster, err := mc.ManagementClient.Cluster.ByID(clusterId)
 	if err != nil {
 		return fmt.Errorf("no cluster found with the ID [%s], run `rancher clusters` to see available clusters: %s", clusterId, err)

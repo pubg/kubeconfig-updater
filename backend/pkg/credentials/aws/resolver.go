@@ -58,7 +58,7 @@ type ProfileResolver struct {
 	profile string
 }
 
-func (r *ProfileResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *ProfileResolver) GetSdkConfig(ctx context.Context) (cred interface{}, profile string, err error) {
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(r.profile))
 	return &cfg, r.profile, err
 }

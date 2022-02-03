@@ -36,7 +36,7 @@ Linux: /home/<username>/.kubeconfig-updater-gui
 MacOS: /Users/<username>/.kubeconfig-updater-gui
 ```
 
-## Requirement Permission
+## Requirement Permissions
 ```yaml
 # AWS Policy 
 {
@@ -62,8 +62,12 @@ BuiltinRole: Azure Kubernetes Service Cluster User Role
 ```
 
 ```yaml
-# TencentCloud Policy
-# You can use Preset Policy That Named 'QcloudTKEReadOnlyAccessPreset' or Custom Policy
+#TencentCloud Builtin Policy
+PolicyName: QcloudTKEReadOnlyAccessPreset
+```
+
+```yaml
+# TencentCloud Custom Policy
 {
   "version": "2.0",
   "statement": [
@@ -78,8 +82,15 @@ BuiltinRole: Azure Kubernetes Service Cluster User Role
     }
   ]
 }
-                 
+```
 
+```yaml
+# GCP
+```
+
+```yaml
+# Rancher
+BuiltinClusterRole: Cluster Member
 ```
 
 ## Other Documents
@@ -107,8 +118,8 @@ BuiltinRole: Azure Kubernetes Service Cluster User Role
 ```bash
 # Init Project
 cd electron-app
-npm install
-npm run start
+pnpm install
+pnpm run start
 ```
 
 ## Backend

@@ -33,7 +33,6 @@ type ServerApplication struct {
 	CredResolverConfigStorage             *cred_resolver_config_persist.CredResolverConfigStorage
 	AggreagtedClusterMetadataCacheStorage *cluster_metadata_persist.AggregatedClusterMetadataStorage
 
-	CredService      *cred_resolver_service.CredResolveService
 	CredStoreService *cred_resolver_service.CredResolverStoreService
 	RegisterService  *cluster_register_service.ClusterRegisterService
 	MetaService      *cluster_metadata_service.ClusterMetadataService
@@ -149,7 +148,7 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 	if useMockController {
 		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewMockController())
 	} else {
-		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.CredService, s.RegisterService, s.MetaService))
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.RegisterService, s.MetaService))
 	}
 
 	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer, grpcweb.WithOriginFunc(func(_ string) bool { return true }))
@@ -175,9 +174,8 @@ func (s *ServerApplication) initServiceLayer() error {
 	if err != nil {
 		return err
 	}
-	s.CredService = cred_resolver_service.NewCredResolveService(s.CredStoreService)
-	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
-	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService, s.Config.Extensions)
+	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
+	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.MetaService, s.Config.Extensions)
 	return nil
 }
 

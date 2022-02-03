@@ -38,12 +38,12 @@ func NewRancherResolver(credConf *protos.CredResolverConfig) (credentials.CredRe
 type DefaultResolver struct {
 }
 
-func (r *DefaultResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *DefaultResolver) GetSdkConfig(ctx context.Context) (cred interface{}, serverName string, err error) {
 	cfg, err := rancher_service.LoadConfig()
 	if err != nil {
 		return nil, "", err
 	}
-	return cfg.FocusedServer(), "", nil
+	return cfg.FocusedServer(), cfg.CurrentServer, nil
 }
 
 func (r *DefaultResolver) SupportIdentityType() types.InfraVendor {
@@ -62,13 +62,13 @@ type ServerResolver struct {
 	server string
 }
 
-func (r *ServerResolver) GetSdkConfig(ctx context.Context) (cred interface{}, accountId string, err error) {
+func (r *ServerResolver) GetSdkConfig(ctx context.Context) (cred interface{}, serverName string, err error) {
 	cfg, err := rancher_service.LoadConfig()
 	if err != nil {
 		return nil, "", err
 	}
 	if server, ok := cfg.Servers[r.server]; ok {
-		return server, "", nil
+		return server, r.server, nil
 	}
 	return nil, "", fmt.Errorf("NotFoundTargetServerConfig: %s", r.server)
 }
