@@ -25,7 +25,7 @@ type Register struct {
 	configurationOrEmpty string
 }
 
-func NewGkeRegister(credResolver credentials.CredResolver, extension *configs.Extension) (cluster_register_service.ClusterRegister,error) {
+func NewGkeRegister(credResolver credentials.CredResolver, extension *configs.Extension) (cluster_register_service.ClusterRegister, error) {
 	_, configurationOrEmpty, err := credResolver.GetSdkConfig(context.TODO())
 	if err != nil {
 		return nil, err

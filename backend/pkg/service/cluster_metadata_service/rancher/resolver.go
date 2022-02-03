@@ -3,14 +3,14 @@ package rancher
 import (
 	"context"
 	"fmt"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
-	"github.com/rancher/cli/config"
 	"log"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/rancher_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
-	"github.com/rancher/cli/cliclient"
+	"github.com/rancher/cli/config"
 	rancherTypes "github.com/rancher/norman/types"
 )
 
@@ -22,8 +22,8 @@ func init() {
 }
 
 type Resolver struct {
-	masterClient *cliclient.MasterClient
-	serverName   string
+	cfg        *config.ServerConfig
+	serverName string
 }
 
 func NewRancherResolver(cred credentials.CredResolver, serverName string) (cluster_metadata_service.ClusterMetadataResolver, error) {
@@ -31,24 +31,25 @@ func NewRancherResolver(cred credentials.CredResolver, serverName string) (clust
 	if err != nil {
 		return nil, fmt.Errorf("GetRancherSdkConfig: %v", err)
 	}
-	mc, err := cliclient.NewMasterClient(rawCfg.(*config.ServerConfig))
-	if err != nil {
-		return nil, fmt.Errorf("NewMasterClient: %v", err)
-	}
 
 	resolver := &Resolver{
-		masterClient: mc,
-		serverName:   serverName,
+		cfg:        rawCfg.(*config.ServerConfig),
+		serverName: serverName,
 	}
 	return resolver, nil
 }
 
 func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+	mc, err := rancher_service.NewManagementClient(r.cfg, types.RANCHER_TIMEOUT)
+	if err != nil {
+		return nil, fmt.Errorf("NewMasterClient: %v", err)
+	}
+
 	option := &rancherTypes.ListOpts{Filters: map[string]interface{}{
 		"filter": true,
 		"limit":  -1,
 	}}
-	res, err := r.masterClient.ManagementClient.Cluster.List(option)
+	res, err := mc.Cluster.List(option)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +64,10 @@ func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 
 		for key, value := range cluster.Labels {
 			meta.ClusterTags[key] = value
+		}
+
+		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterId.String()]; !ok {
+			meta.ClusterTags[types.KnownClusterTag_ClusterId.String()] = cluster.ID
 		}
 
 		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterEngine.String()]; !ok {

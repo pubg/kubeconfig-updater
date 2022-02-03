@@ -3,14 +3,14 @@ package rancher
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/rancher_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
-	"github.com/rancher/cli/cliclient"
 	rancherCfg "github.com/rancher/cli/config"
 	rancherTypes "github.com/rancher/norman/types"
-	"log"
 )
 
 func init() {
@@ -92,13 +92,14 @@ func getStatus(ctx context.Context, resolver credentials.CredResolver) (protos.C
 	}
 
 	serverCfg := rawCred.(*rancherCfg.ServerConfig)
-	mc, err := cliclient.NewMasterClient(serverCfg)
+
+	client, err := rancher_service.NewCAPIClient(serverCfg, types.RANCHER_TIMEOUT)
 	if err != nil {
 		return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, err, nil
 	}
 
 	var rawRes interface{}
-	err = mc.CAPIClient.APIBaseClient.List("userpreference", &rancherTypes.ListOpts{}, &rawRes)
+	err = client.APIBaseClient.List("userpreference", &rancherTypes.ListOpts{}, &rawRes)
 	if err != nil {
 		return protos.CredentialResolverStatus_CRED_REGISTERED_NOT_OK, fmt.Errorf("GetUserpreferences, err: %s", err.Error()), nil
 	}

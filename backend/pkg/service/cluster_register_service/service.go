@@ -47,4 +47,3 @@ func (s *ClusterRegisterService) RegisterCluster(ctx context.Context, clusterNam
 
 	return nil
 }
-

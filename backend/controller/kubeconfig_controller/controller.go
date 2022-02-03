@@ -14,9 +14,9 @@ import (
 type kubeconfigService struct {
 	protos.UnimplementedKubeconfigServer
 
-	credStoreService    *cred_resolver_service.CredResolverStoreService
-	registerService     *cluster_register_service.ClusterRegisterService
-	metadataService     *cluster_metadata_service.ClusterMetadataService
+	credStoreService *cred_resolver_service.CredResolverStoreService
+	registerService  *cluster_register_service.ClusterRegisterService
+	metadataService  *cluster_metadata_service.ClusterMetadataService
 }
 
 func NewKubeconfigService(credStoreService *cred_resolver_service.CredResolverStoreService, registerService *cluster_register_service.ClusterRegisterService, metadataService *cluster_metadata_service.ClusterMetadataService) *kubeconfigService {

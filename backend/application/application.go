@@ -27,6 +27,8 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	_ "github.com/pubg/kubeconfig-updater/backend/pkg"
 )
 
 type ServerApplication struct {

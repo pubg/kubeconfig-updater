@@ -3,7 +3,10 @@ package cred_resolver_service
 import (
 	"context"
 	"fmt"
+
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/concurrency"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cred_resolver_config_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
@@ -110,8 +113,13 @@ func (s *CredResolverStoreService) GetLocalProfiles(infraVendor string) ([]*prot
 }
 
 func (s *CredResolverStoreService) SyncCredResolversStatus() error {
-	configs := s.ListCredResolverConfigs()
-	for _, cfg := range configs {
+	type In struct {
+		Cfg *protos.CredResolverConfig
+		Res credentials.CredResolver
+	}
+
+	var parallelInputs []*In
+	for _, cfg := range s.ListCredResolverConfigs() {
 		if !isRegisteredStatus(cfg.Status) {
 			continue
 		}
@@ -121,21 +129,61 @@ func (s *CredResolverStoreService) SyncCredResolversStatus() error {
 			fmt.Printf("GetCredResolverInstanceFailed: Instance Not Exists %s", cfg.AccountId)
 			continue
 		}
+		parallelInputs = append(parallelInputs, &In{
+			Cfg: cfg,
+			Res: resolver,
+		})
+	}
 
-		status, userErr, err := resolver.GetStatus(context.TODO())
-		fmt.Printf("UpdateCredResolverConfig: status=%s, userErr:%s, err:%+v\n", status.String(), userErr, err)
+	type Out struct {
+		Status       protos.CredentialResolverStatus
+		StatusDetail string
+	}
+
+	parallelOuts := concurrency.Parallel(common.ToInterfaceSlice(parallelInputs), func(in interface{}) (output interface{}, err error) {
+		input, ok := in.(*In)
+		if !ok {
+			return nil, common.TypeCastError("credentials.CredResolver")
+		}
+
+		status, userErr, err := input.Res.GetStatus(context.TODO())
+		if err != nil {
+			return nil, err
+		}
+
+		out := &Out{
+			Status: status,
+		}
+		if userErr != nil {
+			out.StatusDetail = userErr.Error()
+		}
+
+		return out, nil
+	})
+
+	for _, out := range parallelOuts {
+		if out.Err != nil {
+			return fmt.Errorf("SyncCredResolversStatusError: '%s'", out.Err.Error())
+		}
+
+		statusOut := out.Output.(*Out)
+		fmt.Printf("SyncCredResolversStatus: status='%s', userErr='%s', duration: %.2fs\n", statusOut.Status.String(), statusOut.StatusDetail, out.Duration.Seconds())
+
+		input := out.Input.(*In)
+		cfg, exists, err := s.GetCredResolverConfig(input.Cfg.AccountId)
 		if err != nil {
 			return err
 		}
-		cfg.Status = status
-		if userErr != nil {
-			cfg.StatusDetail = userErr.Error()
+		if !exists {
+			return fmt.Errorf("GetCredResolverConfigNotFound: '%s'", cfg.AccountId)
 		}
+
 		err = s.SetCredResolverConfig(cfg)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 

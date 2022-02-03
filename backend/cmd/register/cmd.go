@@ -58,11 +58,13 @@ func aksCommand() *cobra.Command {
 		Args:  cobra.ExactValidArgs(2),
 	}
 
+	var azSubscription string
+	aksCmd.Flags().StringVar(&azSubscription, "subscription", "", "[Option] Azure Subscription Id to use")
+
 	aksCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		resourceGroup := args[0]
 		clusterName := args[1]
-		// TODO: add profile support?
-		return azure_service.RegisterAksCluster(resourceGroup, clusterName)
+		return azure_service.RegisterAksCluster(resourceGroup, clusterName, azSubscription)
 	}
 
 	return aksCmd

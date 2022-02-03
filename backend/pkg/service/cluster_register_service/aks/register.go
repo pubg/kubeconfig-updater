@@ -25,7 +25,7 @@ type Register struct {
 	subscriptionId string
 }
 
-func NewAksRegister(credResolver credentials.CredResolver, extension *configs.Extension) (cluster_register_service.ClusterRegister,error) {
+func NewAksRegister(credResolver credentials.CredResolver, extension *configs.Extension) (cluster_register_service.ClusterRegister, error) {
 	_, subscriptionId, err := credResolver.GetSdkConfig(context.TODO())
 	if err != nil {
 		return nil, err

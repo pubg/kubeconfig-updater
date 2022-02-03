@@ -43,7 +43,7 @@ type BasicMetaResolverFactory struct {
 // NewBasicMetaResolver Can Returns nil Slice with no Error
 type NewBasicMetaResolver func(ext *configs.Extension) ([]ClusterMetadataResolver, error)
 
-func RegisterBasicResolverFactories(factoryFunc *BasicMetaResolverFactory)  {
+func RegisterBasicResolverFactories(factoryFunc *BasicMetaResolverFactory) {
 	basicResolverFactories = append(basicResolverFactories, factoryFunc)
 }
 

@@ -2,19 +2,20 @@ package rancher_service
 
 import (
 	"fmt"
+
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
-	"github.com/rancher/cli/cliclient"
+	managementClient "github.com/rancher/rancher/pkg/client/generated/management/v3"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func RegisterRancherCluster(mc *cliclient.MasterClient, clusterId string) error {
-	cluster, err := mc.ManagementClient.Cluster.ByID(clusterId)
+func RegisterRancherCluster(mc *managementClient.Client, clusterId string) error {
+	cluster, err := mc.Cluster.ByID(clusterId)
 	if err != nil {
 		return fmt.Errorf("no cluster found with the ID [%s], run `rancher clusters` to see available clusters: %s", clusterId, err)
 	}
 
-	out, err := mc.ManagementClient.Cluster.ActionGenerateKubeconfig(cluster)
+	out, err := mc.Cluster.ActionGenerateKubeconfig(cluster)
 	if err != nil {
 		return err
 	}
