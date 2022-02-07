@@ -4,6 +4,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import browserLogger from '../logger/browserLogger'
 import ClusterRepository from '../repositories/clusterRepository'
+import EventStore from '../event/eventStore'
+import { ResultCode } from '../protos/common_pb'
 
 @singleton()
 export default class ClusterMetadataStore {
@@ -49,6 +51,8 @@ export default class ClusterMetadataStore {
     return false
   }
 
+  readonly errorEvent = new EventStore<Error>()
+
   constructor() {
     makeObservable(this)
   }
@@ -63,6 +67,7 @@ export default class ClusterMetadataStore {
       try {
         yield ClusterMetadataStore.sync()
       } catch (e) {
+        this.errorEvent.emit(e as Error)
         this.logger.error(e)
       }
     }
@@ -73,6 +78,7 @@ export default class ClusterMetadataStore {
     try {
       this._items = yield ClusterMetadataStore.fetch()
     } catch (e) {
+      this.errorEvent.emit(e as Error)
       this.logger.error(e)
     }
 
@@ -83,12 +89,28 @@ export default class ClusterMetadataStore {
   private static async sync() {
     const repo = container.resolve(ClusterRepository)
 
-    return repo.SyncAvailableClusters()
+    const res = await repo.SyncAvailableClusters()
+
+    if (res.getStatus() !== ResultCode.SUCCESS) {
+      const statusCode = res.getStatus()
+      const message = res.getMessage()
+
+      throw new Error(`failed sync available clusters, statusCode: ${statusCode} message: ${message}`)
+    }
+
+    return res
   }
 
   private static async fetch() {
     const repository = container.resolve(ClusterRepository)
     const res = await repository.GetAvailableClusters()
+
+    if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
+      const statusCode = res.getCommonres()?.getStatus() ?? 'internal error (statusCode is undefined)'
+      const message = res.getCommonres()?.getMessage() ?? 'internal error (message is undefined)'
+
+      throw new Error(`failed fetching available clusters, statusCode: ${statusCode} message: ${message}`)
+    }
 
     return res.getClustersList()
   }
