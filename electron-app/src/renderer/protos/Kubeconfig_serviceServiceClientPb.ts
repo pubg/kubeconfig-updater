@@ -251,6 +251,49 @@ export class KubeconfigClient {
     this.methodInfoSyncAvailableCredResolvers);
   }
 
+  methodInfoGetSupportedVendors = new grpcWeb.MethodDescriptor(
+    '/kubeconfig.Kubeconfig/GetSupportedVendors',
+    grpcWeb.MethodType.UNARY,
+    protos_common_pb.CommonReq,
+    protos_kubeconfig_service_pb.GetSupportedVendorsRes,
+    (request: protos_common_pb.CommonReq) => {
+      return request.serializeBinary();
+    },
+    protos_kubeconfig_service_pb.GetSupportedVendorsRes.deserializeBinary
+  );
+
+  getSupportedVendors(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null): Promise<protos_kubeconfig_service_pb.GetSupportedVendorsRes>;
+
+  getSupportedVendors(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: protos_kubeconfig_service_pb.GetSupportedVendorsRes) => void): grpcWeb.ClientReadableStream<protos_kubeconfig_service_pb.GetSupportedVendorsRes>;
+
+  getSupportedVendors(
+    request: protos_common_pb.CommonReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: protos_kubeconfig_service_pb.GetSupportedVendorsRes) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/kubeconfig.Kubeconfig/GetSupportedVendors',
+        request,
+        metadata || {},
+        this.methodInfoGetSupportedVendors,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/kubeconfig.Kubeconfig/GetSupportedVendors',
+    request,
+    metadata || {},
+    this.methodInfoGetSupportedVendors);
+  }
+
   methodInfoGetRegisteredProfiles = new grpcWeb.MethodDescriptor(
     '/kubeconfig.Kubeconfig/GetRegisteredProfiles',
     grpcWeb.MethodType.UNARY,

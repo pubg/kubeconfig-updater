@@ -9,6 +9,7 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_register_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 )
 
 type kubeconfigService struct {
@@ -220,5 +221,21 @@ func (s *kubeconfigService) SyncAvailableClusters(context.Context, *protos.Commo
 	}
 	return &protos.CommonRes{
 		Message: fmt.Sprintf("sync success"),
+	}, nil
+}
+
+func (s *kubeconfigService) GetSupportedVendors(context.Context, *protos.CommonReq) (*protos.GetSupportedVendorsRes, error) {
+	var vendors []*protos.Vendor
+	for _, vendor := range types.InfraVendors() {
+		vendors = append(vendors, &protos.Vendor{
+			VendorName: vendor.String(),
+		})
+	}
+
+	return &protos.GetSupportedVendorsRes{
+		CommonRes: &protos.CommonRes{
+			Message: fmt.Sprintf("GetSupportedVendors is static response"),
+		},
+		Vendors: vendors,
 	}, nil
 }

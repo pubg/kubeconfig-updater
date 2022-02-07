@@ -24,6 +24,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/rancher/cli v1.0.0-alpha9.0.20211102233805-7e32bb2e16a0
 	github.com/rancher/norman v0.0.0-20200820172041-261460ee9088
+	github.com/rancher/rancher/pkg/client v0.0.0-20211102002137-7a574e4a17ae
 	github.com/schollz/jsonstore v1.1.0
 	github.com/spf13/cobra v1.2.1
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.228
@@ -94,7 +95,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rancher/rancher/pkg/client v0.0.0-20211102002137-7a574e4a17ae // indirect
 	github.com/rancher/wrangler v0.6.2-0.20200820173016-2068de651106 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -109,7 +109,6 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect

@@ -23,6 +23,7 @@ type KubeconfigClient interface {
 	SetCredResolvers(ctx context.Context, in *CredResolversReq, opts ...grpc.CallOption) (*CommonRes, error)
 	DeleteCredResolver(ctx context.Context, in *DeleteCredResolverReq, opts ...grpc.CallOption) (*CommonRes, error)
 	SyncAvailableCredResolvers(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+	GetSupportedVendors(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetSupportedVendorsRes, error)
 	GetRegisteredProfiles(ctx context.Context, in *GetRegisteredProfilesReq, opts ...grpc.CallOption) (*GetRegisteredProfilesRes, error)
 	GetAvailableClusters(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetAvailableClustersRes, error)
 	RegisterCluster(ctx context.Context, in *RegisterClusterReq, opts ...grpc.CallOption) (*CommonRes, error)
@@ -83,6 +84,15 @@ func (c *kubeconfigClient) SyncAvailableCredResolvers(ctx context.Context, in *C
 	return out, nil
 }
 
+func (c *kubeconfigClient) GetSupportedVendors(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetSupportedVendorsRes, error) {
+	out := new(GetSupportedVendorsRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/GetSupportedVendors", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *kubeconfigClient) GetRegisteredProfiles(ctx context.Context, in *GetRegisteredProfilesReq, opts ...grpc.CallOption) (*GetRegisteredProfilesRes, error) {
 	out := new(GetRegisteredProfilesRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Kubeconfig/GetRegisteredProfiles", in, out, opts...)
@@ -137,6 +147,7 @@ type KubeconfigServer interface {
 	SetCredResolvers(context.Context, *CredResolversReq) (*CommonRes, error)
 	DeleteCredResolver(context.Context, *DeleteCredResolverReq) (*CommonRes, error)
 	SyncAvailableCredResolvers(context.Context, *CommonReq) (*CommonRes, error)
+	GetSupportedVendors(context.Context, *CommonReq) (*GetSupportedVendorsRes, error)
 	GetRegisteredProfiles(context.Context, *GetRegisteredProfilesReq) (*GetRegisteredProfilesRes, error)
 	GetAvailableClusters(context.Context, *CommonReq) (*GetAvailableClustersRes, error)
 	RegisterCluster(context.Context, *RegisterClusterReq) (*CommonRes, error)
@@ -163,6 +174,9 @@ func (UnimplementedKubeconfigServer) DeleteCredResolver(context.Context, *Delete
 }
 func (UnimplementedKubeconfigServer) SyncAvailableCredResolvers(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncAvailableCredResolvers not implemented")
+}
+func (UnimplementedKubeconfigServer) GetSupportedVendors(context.Context, *CommonReq) (*GetSupportedVendorsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSupportedVendors not implemented")
 }
 func (UnimplementedKubeconfigServer) GetRegisteredProfiles(context.Context, *GetRegisteredProfilesReq) (*GetRegisteredProfilesRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRegisteredProfiles not implemented")
@@ -278,6 +292,24 @@ func _Kubeconfig_SyncAvailableCredResolvers_Handler(srv interface{}, ctx context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KubeconfigServer).SyncAvailableCredResolvers(ctx, req.(*CommonReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Kubeconfig_GetSupportedVendors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommonReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KubeconfigServer).GetSupportedVendors(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Kubeconfig/GetSupportedVendors",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KubeconfigServer).GetSupportedVendors(ctx, req.(*CommonReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -398,6 +430,10 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SyncAvailableCredResolvers",
 			Handler:    _Kubeconfig_SyncAvailableCredResolvers_Handler,
+		},
+		{
+			MethodName: "GetSupportedVendors",
+			Handler:    _Kubeconfig_GetSupportedVendors_Handler,
 		},
 		{
 			MethodName: "GetRegisteredProfiles",
