@@ -27,13 +27,14 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	_ "github.com/pubg/kubeconfig-updater/backend/pkg"
 )
 
 type ServerApplication struct {
 	CredResolverConfigStorage             *cred_resolver_config_persist.CredResolverConfigStorage
 	AggreagtedClusterMetadataCacheStorage *cluster_metadata_persist.AggregatedClusterMetadataStorage
 
-	CredService      *cred_resolver_service.CredResolveService
 	CredStoreService *cred_resolver_service.CredResolverStoreService
 	RegisterService  *cluster_register_service.ClusterRegisterService
 	MetaService      *cluster_metadata_service.ClusterMetadataService
@@ -108,7 +109,10 @@ func (s *ServerApplication) InitApplication(option *ServerApplicationOption) err
 	if err != nil {
 		return err
 	}
-	s.initServiceLayer()
+	err = s.initServiceLayer()
+	if err != nil {
+		return err
+	}
 	s.initControllerLayer(option.UseMockController)
 	return nil
 }
@@ -146,7 +150,7 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 	if useMockController {
 		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewMockController())
 	} else {
-		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.CredService, s.RegisterService, s.MetaService))
+		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewKubeconfigService(s.CredStoreService, s.RegisterService, s.MetaService))
 	}
 
 	wrappedGrpc := grpcweb.WrapServer(s.GrpcServer, grpcweb.WithOriginFunc(func(_ string) bool { return true }))
@@ -165,12 +169,16 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 	s.ApplicationClose = make(chan bool, 1)
 }
 
-func (s *ServerApplication) initServiceLayer() {
+func (s *ServerApplication) initServiceLayer() error {
+	var err error
 	//Where is DI?
-	s.CredStoreService = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
-	s.CredService = cred_resolver_service.NewCredResolveService(s.CredStoreService)
-	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredService, s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
-	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.CredService, s.MetaService, s.Config.Extensions)
+	s.CredStoreService, err = cred_resolver_service.NewCredResolverService(s.CredResolverConfigStorage)
+	if err != nil {
+		return err
+	}
+	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
+	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.MetaService, s.Config.Extensions)
+	return nil
 }
 
 func (s *ServerApplication) initPersistLayer(credResolverConfig *configs.DataStoreConfig, aggrClstMetaConfig *configs.DataStoreConfig) error {

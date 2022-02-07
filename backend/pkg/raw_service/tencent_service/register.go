@@ -2,24 +2,13 @@ package tencent_service
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"path"
-
+	kuCommon "github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	tke "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke/v20180525"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
-
-func getKubeconfigPath() string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return path.Join(home, "/.kube/config")
-}
 
 func RegisterTkeCluster(region, clusterId, clusterName string, profileName string) error {
 	credProviders := common.NewProviderChain([]common.Provider{common.DefaultEnvProvider(), NewTencentIntlProfileProvider(profileName), common.DefaultProfileProvider(), common.DefaultCvmRoleProvider()})
@@ -49,37 +38,32 @@ func RegisterTkeCluster0(region, clusterId, clusterName string, credProvider com
 	if err != nil {
 		return err
 	}
-
-	oldKubeconfig, err := clientcmd.LoadFromFile(getKubeconfigPath())
+	targetKubeconfig, err := clientcmd.LoadFromFile(kuCommon.GetKubeconfigPath())
 	if err != nil {
 		return err
 	}
 
-	// 텐센트에서 내려주는 key가 unique하지 않음, 따라서 그냥 머지시 마지막에 작업한 key로 덮어씌워지므로 key는 clusterId로 변경함
+	AddNewKubeconfig(newKubeconfig, targetKubeconfig, clusterId, clusterName)
+
+	fmt.Printf("[INFO]: Register TKE{clusterName=%s, clusterId=%s, clusterRegion=%s}\n", clusterName, clusterId, region)
+
+	return nil
+
+}
+
+func AddNewKubeconfig(newKubeconfig *api.Config, targetKubeconfig *api.Config, mergeKey string, contextName string) {
 	for _, cluster := range newKubeconfig.Clusters {
-		oldKubeconfig.Clusters[clusterId] = cluster
+		targetKubeconfig.Clusters[mergeKey] = cluster
 		break
 	}
 
 	for _, authInfo := range newKubeconfig.AuthInfos {
-		oldKubeconfig.AuthInfos[clusterId] = authInfo
+		targetKubeconfig.AuthInfos[mergeKey] = authInfo
 		break
 	}
 
-	oldKubeconfig.Contexts[clusterName] = &api.Context{
-		Cluster:  clusterId,
-		AuthInfo: clusterId,
+	targetKubeconfig.Contexts[contextName] = &api.Context{
+		Cluster:  mergeKey,
+		AuthInfo: mergeKey,
 	}
-
-	oldKubeconfig.CurrentContext = clusterName
-
-	err = clientcmd.WriteToFile(*oldKubeconfig, getKubeconfigPath())
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("[INFO]: Register TKE{clusterName=%s, clusterId=%s, clusterRegion=%s}\n\n", clusterName, clusterId, region)
-
-	return nil
-
 }

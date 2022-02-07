@@ -2,8 +2,6 @@ package cluster_metadata_service
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
@@ -11,22 +9,17 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
+	"strings"
 )
 
-type ClusterMetadataResolver interface {
-	ListClusters() ([]*protos.ClusterMetadata, error)
-	GetResolverDescription() string
-}
-
 type ClusterMetadataService struct {
-	credService      *cred_resolver_service.CredResolveService
 	credStoreService *cred_resolver_service.CredResolverStoreService
 	cache            *cluster_metadata_persist.AggregatedClusterMetadataStorage
 	cfg              *configs.ApplicationConfig
 }
 
-func NewClusterMetadataService(credService *cred_resolver_service.CredResolveService, credStoreService *cred_resolver_service.CredResolverStoreService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage, cfg *configs.ApplicationConfig) *ClusterMetadataService {
-	return &ClusterMetadataService{credService: credService, credStoreService: credStoreService, cache: cache, cfg: cfg}
+func NewClusterMetadataService(credStoreService *cred_resolver_service.CredResolverStoreService, cache *cluster_metadata_persist.AggregatedClusterMetadataStorage, cfg *configs.ApplicationConfig) *ClusterMetadataService {
+	return &ClusterMetadataService{credStoreService: credStoreService, cache: cache, cfg: cfg}
 }
 
 func (s *ClusterMetadataService) ListClusterMetadatas() []*protos.AggregatedClusterMetadata {
@@ -84,7 +77,8 @@ func (s *ClusterMetadataService) SyncAvailableClusters() error {
 				}
 			}
 
-			if _, ok := resolver.(*KubeconfigResolver); ok {
+			// TODO: string말고 컴파일 되는 타입으로 판단해야 함
+			if strings.HasPrefix(resolver.GetResolverDescription(), "Kubeconfig") {
 				regedMetaMap[metadata.ClusterName] = true
 			}
 		}
@@ -127,7 +121,7 @@ func getClusterInfoStatus(credStoreService *cred_resolver_service.CredResolverSt
 	if credResolverId == "" {
 		return "not_exists"
 	}
-	credResolver, exists, err := credStoreService.GetCredResolver(credResolverId)
+	credResolver, exists, err := credStoreService.GetCredResolverConfig(credResolverId)
 	if err != nil {
 		return "not_ok"
 	}
@@ -165,44 +159,40 @@ func mergeMetadata(a *protos.ClusterMetadata, b *protos.ClusterMetadata) *protos
 }
 
 func (s *ClusterMetadataService) ListMetadataResolvers() ([]ClusterMetadataResolver, error) {
-	var metaResolvers []ClusterMetadataResolver
-	if s.cfg.Extensions.Fox.Enable {
-		fox, err := NewFoxResolver(s.cfg.Extensions.Fox.Address)
+	var allResolvers []ClusterMetadataResolver
+
+	for _, factory := range GetBasicResolverFactories() {
+		resolvers, err := factory.FactoryFunc(s.cfg.Extensions)
 		if err != nil {
 			return nil, err
 		}
-		metaResolvers = append(metaResolvers, fox)
-	}
-
-	kubeconfigs, err := NewKubeconfigResolvers()
-	if err != nil {
-		return nil, err
-	}
-	for _, resolver := range kubeconfigs {
-		metaResolvers = append(metaResolvers, resolver)
-	}
-
-	credResolvers := s.credStoreService.ListCredResolvers()
-	for _, cr := range credResolvers {
-		if strings.EqualFold(cr.InfraVendor, types.InfraVendor_AWS.String()) {
-			awsResolver, err := NewAwsResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, awsResolver)
-		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_Azure.String()) {
-			authorizer, err := NewAzureResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, authorizer)
-		} else if strings.EqualFold(cr.InfraVendor, types.InfraVendor_Tencent.String()) {
-			tcResolver, err := NewTencentResolver(cr, cr.AccountId, s.credService)
-			if err != nil {
-				return nil, err
-			}
-			metaResolvers = append(metaResolvers, tcResolver)
+		if resolvers != nil {
+			allResolvers = append(allResolvers, resolvers...)
 		}
 	}
-	return metaResolvers, nil
+
+	credCfgs := s.credStoreService.ListCredResolverConfigs()
+	for _, cr := range credCfgs {
+		vendor, ok := types.ToInfraVendorIgnoreCase(cr.InfraVendor)
+		if !ok {
+			return nil, fmt.Errorf("InfraVendorNotFound: '%s'", cr.InfraVendor)
+		}
+
+		fact, exists := GetCloudResolverFactory(vendor)
+		if !exists {
+			return nil, fmt.Errorf("FactoryNotFound: '%s'", vendor.String())
+		}
+
+		credResolver, exists := s.credStoreService.GetCredResolverInstance(cr.AccountId)
+		if !exists {
+			return nil, fmt.Errorf("GetCredResolverInstanceFailed: Instance Not Exists %s", cr.AccountId)
+		}
+
+		metaResolver, err := fact.FactoryFunc(credResolver, cr.AccountId)
+		if err != nil {
+			return nil, err
+		}
+		allResolvers = append(allResolvers, metaResolver)
+	}
+	return allResolvers, nil
 }

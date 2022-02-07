@@ -101,3 +101,11 @@ func ToInterfaceSlice(slice interface{}) []interface{} {
 func TypeCastError(typeName string) error {
 	return fmt.Errorf("failed cast value to %s", typeName)
 }
+
+func GetKubeconfigPath() string {
+	path, err := ResolvePathToAbs(filepath.Join("~", ".kube", "config"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return path
+}

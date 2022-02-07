@@ -1,7 +1,6 @@
 package aws_service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -29,7 +28,7 @@ func RegisterEks(clusterName, clusterRegion, role, profile string) error {
 	}
 
 	if exitCode != 0 {
-		return errors.New("register cluster failed")
+		return fmt.Errorf("RegisterClusterFailed: %s", *err)
 	}
 	return nil
 }

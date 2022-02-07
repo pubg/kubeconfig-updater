@@ -1,8 +1,11 @@
-package cluster_metadata_service
+package azure
 
 import (
 	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
+	"log"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
@@ -10,30 +13,36 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	aks "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2021-10-01/containerservice"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 )
 
-func NewAzureResolver(credCfg *protos.CredResolverConfig, subscriptionId string, credService *cred_resolver_service.CredResolveService) (*AzureResolver, error) {
-	authConfig, err := credService.GetAzureSdkConfig(context.Background(), credCfg)
-	if err != nil {
-		return nil, err
+func init() {
+	factory := &cluster_metadata_service.CloudMetaResolverFactory{FactoryFunc: NewAzureResolver}
+	if err := cluster_metadata_service.RegisterCloudResolverFactory(types.InfraVendor_Azure, factory); err != nil {
+		log.Fatalln(err)
 	}
-	return &AzureResolver{
-		authConfig:     authConfig,
-		subscriptionId: subscriptionId,
-	}, nil
 }
 
-type AzureResolver struct {
+type Resolver struct {
 	authConfig     auth.AuthorizerConfig
 	subscriptionId string
 }
 
-func (r *AzureResolver) GetResolverDescription() string {
+func NewAzureResolver(cred credentials.CredResolver, subscriptionId string) (cluster_metadata_service.ClusterMetadataResolver, error) {
+	azCfg, _, err := cred.GetSdkConfig(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	return &Resolver{
+		authConfig:     azCfg.(auth.AuthorizerConfig),
+		subscriptionId: subscriptionId,
+	}, nil
+}
+
+func (r *Resolver) GetResolverDescription() string {
 	return fmt.Sprintf("Azure/%s", r.subscriptionId)
 }
 
-func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
+func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	authorizer, err := r.authConfig.Authorizer()
 	if err != nil {
 		return nil, err
@@ -64,10 +73,16 @@ func (r *AzureResolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error occurred when trying parse ResourceId id:%s error:%s", *cluster.ID, err.Error())
 		}
+
 		meta.ClusterTags[types.KnownClusterTag_ResourceGroup.String()] = resource.ResourceGroupName
 		for key, value := range cluster.Tags {
 			meta.ClusterTags[key] = *value
 		}
+
+		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterRegion.String()]; !ok {
+			meta.ClusterTags[types.KnownClusterTag_ClusterRegion.String()] = resource.Location
+		}
+
 		if _, ok := meta.ClusterTags[types.KnownClusterTag_ClusterEngine.String()]; !ok {
 			meta.ClusterTags[types.KnownClusterTag_ClusterEngine.String()] = types.KnownClusterEngine_AKS.String()
 		}

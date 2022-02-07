@@ -8,10 +8,12 @@ const (
 	InfraVendor_AWS     InfraVendor = 0
 	InfraVendor_Azure   InfraVendor = 1
 	InfraVendor_Tencent InfraVendor = 2
+	InfraVendor_GCP     InfraVendor = 3
+	InfraVendor_Rancher InfraVendor = 4
 )
 
-var _InfraVendorNames = []string{"AWS", "Azure", "Tencent"}
-var _InfraVendorValues = []InfraVendor{InfraVendor_AWS, InfraVendor_Azure, InfraVendor_Tencent}
+var _InfraVendorNames = []string{"AWS", "Azure", "Tencent", "GCP", "Rancher"}
+var _InfraVendorValues = []InfraVendor{InfraVendor_AWS, InfraVendor_Azure, InfraVendor_Tencent, InfraVendor_GCP, InfraVendor_Rancher}
 
 func (v InfraVendor) String() string {
 	return _InfraVendorNames[v]

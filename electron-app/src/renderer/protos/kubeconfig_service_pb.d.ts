@@ -109,6 +109,50 @@ export namespace DeleteCredResolverReq {
   }
 }
 
+export class GetSupportedVendorsRes extends jspb.Message {
+  getCommonres(): protos_common_pb.CommonRes | undefined;
+  setCommonres(value?: protos_common_pb.CommonRes): GetSupportedVendorsRes;
+  hasCommonres(): boolean;
+  clearCommonres(): GetSupportedVendorsRes;
+
+  getVendorsList(): Array<Vendor>;
+  setVendorsList(value: Array<Vendor>): GetSupportedVendorsRes;
+  clearVendorsList(): GetSupportedVendorsRes;
+  addVendors(value?: Vendor, index?: number): Vendor;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetSupportedVendorsRes.AsObject;
+  static toObject(includeInstance: boolean, msg: GetSupportedVendorsRes): GetSupportedVendorsRes.AsObject;
+  static serializeBinaryToWriter(message: GetSupportedVendorsRes, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetSupportedVendorsRes;
+  static deserializeBinaryFromReader(message: GetSupportedVendorsRes, reader: jspb.BinaryReader): GetSupportedVendorsRes;
+}
+
+export namespace GetSupportedVendorsRes {
+  export type AsObject = {
+    commonres?: protos_common_pb.CommonRes.AsObject,
+    vendorsList: Array<Vendor.AsObject>,
+  }
+}
+
+export class Vendor extends jspb.Message {
+  getVendorname(): string;
+  setVendorname(value: string): Vendor;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Vendor.AsObject;
+  static toObject(includeInstance: boolean, msg: Vendor): Vendor.AsObject;
+  static serializeBinaryToWriter(message: Vendor, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Vendor;
+  static deserializeBinaryFromReader(message: Vendor, reader: jspb.BinaryReader): Vendor;
+}
+
+export namespace Vendor {
+  export type AsObject = {
+    vendorname: string,
+  }
+}
+
 export class GetRegisteredProfilesReq extends jspb.Message {
   getInfravendor(): string;
   setInfravendor(value: string): GetRegisteredProfilesReq;
@@ -365,19 +409,19 @@ export namespace DeleteClusterReq {
   }
 }
 
-export enum CredentialResolverKind {
+export enum CredentialResolverKind { 
   DEFAULT = 0,
   ENV = 1,
   IMDS = 2,
   PROFILE = 3,
 }
-export enum CredentialResolverStatus {
+export enum CredentialResolverStatus { 
   CRED_RESOLVER_UNKNOWN = 0,
   CRED_REGISTERED_OK = 1,
   CRED_REGISTERED_NOT_OK = 2,
   CRED_SUGGESTION_OK = 101,
 }
-export enum ClusterInformationStatus {
+export enum ClusterInformationStatus { 
   INFO_NOT_SETTED = 0,
   REGISTERED_OK = 1,
   REGISTERED_NOTOK_NO_CRED_RESOLVER = 2,

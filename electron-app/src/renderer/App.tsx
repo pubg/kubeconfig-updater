@@ -4,6 +4,7 @@ import './App.css'
 import { container } from 'tsyringe'
 import { SnackbarProvider } from 'notistack'
 import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
 import About from './pages/about/about'
@@ -15,15 +16,25 @@ import CredResolver from './pages/credResolver/page'
 import CredResolverStore from './store/credResolverStore'
 import ProfileStore from './store/profileStore'
 import UpdateNotification from './components/updateNotification'
+import VendorStore from './store/vendorStore'
 
 export default observer(function App() {
   const { muiTheme } = container.resolve(ThemeStore)
 
   browserLogger.debug('current theme: ', muiTheme)
 
+  const vendorStore = container.resolve(VendorStore)
+  const credResolverStore = container.resolve(CredResolverStore)
+  const profileStore = container.resolve(ProfileStore)
+
   // trigger sync on start to minimize loading
-  container.resolve(CredResolverStore).fetchCredResolver(true)
-  container.resolve(ProfileStore).fetchProfiles(true)
+  useEffect(() => {
+    ;(async () => {
+      await vendorStore.fetchVendors()
+      credResolverStore.fetchCredResolver(true)
+      profileStore.fetchProfiles(true)
+    })()
+  }, [credResolverStore, profileStore, vendorStore])
 
   return (
     <ThemeProvider theme={muiTheme}>
