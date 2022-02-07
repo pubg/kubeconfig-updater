@@ -177,6 +177,8 @@ func (s *CredResolverStoreService) SyncCredResolversStatus() error {
 		if !exists {
 			return fmt.Errorf("GetCredResolverConfigNotFound: '%s'", cfg.AccountId)
 		}
+		cfg.Status = statusOut.Status
+		cfg.StatusDetail = statusOut.StatusDetail
 
 		err = s.SetCredResolverConfig(cfg)
 		if err != nil {
