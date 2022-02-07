@@ -17,9 +17,7 @@ import LINQ from 'linq'
 import { useResolve } from '../../../hooks/container'
 import CredResolverStore from '../../../store/credResolverStore'
 import ProfileStore from '../../../store/profileStore'
-
-// TODO: refactor this hard-coded values
-const vendors = ['AWS', 'Azure', 'Tencent'] as const
+import VendorStore from '../../../store/vendorStore'
 
 interface ConfigAddData {
   vendor: string
@@ -36,6 +34,7 @@ export interface ConfigAddModalProps {
 export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: ConfigAddModalProps) {
   const profileStore = useResolve(ProfileStore)
   const credResolverStore = useResolve(CredResolverStore)
+  const vendorStore = useResolve(VendorStore)
 
   const [vendor, setVendor] = useState('')
   const [account, setAccount] = useState('')
@@ -94,7 +93,7 @@ export default function ConfigAddModal({ popperProps, onSubmit, onAbort }: Confi
                   onChange={(e) => setVendor(e.target.value)}
                   margin="normal"
                 >
-                  {vendors.map((value) => (
+                  {vendorStore.vendors.map((value) => (
                     <MenuItem key={value} value={value}>
                       {value}
                     </MenuItem>

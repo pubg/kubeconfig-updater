@@ -25,6 +25,7 @@ module.exports = {
         custom: 'ignore',
       },
     ],
+    'class-methods-use-this': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

@@ -6,6 +6,7 @@ import browserLogger from '../logger/browserLogger'
 import { ResultCode } from '../protos/common_pb'
 import { GetRegisteredProfilesRes, Profile } from '../protos/kubeconfig_service_pb'
 import ProfileRepository from '../repositories/profileRepository'
+import VendorStore from './vendorStore'
 
 @singleton()
 export default class ProfileStore {
@@ -33,7 +34,7 @@ export default class ProfileStore {
 
   private expiredMinute = 5
 
-  constructor(private readonly profileRepository: ProfileRepository) {
+  constructor(private readonly profileRepository: ProfileRepository, private readonly vendorStore: VendorStore) {
     makeObservable(this)
   }
 
@@ -47,11 +48,9 @@ export default class ProfileStore {
     this._state = 'fetching'
     this.logger.debug('fetching profiles...')
 
-    const profiles: Profile.AsObject[][] = yield Promise.all([
-      this.fetchVendorProfile('AWS'),
-      this.fetchVendorProfile('Azure'),
-      this.fetchVendorProfile('Tencent'),
-    ])
+    const profiles: Profile.AsObject[][] = yield Promise.all(
+      this.vendorStore.vendors.map((vendor) => this.fetchVendorProfile(vendor))
+    )
 
     this._profiles = profiles.flat()
     this.lastUpdated = dayjs()
@@ -60,10 +59,14 @@ export default class ProfileStore {
     this.logger.debug(`fetched ${this.profiles.length} profiles: `, toJS(this.profiles))
   })
 
-  private async fetchVendorProfile(vendor: 'AWS' | 'Azure' | 'Tencent') {
+  private async fetchVendorProfile(vendor: string) {
     const result: GetRegisteredProfilesRes = await this.profileRepository.getProfiles(vendor)
     if (result.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      this.errorEvent.emit(new Error(result.getCommonres()?.getMessage()))
+      const statusCode = result.getCommonres()?.getStatus() ?? 'internal error(undefined statusCode)'
+      const message = result.getCommonres()?.getStatus() ?? 'internal error(undefined message)'
+      this.errorEvent.emit(
+        new Error(`failed to fetch profiles of vendor: ${vendor}, statusCode: ${statusCode}, message: ${message}`)
+      )
       return []
     }
 

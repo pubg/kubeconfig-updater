@@ -1,18 +1,14 @@
 import { singleton } from 'tsyringe'
-import { ResultCode } from '../protos/common_pb'
 import { KubeconfigClient } from '../protos/Kubeconfig_serviceServiceClientPb'
 import { GetRegisteredProfilesReq, GetRegisteredProfilesRes } from '../protos/kubeconfig_service_pb'
 import { createErrorResponse } from './error'
 import { getDefaultMetadata } from './grpcMetadata'
 
-// check backend/pkg/types/enums.go _InfraVendorNames
-type VendorNames = 'AWS' | 'Azure' | 'Tencent'
-
 @singleton()
 export default class ProfileRepository {
   constructor(private readonly client: KubeconfigClient) {}
 
-  async getProfiles(vendor: VendorNames): Promise<GetRegisteredProfilesRes> {
+  async getProfiles(vendor: string): Promise<GetRegisteredProfilesRes> {
     const req = new GetRegisteredProfilesReq()
     req.setInfravendor(vendor)
 

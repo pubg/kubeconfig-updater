@@ -4,10 +4,7 @@ import {
   FormGroup,
   TextField,
   Autocomplete,
-  FormControlLabel,
   Button,
-  SwitchProps,
-  Switch,
   UseAutocompleteProps,
   ButtonGroup,
   Popper,
@@ -17,6 +14,9 @@ import {
   MenuItem,
   Grow,
   useTheme,
+  Select,
+  InputLabel,
+  FormControl,
 } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -28,7 +28,11 @@ import ClusterManagementUIStore from './UIStore/ClusterManagementUIStore'
 import ClusterMetadataStore from '../../store/clusterMetadataStore'
 import { ClusterMetadataItem, ClusterMetadataItemFilter } from './UIStore/types'
 
-function filterFactory(name: string, showRegistered: boolean): ClusterMetadataItemFilter {
+// use string alias over const enum
+// https://engineering.linecorp.com/ko/blog/typescript-enum-tree-shaking/
+type ViewType = 'All' | 'Registered' | 'Suggested'
+
+function filterFactory(name: string, viewType: ViewType): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
     // fuzzy search
     const clusterName = data.metadata.clustername
@@ -36,14 +40,11 @@ function filterFactory(name: string, showRegistered: boolean): ClusterMetadataIt
       return false
     }
 
-    // filter by tags
-    // TODO
-
-    // filter by registered state
-    if (!showRegistered) {
-      if (data.status === ClusterInformationStatus.REGISTERED_OK) {
-        return false
-      }
+    if (viewType === 'Registered') {
+      return data.status === ClusterInformationStatus.REGISTERED_OK
+    }
+    if (viewType === 'Suggested') {
+      return data.status !== ClusterInformationStatus.REGISTERED_OK
     }
 
     return true
@@ -58,23 +59,19 @@ export default observer(function TopBar() {
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
-  const [showRegistered, setShowRegistered] = useState(true)
   const [showReloadDropdown, setShowReloadDropdown] = useState(false)
+  const [viewType, setViewType] = useState<ViewType>('All')
   const reloadDropdownRef = useRef(null)
 
   // update store's filter when filter variables are changed
   useEffect(() => {
-    store.setFilter(filterFactory(nameFilter, showRegistered))
-  }, [store, nameFilter, showRegistered])
+    store.setFilter(filterFactory(nameFilter, viewType))
+  }, [store, nameFilter, viewType])
 
   // define handlers
   const onTagSelectChanged: UseAutocompleteProps<string, false, false, false>['onChange'] = (e, value) => {
     browserLogger.debug(`selected tag: ${value}`)
     store.setGroupTag(value)
-  }
-
-  const onShowRegisteredToggled: SwitchProps['onChange'] = (_, checked) => {
-    setShowRegistered(checked)
   }
 
   // TODO: refactor this hard-coded requester binding to parent?
@@ -119,10 +116,21 @@ export default observer(function TopBar() {
             <TextField {...params} label="Group by Tag" />
           )}
         />
-        <FormControlLabel
-          control={<Switch checked={showRegistered} onChange={onShowRegisteredToggled} />}
-          label="Show Registered"
-        />
+        <FormControl>
+          <InputLabel id="viewType-select-label">filter</InputLabel>
+          <Select
+            id="viewType-select"
+            labelId="viewType-select-label"
+            size="small"
+            label="filter"
+            value={viewType}
+            onChange={(e) => setViewType(e.target.value as ViewType)}
+          >
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Registered">Show Registered</MenuItem>
+            <MenuItem value="Suggested">Show Suggested</MenuItem>
+          </Select>
+        </FormControl>
       </FormGroup>
       <Stack>
         <ButtonGroup variant="outlined" ref={reloadDropdownRef}>
