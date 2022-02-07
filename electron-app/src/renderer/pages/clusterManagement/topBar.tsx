@@ -4,10 +4,7 @@ import {
   FormGroup,
   TextField,
   Autocomplete,
-  FormControlLabel,
   Button,
-  SwitchProps,
-  Switch,
   UseAutocompleteProps,
   ButtonGroup,
   Popper,
@@ -33,7 +30,7 @@ import { ClusterMetadataItem, ClusterMetadataItemFilter } from './UIStore/types'
 
 // use string alias over const enum
 // https://engineering.linecorp.com/ko/blog/typescript-enum-tree-shaking/
-type ViewType = 'All' | 'Registered' | 'Unregistered'
+type ViewType = 'All' | 'Registered' | 'Suggested'
 
 function filterFactory(name: string, viewType: ViewType): ClusterMetadataItemFilter {
   const filter = ({ data }: ClusterMetadataItem): boolean => {
@@ -46,7 +43,7 @@ function filterFactory(name: string, viewType: ViewType): ClusterMetadataItemFil
     if (viewType === 'Registered') {
       return data.status === ClusterInformationStatus.REGISTERED_OK
     }
-    if (viewType === 'Unregistered') {
+    if (viewType === 'Suggested') {
       return data.status !== ClusterInformationStatus.REGISTERED_OK
     }
 
@@ -120,18 +117,18 @@ export default observer(function TopBar() {
           )}
         />
         <FormControl>
-          <InputLabel id="viewType-select-label">view</InputLabel>
+          <InputLabel id="viewType-select-label">filter</InputLabel>
           <Select
             id="viewType-select"
             labelId="viewType-select-label"
             size="small"
-            label="view"
+            label="filter"
             value={viewType}
             onChange={(e) => setViewType(e.target.value as ViewType)}
           >
             <MenuItem value="All">All</MenuItem>
-            <MenuItem value="Registered">Registered</MenuItem>
-            <MenuItem value="Unregistered">Unregistered</MenuItem>
+            <MenuItem value="Registered">Show Registered</MenuItem>
+            <MenuItem value="Suggested">Show Suggested</MenuItem>
           </Select>
         </FormControl>
       </FormGroup>
