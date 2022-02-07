@@ -106,8 +106,8 @@ export default class ClusterMetadataStore {
     const res = await repository.GetAvailableClusters()
 
     if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      const statusCode = res.getCommonres()?.getStatus() ?? 'internal error (statusCode is undefined)'
-      const message = res.getCommonres()?.getMessage() ?? 'internal error (message is undefined)'
+      const statusCode = res.getCommonres()?.getStatus() ?? 'internal error (undefined statusCode)'
+      const message = res.getCommonres()?.getMessage() ?? 'internal error (undefined statusCode)'
 
       throw new Error(`failed fetching available clusters, statusCode: ${statusCode} message: ${message}`)
     }

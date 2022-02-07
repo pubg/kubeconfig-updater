@@ -6,6 +6,7 @@ const defaultVendors = ['AWS', 'Azure', 'Tencent']
 
 /**
  * VendorStore provides all available vendors
+ * @todo add vendorRepository layer
  */
 @singleton()
 export default class VendorStore {
