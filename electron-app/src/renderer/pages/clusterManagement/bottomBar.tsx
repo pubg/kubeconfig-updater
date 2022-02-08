@@ -39,7 +39,7 @@ export default observer(function BottomBar() {
         Register Selected
       </Button>
       {/* on ready (selecting items...) */}
-      <Typography>{store.selection.count} Clusters Selected.</Typography>
+      <Typography>{store.selection.count} Clusters Selected</Typography>
     </Stack>
   )
 })
