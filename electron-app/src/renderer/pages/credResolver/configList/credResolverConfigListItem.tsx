@@ -70,7 +70,7 @@ export default observer(function CredResolverConfigListItem({
     credResolverStore.deleteCredResolver(config.accountid)
   }
 
-  const selectionTooltip = '해당 계정에 사용할 프로필 이름입니다'
+  const selectionTooltip = 'Credential Resolve Method to Access The Server'
 
   return (
     <Container>

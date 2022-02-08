@@ -117,12 +117,12 @@ export default observer(function TopBar() {
           )}
         />
         <FormControl>
-          <InputLabel id="viewType-select-label">filter</InputLabel>
+          <InputLabel id="viewType-select-label">Status Filter</InputLabel>
           <Select
             id="viewType-select"
             labelId="viewType-select-label"
             size="small"
-            label="filter"
+            label="Status Filter"
             value={viewType}
             onChange={(e) => setViewType(e.target.value as ViewType)}
           >

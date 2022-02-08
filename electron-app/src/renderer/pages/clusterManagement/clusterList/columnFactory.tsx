@@ -35,15 +35,15 @@ const dataSourceColumn: IColumn = {
     const tooltipString = resolverDescs.join('\n')
 
     return (
-      <Tooltip title={tooltipString}>
-        <Stack direction="row" spacing={1}>
-          {resolverDescs.map((resolverDesc) => {
-            return (
+      <Stack direction="row" spacing={1}>
+        {resolverDescs.map((resolverDesc) => {
+          return (
+            <Tooltip title={resolverDesc}>
               <Chip color="default" style={{ borderRadius: '4px' }} size="small" label={resolverDesc.split('/')[0]} />
-            )
-          })}
-        </Stack>
-      </Tooltip>
+            </Tooltip>
+          )
+        })}
+      </Stack>
     )
   },
 }
@@ -107,19 +107,19 @@ const statusColumn: IColumn = {
         return <Typography>Registered</Typography>
 
       case ClusterInformationStatus.SUGGESTION_OK:
-        return <Typography>Suggested (Not Registered)</Typography>
+        return <Typography>Suggested</Typography>
 
       case ClusterInformationStatus.REGISTERED_NOTOK_CRED_RES_NOTOK:
-        return <Typography>Registered (Credential Resolver invalid)</Typography>
+        return <Typography>Registered (Credential Resolver Error)</Typography>
 
       case ClusterInformationStatus.SUGGESTION_NOTOK_CRED_RES_NOTOK:
-        return <Typography>Suggested (Credential Resolver invalid)</Typography>
+        return <Typography>Suggested (Credential Resolver Error)</Typography>
 
       case ClusterInformationStatus.REGISTERED_NOTOK_NO_CRED_RESOLVER:
-        return <Typography>Registered (Credential Resolver not set)</Typography>
+        return <Typography>Registered (Credential Resolver Not Set)</Typography>
 
       case ClusterInformationStatus.SUGGESTION_NOTOK_NO_CRED_RESOLVER:
-        return <Typography>Suggested (Credential Resolver not set)</Typography>
+        return <Typography>Suggested (Credential Resolver Not Set)</Typography>
 
       case ClusterInformationStatus.REGISTERED_UNKNOWN:
         return <Typography>Unknown</Typography>
