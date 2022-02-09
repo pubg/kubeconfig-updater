@@ -3,12 +3,13 @@ package tencent
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/tencent_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
-	"log"
 )
 
 func init() {
@@ -104,7 +105,7 @@ func (r *ProfileResolver) GetSdkConfig(ctx context.Context) (cred interface{}, p
 }
 
 func (r *ProfileResolver) SupportIdentityType() types.InfraVendor {
-	return types.InfraVendor_AWS
+	return types.InfraVendor_Tencent
 }
 
 func (r *ProfileResolver) Description() string {
