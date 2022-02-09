@@ -31,6 +31,11 @@ func RegisterRancherCluster(mc *managementClient.Client, clusterId string) error
 
 	tencent_service.AddNewKubeconfig(newKubeconfig, targetKubeconfig, clusterId, cluster.Name)
 
+	err = clientcmd.WriteToFile(*targetKubeconfig, common.GetKubeconfigPath())
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("[INFO]: Register Rancher{clusterName=%s, clusterId=%s}\n", cluster.Name, clusterId)
 
 	return nil

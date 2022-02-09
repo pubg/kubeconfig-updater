@@ -2,6 +2,7 @@ package tencent_service
 
 import (
 	"fmt"
+
 	kuCommon "github.com/pubg/kubeconfig-updater/backend/pkg/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
@@ -44,6 +45,11 @@ func RegisterTkeCluster0(region, clusterId, clusterName string, credProvider com
 	}
 
 	AddNewKubeconfig(newKubeconfig, targetKubeconfig, clusterId, clusterName)
+
+	err = clientcmd.WriteToFile(*targetKubeconfig, kuCommon.GetKubeconfigPath())
+	if err != nil {
+		return err
+	}
 
 	fmt.Printf("[INFO]: Register TKE{clusterName=%s, clusterId=%s, clusterRegion=%s}\n", clusterName, clusterId, region)
 
