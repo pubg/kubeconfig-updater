@@ -134,7 +134,9 @@ func (s *ServerApplication) initApplicationConfig(absPath string) error {
 }
 
 func (s *ServerApplication) initControllerLayer(useMockController bool) {
-	logger, _ := zap.NewProduction()
+	config := zap.NewProductionConfig()
+	config.OutputPaths = []string{"stdout"}
+	logger, _ := config.Build()
 	defer logger.Sync() // flushes buffer, if any
 
 	grpcOption := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(

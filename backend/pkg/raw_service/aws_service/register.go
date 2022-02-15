@@ -19,16 +19,9 @@ func RegisterEks(clusterName, clusterRegion, role, profile string) error {
 		command = strings.Join([]string{command, fmt.Sprintf("--profile=%s", profile)}, " ")
 	}
 
-	out, err, exitCode := common.Execute(command)
-	if *out != "" {
-		fmt.Println("STDOUT: " + strings.Trim(*out, "\n"))
-	}
-	if *err != "" {
-		fmt.Println("STDERR: " + strings.Trim(*err, "\n"))
-	}
-
-	if exitCode != 0 {
-		return fmt.Errorf("RegisterClusterFailed: %s", *err)
+	err := common.SimpleExecute(command, "RegisterClusterFailed")
+	if err != nil {
+		return err
 	}
 	return nil
 }

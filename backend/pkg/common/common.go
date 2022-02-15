@@ -9,14 +9,29 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
-	"runtime/debug"
 	"strings"
 	"syscall"
 )
 
-func Execute(commandLine string) (stdout *string, stderr *string, exit int) {
-	stdout = nil
-	stderr = nil
+func SimpleExecute(commandLine string, failureMessage string) error {
+	stdout, stderr, exitCode, err := Execute(commandLine)
+	if stdout != "" {
+		fmt.Println("STDOUT: " + strings.Trim(stdout, "\n"))
+	}
+	if stderr != "" {
+		fmt.Println("STDERR: " + strings.Trim(stderr, "\n"))
+	}
+
+	if exitCode != 0 {
+		return fmt.Errorf("%s: %s", failureMessage, stderr)
+	}
+	if err != nil {
+		return fmt.Errorf("%s: %s", failureMessage, err.Error())
+	}
+	return nil
+}
+
+func Execute(commandLine string) (stdout string, stderr string, exit int, err error) {
 	exit = 0
 
 	commands := strings.Split(commandLine, " ")
@@ -26,23 +41,23 @@ func Execute(commandLine string) (stdout *string, stderr *string, exit int) {
 	cmd.Stdout = &bufOut
 	cmd.Stderr = &bufErr
 
-	err := cmd.Run()
-	if err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
+	cmdErr := cmd.Run()
+	if cmdErr != nil {
+		if exiterr, ok := cmdErr.(*exec.ExitError); ok {
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 				exit = status.ExitStatus()
+			} else {
+				err = fmt.Errorf("ExitError: %s", cmdErr.Error())
 			}
+		} else if exiterr2, ok := cmdErr.(*exec.Error); ok {
+			err = fmt.Errorf("ExecError: PATH=%s, %s", os.Getenv("PATH"), exiterr2.Error())
 		} else {
-			debug.PrintStack()
-			log.Fatalf("cmd.Wait: %s, %v", commandLine, err)
+			err = fmt.Errorf("ExecUnknownError: %s", cmdErr.Error())
 		}
 	}
 
-	sout := bufOut.String()
-	stdout = &sout
-
-	serr := bufErr.String()
-	stderr = &serr
+	stdout = bufOut.String()
+	stderr = bufErr.String()
 	fmt.Printf("Command execute: %s, exitcode: %d\n", commandLine, exit)
 	return
 }
