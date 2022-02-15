@@ -1,10 +1,11 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import _ from 'lodash'
-import { ChildProcess, exec, ExecException, execFile, ExecFileException, spawn } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
 import { inject, singleton } from 'tsyringe'
 import { dialog } from 'electron'
 import kill from 'tree-kill'
+import fixPath from 'fix-path'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './symbols'
 import mainLogger from '../logger/mainLogger'
 
@@ -116,15 +117,13 @@ export default class BackendManager {
     // when darwin platform production, it's launched under launchd
     // that has default $PATH env and it doesn't have /usr/local/bin
     if (process.platform === 'darwin') {
-      const paths = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin'
-      const PATH = `${process.env.PATH}:${paths}`
+      fixPath()
+      this.backendLogger.info(`process.env.PATH variable fixed as: ${process.env.PATH}`)
+      const { PATH } = process.env
       return spawn(cmd, args, {
         cwd: this.cwd,
         shell: true,
-        env: {
-          ...process.env,
-          PATH,
-        },
+        env: { PATH },
       })
     }
 
