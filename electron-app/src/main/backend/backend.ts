@@ -123,7 +123,7 @@ export default class BackendManager {
       return spawn(cmd, args, {
         cwd: this.cwd,
         shell: true,
-        env: { PATH },
+        env: { ...process.env, PATH },
       })
     }
 
