@@ -2,6 +2,10 @@ const { contextBridge, ipcRenderer, shell } = require('electron')
 const electronLogger = require('electron-log').create('renderer')
 
 electronLogger.transports.console.format = '[{level}]{scope} {text}'
+// move past logs to main.old.log and clear the current log file.
+const rendererLogFilePath = electronLogger.transports.file.getFile().path
+electronLogger.transports.file.archiveLog(rendererLogFilePath)
+electronLogger.transports.file.getFile().clear()
 
 if (process.env.DEBUG_PROD !== 'true' && process.env.NODE_ENV === 'production') {
   electronLogger.transports.console.level = 'info'
