@@ -152,7 +152,7 @@ export default class ClusterRegisterStore {
       this.logger.error(errorMessage)
       this.errorEvent.emit(new Error(errorMessage))
     } else {
-      this.logger.info(`register complete. clusterName: ${clusterName}, accountId: ${accountId}`)
+      this.logger.info(`${mode} complete. clusterName: ${clusterName}, accountId: ${accountId}`)
     }
 
     return itemWithPayload

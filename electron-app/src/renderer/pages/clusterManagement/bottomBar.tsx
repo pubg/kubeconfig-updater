@@ -16,27 +16,34 @@ export default observer(function BottomBar() {
     return metadataStore.state !== 'ready' || registerStore.state !== 'ready'
   }, [metadataStore.state, registerStore.state])
 
-  const onRegisterAllClicked = useCallback(() => {
-    // clear items after request
-    const { selectedItems } = store
-    store.resetSelection()
+  const onButonClicked = useCallback(
+    (mode: 'register' | 'unregister') => {
+      // clear items after request
+      const { selectedItems } = store
+      store.resetSelection()
 
-    // NOTE: should this exists in here?
-    registerStore
-      .request(
-        selectedItems.map((item) => ({
-          clusterName: item.data.metadata.clustername,
-          accountId: item.data.metadata.credresolverid,
-        }))
-      )
-      .then(() => metadataStore.fetchMetadata())
-      .catch(browserLogger.error)
-  }, [metadataStore, registerStore, store])
+      // NOTE: should this exists in here?
+      registerStore
+        .request(
+          selectedItems.map((item) => ({
+            clusterName: item.data.metadata.clustername,
+            accountId: item.data.metadata.credresolverid,
+          })),
+          mode
+        )
+        .then(() => metadataStore.fetchMetadata())
+        .catch(browserLogger.error)
+    },
+    [metadataStore, registerStore, store]
+  )
 
   return (
     <Stack direction="row" width="100%" alignItems="center" gap="16px" marginLeft="32px">
-      <Button variant="outlined" disabled={isProcessing} onClick={onRegisterAllClicked}>
+      <Button variant="outlined" disabled={isProcessing} onClick={() => onButonClicked('register')}>
         Register Selected
+      </Button>
+      <Button variant="outlined" disabled={isProcessing} onClick={() => onButonClicked('unregister')}>
+        UnRegister Selected
       </Button>
       {/* on ready (selecting items...) */}
       <Typography>{store.selection.count} Clusters Selected</Typography>
