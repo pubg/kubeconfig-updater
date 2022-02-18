@@ -205,8 +205,8 @@ func (s *kubeconfigService) DeleteCluster(ctx context.Context, req *protos.Delet
 		}, nil
 	} else {
 		return &protos.CommonRes{
-			Status:  protos.ResultCode_NOT_FOUND,
-			Message: fmt.Sprintf("Cannot Find Target Context Name:%s", req.ClusterName),
+			Status:  protos.ResultCode_INVALID_ARGUMENT,
+			Message: fmt.Sprintf("Delete Target Not Success, Name:%s", req.ClusterName),
 		}, nil
 	}
 }
