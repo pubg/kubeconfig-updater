@@ -1,5 +1,4 @@
 import electronLogger from 'electron-log'
-import * as fs from 'fs'
 
 // const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
 
