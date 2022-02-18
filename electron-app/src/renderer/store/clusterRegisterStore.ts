@@ -25,6 +25,11 @@ function keySelector(item: Item): string {
   return `${item.accountId}#${item.clusterName}`
 }
 
+/**
+ * @todo refactor to remove type Mode if alias count increase
+ */
+type Mode = 'register' | 'unregister'
+
 @singleton()
 export default class ClusterRegisterStore {
   private readonly logger = browserLogger
@@ -72,7 +77,7 @@ export default class ClusterRegisterStore {
     this._cancelSource.cancel()
   }
 
-  request = flow(function* (this: ClusterRegisterStore, items: Item[]) {
+  request = flow(function* (this: ClusterRegisterStore, items: Item[], mode: Mode = 'register') {
     this._cancelSource = new CancellationTokenSource()
     const cancelToken = this._cancelSource.token
 
@@ -88,34 +93,38 @@ export default class ClusterRegisterStore {
     const parallelRun = false
 
     if (parallelRun) {
-      yield this.requestParallel(cancelToken)
+      yield this.requestParallel(cancelToken, mode)
     } else {
-      yield this.requestSync(cancelToken)
+      yield this.requestSync(cancelToken, mode)
     }
 
     this._state = 'ready'
-    this.logger.info('finished cluster register request')
+    this.logger.info(`finished cluster ${mode} request`)
   })
 
-  private async requestParallel(cancelToken: CancellationToken) {
-    const promises = [...this._registerMap.values()].map((p) => this.requestRegister(p, cancelToken))
+  private async requestParallel(cancelToken: CancellationToken, mode: Mode) {
+    const promises = [...this._registerMap.values()].map((p) => this.requestInternal(p, cancelToken, mode))
 
     await Promise.all(promises)
   }
 
-  private async requestSync(cancelToken: CancellationToken) {
+  private async requestSync(cancelToken: CancellationToken, mode: Mode) {
     for (const [, itemWithPayload] of this._registerMap) {
       // eslint-disable-next-line no-await-in-loop
-      await this.requestRegister(itemWithPayload, cancelToken)
+      await this.requestInternal(itemWithPayload, cancelToken, mode)
     }
   }
 
   @flow
-  private *requestRegister(itemWithPayload: ValueWithPayload<Item, Payload>, cancelToken: CancellationToken) {
+  private *requestInternal(
+    itemWithPayload: ValueWithPayload<Item, Payload>,
+    cancelToken: CancellationToken,
+    mode: Mode
+  ) {
     const { accountId, clusterName } = itemWithPayload.value
     itemWithPayload.payload = observable({ resolved: false }) as Payload
 
-    this.logger.info(`request cluster register, clusterName: ${clusterName}, accountId: ${accountId}`)
+    this.logger.info(`request cluster ${mode}, clusterName: ${clusterName}, accountId: ${accountId}`)
 
     if (cancelToken.canceled) {
       itemWithPayload.payload.resolved = true
@@ -126,7 +135,10 @@ export default class ClusterRegisterStore {
       return itemWithPayload
     }
 
-    const response: CommonRes = yield this.clusterRepository.RegisterCluster(clusterName, accountId)
+    const response: CommonRes =
+      mode === 'register'
+        ? yield this.clusterRepository.RegisterCluster(clusterName, accountId)
+        : yield this.clusterRepository.DeleteCluster(clusterName)
 
     itemWithPayload.payload.resolved = true
     itemWithPayload.payload.response = {
@@ -135,7 +147,7 @@ export default class ClusterRegisterStore {
     }
 
     if (itemWithPayload.payload.response.resultCode !== ResultCode.SUCCESS) {
-      const errorMessage = `failed to register cluster account: ${accountId}, clusterName: ${clusterName}, reason: ${itemWithPayload.payload.response.message}`
+      const errorMessage = `failed to ${mode} cluster account: ${accountId}, clusterName: ${clusterName}, reason: ${itemWithPayload.payload.response.message}`
 
       this.logger.error(errorMessage)
       this.errorEvent.emit(new Error(errorMessage))
