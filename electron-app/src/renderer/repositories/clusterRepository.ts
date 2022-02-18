@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe'
 import { KubeconfigClient } from '../protos/Kubeconfig_serviceServiceClientPb'
-import { GetAvailableClustersRes, RegisterClusterReq } from '../protos/kubeconfig_service_pb'
+import { DeleteClusterReq, GetAvailableClustersRes, RegisterClusterReq } from '../protos/kubeconfig_service_pb'
 import { CommonReq, CommonRes } from '../protos/common_pb'
 import { getDefaultMetadata } from './grpcMetadata'
 import { createErrorResponse } from './error'
@@ -36,6 +36,20 @@ export default class ClusterRepository {
   async SyncAvailableClusters(): Promise<CommonRes> {
     try {
       return await this.client.syncAvailableClusters(new CommonReq(), getDefaultMetadata())
+    } catch (e) {
+      return createErrorResponse(e)
+    }
+  }
+
+  async DeleteCluster(clusterName: string, cascade?: boolean): Promise<CommonRes> {
+    try {
+      const req = new DeleteClusterReq()
+      req.setClustername(clusterName)
+      if (cascade !== undefined) {
+        req.setCascade(cascade)
+      }
+
+      return await this.client.deleteCluster(req, getDefaultMetadata())
     } catch (e) {
       return createErrorResponse(e)
     }
