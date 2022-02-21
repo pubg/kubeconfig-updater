@@ -20,7 +20,8 @@ declare global {
     }
   }
 
-  function opendir(): void
+  function openLogDir(): void
+  function openBackendConfigDir(): void
 }
 
 export {}

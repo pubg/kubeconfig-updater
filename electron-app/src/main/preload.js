@@ -65,7 +65,7 @@ const logPath = (() => {
 
 const backendConfigDir = path.join(homedir, '.kubeconfig-updater-gui')
 
-const openLogDir = (dirPath: string) => {
+const openLogDir = (dirPath) => {
   switch (platform) {
     case 'win32':
       return () => {

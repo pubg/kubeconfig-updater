@@ -4,6 +4,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Container,
   FormControlLabel,
   Radio,
@@ -60,6 +61,22 @@ export default function Page() {
             </AccordionDetails>
           </Accordion>
           <Box mt="8px" />
+        </Item>
+
+        <Item>
+          <Box>
+            <Typography variant="h6" sx={{ mb: '8px' }}>
+              Directories
+            </Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="body1">Application Config</Typography>
+              <Button onClick={globalThis.openLogDir}>Open</Button>
+            </Box>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="body1">Logs</Typography>
+              <Button onClick={globalThis.openBackendConfigDir}>Open</Button>
+            </Box>
+          </Box>
         </Item>
       </Stack>
     </Container>
