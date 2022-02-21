@@ -160,6 +160,7 @@
     "@emotion/styled": "^11.6.0",
     "@fluentui/azure-themes": "^8.1.117",
     "@fluentui/react": "^8.47.1",
+    "@monaco-editor/react": "^4.3.1",
     "@mui/icons-material": "^5.2.1",
     "@mui/material": "^5.2.3",
     "axios": "^0.25.0",

@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import Sidebar from './components/sidebar'
 import ClusterManagement from './pages/clusterManagement/page'
 import About from './pages/about/about'
-import Configuration from './pages/configuration/configuration'
+import ConfigurationPage from './pages/configuration/page'
 import ThemeStore from './store/themeStore'
 import NotiSnackbar from './components/notiSnackbar'
 import browserLogger from './logger/browserLogger'
@@ -69,7 +69,7 @@ export default observer(function App() {
               <Route exact path="/" component={ClusterManagement} />
               <Route path="/cluster-management" component={ClusterManagement} />
               <Route path="/credentials-resolver" component={CredResolver} />
-              <Route path="/configuration" component={Configuration} />
+              <Route path="/configuration" component={ConfigurationPage} />
               <Route path="/about" component={About} />
             </Switch>
           </Paper>
