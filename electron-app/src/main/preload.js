@@ -1,5 +1,8 @@
 const { contextBridge, ipcRenderer, shell } = require('electron')
 const electronLogger = require('electron-log').create('renderer')
+const os = require('os')
+const path = require('path')
+const cp = require('child_process')
 
 electronLogger.transports.console.format = '[{level}]{scope} {text}'
 // move past logs to main.old.log and clear the current log file.
@@ -44,3 +47,40 @@ contextBridge.exposeInMainWorld('managedFromElectron', true)
 contextBridge.exposeInMainWorld('openURL', (url) => {
   shell.openExternal(url)
 })
+
+const platform = os.platform()
+const homedir = os.homedir()
+const logPath = (() => {
+  switch (platform) {
+    case 'win32':
+      return path.join(homedir, 'AppData', 'Roaming', 'kubeconfig-updater', 'logs')
+
+    case 'darwin':
+      return path.join(homedir, 'Library', 'Logs', 'kubeconfig-updater')
+
+    default:
+      throw new Error(`platform ${platform} is not supported.`)
+  }
+})()
+
+const backendConfigDir = path.join(homedir, '.kubeconfig-updater-gui')
+
+const openLogDir = (dirPath: string) => {
+  switch (platform) {
+    case 'win32':
+      return () => {
+        cp.execSync(`start ${dirPath}`)
+      }
+
+    case 'darwin':
+      return () => {
+        cp.execSync(`open ${dirPath}`)
+      }
+
+    default:
+      throw new Error(`platform ${platform} is not supported.`)
+  }
+}
+
+contextBridge.exposeInMainWorld('openLogDir', openLogDir(logPath))
+contextBridge.exposeInMainWorld('openBackendConfigDir', openLogDir(backendConfigDir))
