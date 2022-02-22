@@ -5,7 +5,7 @@ import { initializeIcons } from '@fluentui/react/lib/Icons'
 import { render } from 'react-dom'
 import { container } from 'tsyringe'
 import App from './App'
-import { KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
+import { ApplicationClient, KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
 import { BrowserThemeImpl, ElectronThemeImpl } from './repositories/themeRepository'
 
@@ -32,8 +32,11 @@ function getHostName() {
   return `http://localhost:${window.grpcWebPort ?? 10981}`
 }
 
-const client = new KubeconfigClient(getHostName())
-container.register(KubeconfigClient, { useValue: client })
+const kubeConfigClient = new KubeconfigClient(getHostName())
+container.register(KubeconfigClient, { useValue: kubeConfigClient })
+
+const applicationClient = new ApplicationClient(getHostName())
+container.register(ApplicationClient, { useValue: applicationClient })
 
 if (window.managedFromElectron === undefined) {
   container.register('ThemeRepository', { useValue: new BrowserThemeImpl('system') })
