@@ -6,13 +6,22 @@ type Service struct {
 	providerMap map[string]ConfigProvider
 }
 
-func NewService() *Service {
-	return &Service{
+func NewService(providers ...ConfigProvider) (*Service, error) {
+	service := &Service{
 		providerMap: make(map[string]ConfigProvider),
 	}
+
+	for _, provider := range providers {
+		err := service.addProvider(provider)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return service, nil
 }
 
-func (s *Service) AddProvider(provider ConfigProvider) error {
+func (s *Service) addProvider(provider ConfigProvider) error {
 	providerName := provider.Name()
 	if _, exists := s.providerMap[providerName]; exists {
 		return fmt.Errorf("provider %s is already registered", providerName)

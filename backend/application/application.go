@@ -186,9 +186,9 @@ func (s *ServerApplication) initServiceLayer() error {
 	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
 	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.MetaService, s.Config.Extensions)
 
-	s.RawConfigService = raw_config_service.NewService()
-	_ = s.RawConfigService.AddProvider(s.RawConfigProvider)
-	return nil
+	s.RawConfigService, err = raw_config_service.NewService(s.RawConfigProvider)
+
+	return err
 }
 
 func (s *ServerApplication) initPersistLayer(credResolverConfig *configs.DataStoreConfig, aggrClstMetaConfig *configs.DataStoreConfig) error {
