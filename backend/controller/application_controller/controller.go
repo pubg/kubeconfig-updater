@@ -8,8 +8,9 @@ import (
 )
 
 type applicationService struct {
-	RawConfigService *raw_config_service.Service
 	protos.UnimplementedApplicationServer
+
+	RawConfigService *raw_config_service.Service
 }
 
 func NewController(service *raw_config_service.Service) protos.ApplicationServer {
