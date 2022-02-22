@@ -1,19 +1,19 @@
-package configs
+package raw_config_service
 
 import (
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 )
 
-type RawConfigProvider struct {
+type BackendConfigProvider struct {
 	AbsPath string
 }
 
-func (p *RawConfigProvider) Name() string {
-	return "Application-Config"
+func (p *BackendConfigProvider) Name() string {
+	return "Backend-Config"
 }
 
-func (p *RawConfigProvider) GetConfig() (*string, error) {
+func (p *BackendConfigProvider) GetConfig() (*string, error) {
 	data, err := ioutil.ReadFile(p.AbsPath)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (p *RawConfigProvider) GetConfig() (*string, error) {
 	return &str, nil
 }
 
-func (p *RawConfigProvider) SetConfig(data string) error {
+func (p *BackendConfigProvider) SetConfig(data string) error {
 	out := make(map[string]interface{})
 	err := yaml.Unmarshal([]byte(data), &out)
 	if err != nil {
