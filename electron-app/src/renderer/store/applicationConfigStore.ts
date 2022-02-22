@@ -9,7 +9,7 @@ import ApplicationConfigRepository from '../repositories/applicationConfigReposi
 
 @tsyringe.singleton()
 export default class ApplicationConfigStore {
-  private readonly appConfigName = 'Application-Config'
+  private readonly appConfigName = 'Backend-Config'
 
   private log = browserLogger
 
