@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"github.com/pubg/kubeconfig-updater/backend/pkg/service/raw_config_service"
 	"log"
 	"net"
 	"net/http"
@@ -35,6 +36,7 @@ type ServerApplication struct {
 	CredResolverConfigStorage             *cred_resolver_config_persist.CredResolverConfigStorage
 	AggreagtedClusterMetadataCacheStorage *cluster_metadata_persist.AggregatedClusterMetadataStorage
 
+	RawConfigService *raw_config_service.Service
 	CredStoreService *cred_resolver_service.CredResolverStoreService
 	RegisterService  *cluster_register_service.ClusterRegisterService
 	MetaService      *cluster_metadata_service.ClusterMetadataService
@@ -148,7 +150,7 @@ func (s *ServerApplication) initControllerLayer(useMockController bool) {
 	s.GrpcServer = grpc.NewServer(grpcOption)
 	reflection.Register(s.GrpcServer)
 
-	protos.RegisterApplicationServer(s.GrpcServer, application_controller.NewController())
+	protos.RegisterApplicationServer(s.GrpcServer, application_controller.NewController(s.RawConfigService))
 	if useMockController {
 		protos.RegisterKubeconfigServer(s.GrpcServer, kubeconfig_controller.NewMockController())
 	} else {
@@ -180,6 +182,11 @@ func (s *ServerApplication) initServiceLayer() error {
 	}
 	s.MetaService = cluster_metadata_service.NewClusterMetadataService(s.CredStoreService, s.AggreagtedClusterMetadataCacheStorage, s.Config)
 	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.MetaService, s.Config.Extensions)
+
+	s.RawConfigService = raw_config_service.NewService()
+	//_ = s.RawConfigService.AddProvider(s.CredResolverConfigStorage)
+	//_ = s.RawConfigService.AddProvider(s.AggreagtedClusterMetadataCacheStorage)
+	//_ = s.RawConfigService.AddProvider(s.Config)
 	return nil
 }
 
