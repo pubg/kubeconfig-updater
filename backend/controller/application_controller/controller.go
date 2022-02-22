@@ -57,7 +57,7 @@ func (s *applicationService) SetConfig(_ context.Context, req *protos.SetConfigR
 	if err != nil {
 		return &protos.SetConfigRes{
 			CommonRes: &protos.CommonRes{
-				Status:  protos.ResultCode_SERVER_INTERNAL,
+				Status:  protos.ResultCode_SERVER_INVALID_ARGUMENT,
 				Message: err.Error(),
 			},
 		}, nil

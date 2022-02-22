@@ -1,6 +1,9 @@
 package configs
 
-import "io/ioutil"
+import (
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
+)
 
 type RawConfigProvider struct {
 	AbsPath string
@@ -22,5 +25,11 @@ func (p *RawConfigProvider) GetConfig() (*string, error) {
 }
 
 func (p *RawConfigProvider) SetConfig(data string) error {
+	out := make(map[string]interface{})
+	err := yaml.Unmarshal([]byte(data), &out)
+	if err != nil {
+		return err
+	}
+
 	return ioutil.WriteFile(p.AbsPath, []byte(data), 0644)
 }
