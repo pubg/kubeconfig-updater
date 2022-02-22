@@ -1,5 +1,6 @@
 import * as mobx from 'mobx'
 import * as tsyringe from 'tsyringe'
+import yaml from 'js-yaml'
 import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
 import { ResultCode } from '../protos/common_pb'
@@ -53,6 +54,14 @@ export default class ApplicationConfigStore {
 
   @mobx.flow
   *saveConfig(data: string) {
+    try {
+      yaml.load(data)
+    } catch (e) {
+      const err = e as Error
+      this.errorEvent.emit(err)
+      return err
+    }
+
     this._state = 'fetch'
 
     const res: SetConfigRes = yield this.repository.setConfig(this.appConfigName, data)
@@ -63,5 +72,7 @@ export default class ApplicationConfigStore {
     }
 
     this._state = 'ready'
+
+    return null
   }
 }

@@ -35,7 +35,16 @@ export default observer(function BackendConfig() {
   const onSave = useCallback(() => {
     ;(async () => {
       if (store.state === 'ready') {
-        await store.saveConfig(value)
+        const err = (await store.saveConfig(value)) as unknown as Error | null
+        if (err !== null) {
+          snackbarStore.push({
+            key: dayjs().toString(),
+            message: `Cannot update config. error: ${err.message}`,
+            options: { variant: 'error' },
+          })
+          return
+        }
+
         await store.fetchConfig()
         snackbarStore.push({
           key: dayjs().toString(),
