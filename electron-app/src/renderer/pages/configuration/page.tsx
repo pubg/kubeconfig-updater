@@ -38,10 +38,23 @@ export default function Page() {
   return (
     <Container
       maxWidth="md"
-      sx={{ pt: '64px', pb: '64px', height: '100%', display: 'flex', flexDirection: 'column', gap: '64px' }}
+      sx={{
+        pt: '64px',
+        pb: '64px',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '64px',
+      }}
     >
       <Typography variant="h3">Settings</Typography>
-      <Stack direction="column">
+      <Stack
+        direction="column"
+        sx={{
+          overflow: 'hidden',
+          overflowY: 'scroll',
+        }}
+      >
         <Item>
           <Typography variant="h6">Theme</Typography>
           <RadioGroup row aria-label="theme" defaultValue="system" name="theme-radio-groups" onChange={OnChangeTheme}>
