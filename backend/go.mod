@@ -39,6 +39,7 @@ require (
 	google.golang.org/grpc v1.40.1
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.62.0
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/client-go v12.0.0+incompatible
 )
 

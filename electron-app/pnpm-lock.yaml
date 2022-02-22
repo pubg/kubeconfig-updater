@@ -5,6 +5,7 @@ specifiers:
   '@emotion/styled': ^11.6.0
   '@fluentui/azure-themes': ^8.1.117
   '@fluentui/react': ^8.47.1
+  '@monaco-editor/react': ^4.3.1
   '@mui/icons-material': ^5.2.1
   '@mui/material': ^5.2.3
   '@pmmmwh/react-refresh-webpack-plugin': 0.5.1
@@ -16,6 +17,7 @@ specifiers:
   '@types/google-protobuf': ^3.15.5
   '@types/history': 4.7.9
   '@types/jest': ^27.0.2
+  '@types/js-yaml': ^4.0.5
   '@types/lodash': ^4.14.178
   '@types/node': 16.11.6
   '@types/react': ^17.0.33
@@ -71,6 +73,7 @@ specifiers:
   husky: ^7.0.0
   identity-obj-proxy: ^3.0.0
   jest: ^27.3.1
+  js-yaml: ^4.1.0
   linq: ^4.0.0
   lint-staged: ^11.2.6
   lodash: ^4.17.21
@@ -117,6 +120,7 @@ dependencies:
   '@emotion/styled': 11.6.0_49e498e16442da1a9ae75db6f4430d97
   '@fluentui/azure-themes': 8.1.117_d5c215a71cdc3853e6673ca67dc4c091
   '@fluentui/react': 8.47.1_d5c215a71cdc3853e6673ca67dc4c091
+  '@monaco-editor/react': 4.3.1_react-dom@17.0.2+react@17.0.2
   '@mui/icons-material': 5.2.1_5ba8d2bfb1b4f0e067f3951fb85359cb
   '@mui/material': 5.2.3_e775e23d77fc33f172a6bda0cd692c92
   axios: 0.25.0
@@ -129,6 +133,7 @@ dependencies:
   google-protobuf: 3.19.1
   grpc-web: 1.3.0
   history: 4.10.1
+  js-yaml: 4.1.0
   linq: 4.0.0
   lodash: 4.17.21
   mobx: 6.3.8
@@ -157,6 +162,7 @@ devDependencies:
   '@types/google-protobuf': 3.15.5
   '@types/history': 4.7.9
   '@types/jest': 27.0.3
+  '@types/js-yaml': 4.0.5
   '@types/lodash': 4.14.178
   '@types/node': 16.11.6
   '@types/react': 17.0.37
@@ -1364,6 +1370,27 @@ packages:
     resolution: {integrity: sha512-dMXqao/WRNNdmgb6AyVL04O2FoIcZDzT1DN+oostG+hMFlMdZHBIZIYhTZAvrqGwGOfnOgq9QJfbEHbefv0+0w==}
     dev: false
 
+  /@monaco-editor/loader/1.2.0:
+    resolution: {integrity: sha512-cJVCG/T/KxXgzYnjKqyAgsKDbH9mGLjcXxN6AmwumBwa2rVFkwvGcUj1RJtD0ko4XqLqJxwqsN/Z/KURB5f1OQ==}
+    peerDependencies:
+      monaco-editor: '>= 0.21.0 < 1'
+    dependencies:
+      state-local: 1.0.7
+    dev: false
+
+  /@monaco-editor/react/4.3.1_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-f+0BK1PP/W5I50hHHmwf11+Ea92E5H1VZXs+wvKplWUWOfyMa1VVwqkJrXjRvbcqHL+XdIGYWhWNdi4McEvnZg==}
+    peerDependencies:
+      monaco-editor: '>= 0.25.0 < 1'
+      react: ^16.8.0 || ^17.0.0
+      react-dom: ^16.8.0 || ^17.0.0
+    dependencies:
+      '@monaco-editor/loader': 1.2.0
+      prop-types: 15.7.2
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    dev: false
+
   /@mui/base/5.0.0-alpha.59_5539cae010396b202b015f3568914e95:
     resolution: {integrity: sha512-rPgN2FW0FAjQ9+LQ+XBsq3DFcuiiMFhf8uoLJAWnnzft27IJvJqbrhfpCZ68G6l+umJLbbl5RIIbpt8ALZDDNQ==}
     engines: {node: '>=12.0.0'}
@@ -1929,6 +1956,10 @@ packages:
     dependencies:
       jest-diff: 27.4.2
       pretty-format: 27.4.2
+    dev: true
+
+  /@types/js-yaml/4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
     dev: true
 
   /@types/json-schema/7.0.9:
@@ -4557,6 +4588,7 @@ packages:
     resolution: {integrity: sha512-SVeeyiOeinV5JCPHXMdKOgK1YVbak/4+8WL2rBnfqRYpA5FaeFaQnQWb25x628am1w70CbipGDv9S51biph63A==}
     engines: {node: '>=8'}
     os: [darwin]
+    deprecated: 'Disk image license agreements are deprecated by Apple and will probably be removed in a future macOS release. Discussion at: https://github.com/argv-minus-one/dmg-license/issues/11'
     hasBin: true
     requiresBuild: true
     dependencies:
@@ -10657,6 +10689,10 @@ packages:
     resolution: {integrity: sha512-jH9EhtKIjuXZ2cWxmXS8ZP80XyC3iasQxMDV8jzhNJpfDb7VbQLVW4Wvsxz9QZvzV+G4YoSfBUVKDOyxLzi/sg==}
     engines: {node: '>= 6'}
     dev: true
+
+  /state-local/1.0.7:
+    resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
+    dev: false
 
   /statuses/1.5.0:
     resolution: {integrity: sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=}

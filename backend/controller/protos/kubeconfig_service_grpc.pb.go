@@ -466,6 +466,8 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 type ApplicationClient interface {
 	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 	Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
+	GetConfig(ctx context.Context, in *GetConfigReq, opts ...grpc.CallOption) (*GetConfigRes, error)
+	SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*CommonRes, error)
 }
 
 type applicationClient struct {
@@ -494,12 +496,32 @@ func (c *applicationClient) Version(ctx context.Context, in *CommonReq, opts ...
 	return out, nil
 }
 
+func (c *applicationClient) GetConfig(ctx context.Context, in *GetConfigReq, opts ...grpc.CallOption) (*GetConfigRes, error) {
+	out := new(GetConfigRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Application/GetConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationClient) SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
+	err := c.cc.Invoke(ctx, "/kubeconfig.Application/SetConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationServer is the server API for Application service.
 // All implementations must embed UnimplementedApplicationServer
 // for forward compatibility
 type ApplicationServer interface {
 	Ping(context.Context, *CommonReq) (*CommonRes, error)
 	Version(context.Context, *CommonReq) (*CommonRes, error)
+	GetConfig(context.Context, *GetConfigReq) (*GetConfigRes, error)
+	SetConfig(context.Context, *SetConfigReq) (*CommonRes, error)
 	mustEmbedUnimplementedApplicationServer()
 }
 
@@ -512,6 +534,12 @@ func (UnimplementedApplicationServer) Ping(context.Context, *CommonReq) (*Common
 }
 func (UnimplementedApplicationServer) Version(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
+func (UnimplementedApplicationServer) GetConfig(context.Context, *GetConfigReq) (*GetConfigRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
+}
+func (UnimplementedApplicationServer) SetConfig(context.Context, *SetConfigReq) (*CommonRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetConfig not implemented")
 }
 func (UnimplementedApplicationServer) mustEmbedUnimplementedApplicationServer() {}
 
@@ -562,6 +590,42 @@ func _Application_Version_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Application_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServer).GetConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Application/GetConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServer).GetConfig(ctx, req.(*GetConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Application_SetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationServer).SetConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubeconfig.Application/SetConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationServer).SetConfig(ctx, req.(*SetConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Application_ServiceDesc is the grpc.ServiceDesc for Application service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -576,6 +640,14 @@ var Application_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Version",
 			Handler:    _Application_Version_Handler,
+		},
+		{
+			MethodName: "GetConfig",
+			Handler:    _Application_GetConfig_Handler,
+		},
+		{
+			MethodName: "SetConfig",
+			Handler:    _Application_SetConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

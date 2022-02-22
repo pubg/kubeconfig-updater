@@ -1,4 +1,5 @@
 import 'electron'
+import { opendir } from 'fs'
 
 declare global {
   namespace IPCType {
@@ -6,7 +7,8 @@ declare global {
     type IPCThemeType = 'theme' | 'theme:getTheme'
   }
 
-  type IPCType = IPCType.IPCPortRequestType | IPCType.IPCThemeType | 'ipc-test' | 'themeFunc' | 'openURL'
+  type OpenDirType = 'openLogDir' | 'openBackendConfigDir'
+  type IPCType = IPCType.IPCPortRequestType | IPCType.IPCThemeType | 'ipc-test' | 'themeFunc' | 'openURL' | OpenDirType
 
   namespace Electron {
     interface ContextBridge {
@@ -17,6 +19,9 @@ declare global {
       on(channel: IPCType, listener: (event: IpcMainEvent, ...args: any[]) => void): this
     }
   }
+
+  function openLogDir(): void
+  function openBackendConfigDir(): void
 }
 
 export {}

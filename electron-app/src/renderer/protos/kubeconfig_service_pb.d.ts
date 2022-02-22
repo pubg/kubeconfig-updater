@@ -409,6 +409,82 @@ export namespace DeleteClusterReq {
   }
 }
 
+export class GetConfigReq extends jspb.Message {
+  getCommonres(): protos_common_pb.CommonRes | undefined;
+  setCommonres(value?: protos_common_pb.CommonRes): GetConfigReq;
+  hasCommonres(): boolean;
+  clearCommonres(): GetConfigReq;
+
+  getName(): string;
+  setName(value: string): GetConfigReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetConfigReq.AsObject;
+  static toObject(includeInstance: boolean, msg: GetConfigReq): GetConfigReq.AsObject;
+  static serializeBinaryToWriter(message: GetConfigReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetConfigReq;
+  static deserializeBinaryFromReader(message: GetConfigReq, reader: jspb.BinaryReader): GetConfigReq;
+}
+
+export namespace GetConfigReq {
+  export type AsObject = {
+    commonres?: protos_common_pb.CommonRes.AsObject,
+    name: string,
+  }
+}
+
+export class GetConfigRes extends jspb.Message {
+  getCommonres(): protos_common_pb.CommonRes | undefined;
+  setCommonres(value?: protos_common_pb.CommonRes): GetConfigRes;
+  hasCommonres(): boolean;
+  clearCommonres(): GetConfigRes;
+
+  getData(): string;
+  setData(value: string): GetConfigRes;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetConfigRes.AsObject;
+  static toObject(includeInstance: boolean, msg: GetConfigRes): GetConfigRes.AsObject;
+  static serializeBinaryToWriter(message: GetConfigRes, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetConfigRes;
+  static deserializeBinaryFromReader(message: GetConfigRes, reader: jspb.BinaryReader): GetConfigRes;
+}
+
+export namespace GetConfigRes {
+  export type AsObject = {
+    commonres?: protos_common_pb.CommonRes.AsObject,
+    data: string,
+  }
+}
+
+export class SetConfigReq extends jspb.Message {
+  getCommonreq(): protos_common_pb.CommonReq | undefined;
+  setCommonreq(value?: protos_common_pb.CommonReq): SetConfigReq;
+  hasCommonreq(): boolean;
+  clearCommonreq(): SetConfigReq;
+
+  getName(): string;
+  setName(value: string): SetConfigReq;
+
+  getData(): string;
+  setData(value: string): SetConfigReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SetConfigReq.AsObject;
+  static toObject(includeInstance: boolean, msg: SetConfigReq): SetConfigReq.AsObject;
+  static serializeBinaryToWriter(message: SetConfigReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SetConfigReq;
+  static deserializeBinaryFromReader(message: SetConfigReq, reader: jspb.BinaryReader): SetConfigReq;
+}
+
+export namespace SetConfigReq {
+  export type AsObject = {
+    commonreq?: protos_common_pb.CommonReq.AsObject,
+    name: string,
+    data: string,
+  }
+}
+
 export enum CredentialResolverKind { 
   DEFAULT = 0,
   ENV = 1,
