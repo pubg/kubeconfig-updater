@@ -3,8 +3,8 @@ import * as tsyringe from 'tsyringe'
 import yaml from 'js-yaml'
 import EventStore from '../event/eventStore'
 import browserLogger from '../logger/browserLogger'
-import { ResultCode } from '../protos/common_pb'
-import { GetConfigRes, SetConfigRes } from '../protos/kubeconfig_service_pb'
+import { CommonRes, ResultCode } from '../protos/common_pb'
+import { GetConfigRes } from '../protos/kubeconfig_service_pb'
 import ApplicationConfigRepository from '../repositories/applicationConfigRepository'
 
 @tsyringe.singleton()
@@ -64,10 +64,10 @@ export default class ApplicationConfigStore {
 
     this._state = 'fetch'
 
-    const res: SetConfigRes = yield this.repository.setConfig(this.appConfigName, data)
+    const res: CommonRes = yield this.repository.setConfig(this.appConfigName, data)
 
-    if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-      const err = new Error(`failed applying application config, err: ${res.getCommonres()?.getMessage()}`)
+    if (res.getStatus() !== ResultCode.SUCCESS) {
+      const err = new Error(`failed applying application config, err: ${res.getMessage()}`)
       this.errorEvent.emit(err)
     }
 
