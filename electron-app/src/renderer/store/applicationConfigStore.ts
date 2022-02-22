@@ -36,10 +36,6 @@ export default class ApplicationConfigStore {
 
   @mobx.flow
   *fetchConfig() {
-    if (this._state !== 'ready') {
-      return
-    }
-
     this._state = 'fetch'
 
     const res: GetConfigRes = yield this.repository.getConfig(this.appConfigName)
@@ -57,10 +53,6 @@ export default class ApplicationConfigStore {
 
   @mobx.flow
   *saveConfig(data: string) {
-    if (this._state !== 'ready') {
-      return
-    }
-
     this._state = 'fetch'
 
     const res: SetConfigRes = yield this.repository.setConfig(this.appConfigName, data)

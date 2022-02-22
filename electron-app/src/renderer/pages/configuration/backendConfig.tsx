@@ -2,13 +2,16 @@ import { Box, Button, Collapse } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import Editor, * as monaco from '@monaco-editor/react'
 import { useCallback, useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 import { useResolve } from '../../hooks/container'
 import ApplicationConfigStore from '../../store/applicationConfigStore'
 import ThemeStore from '../../store/themeStore'
 import { useReaction } from '../../hooks/mobx'
+import SnackbarStore from '../../store/snackbarStore'
 
 export default observer(function BackendConfig() {
   const store = useResolve(ApplicationConfigStore)
+  const snackbarStore = useResolve(SnackbarStore)
 
   const [value, setValue] = useState(store.value)
   const theme = useResolve(ThemeStore)
@@ -30,8 +33,18 @@ export default observer(function BackendConfig() {
   }, [])
 
   const onSave = useCallback(() => {
-    // TODO: implement this
-  }, [])
+    ;(async () => {
+      if (store.state === 'ready') {
+        await store.saveConfig(value)
+        await store.fetchConfig()
+        snackbarStore.push({
+          key: dayjs().toString(),
+          message: 'Application Config updated.',
+          options: { variant: 'info', persist: false },
+        })
+      }
+    })()
+  }, [snackbarStore, store, value])
 
   return (
     <Box display="flex" border="1px solid black" flexDirection="column" gap="8px">
