@@ -2,6 +2,7 @@ package application_controller
 
 import (
 	"context"
+	"fmt"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/raw_config_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
@@ -53,7 +54,7 @@ func (s *applicationService) GetConfig(_ context.Context, req *protos.GetConfigR
 
 	return &protos.GetConfigRes{
 		CommonRes: &protos.CommonRes{
-			Message: "Success",
+			Message: fmt.Sprintf("Successfully get raw config. name: %s", req.Name),
 		},
 		Data: *cfg,
 	}, nil
@@ -77,6 +78,6 @@ func (s *applicationService) SetConfig(_ context.Context, req *protos.SetConfigR
 	}
 
 	return &protos.CommonRes{
-		Message: "Success",
+		Message: fmt.Sprintf("Successfully save raw config. name: %s", req.Name),
 	}, nil
 }
