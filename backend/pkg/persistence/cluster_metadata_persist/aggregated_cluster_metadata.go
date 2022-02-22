@@ -1,7 +1,6 @@
 package cluster_metadata_persist
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -87,44 +86,4 @@ func (c *AggregatedClusterMetadataStorage) DeleteAggrMetadata(clusterName string
 	}
 	c.keyStore.Delete(clusterName)
 	return nil
-}
-
-/// implements raw_config_service.Provider
-
-func (c *AggregatedClusterMetadataStorage) Name() string {
-	return "AggregatedClusterMetadata"
-}
-
-func (c *AggregatedClusterMetadataStorage) GetConfig() (*string, error) {
-	data := c.keyStore.GetAll(nil)
-	raw, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-
-	str := string(raw)
-
-	return &str, nil
-}
-
-func (c *AggregatedClusterMetadataStorage) SetConfig(raw string) error {
-	data := make(map[string]interface{})
-	err := json.Unmarshal([]byte(raw), &data)
-	if err != nil {
-		return err
-	}
-
-	keys := c.keyStore.Keys()
-	for _, key := range keys {
-		c.keyStore.Delete(key)
-	}
-
-	for key, value := range data {
-		err = c.keyStore.Set(key, value)
-		if err != nil {
-			return err
-		}
-	}
-
-	return c.SaveStorage()
 }
