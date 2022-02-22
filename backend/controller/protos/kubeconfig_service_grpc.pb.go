@@ -467,7 +467,7 @@ type ApplicationClient interface {
 	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 	Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 	GetConfig(ctx context.Context, in *GetConfigReq, opts ...grpc.CallOption) (*GetConfigRes, error)
-	SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*SetConfigRes, error)
+	SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*CommonRes, error)
 }
 
 type applicationClient struct {
@@ -505,8 +505,8 @@ func (c *applicationClient) GetConfig(ctx context.Context, in *GetConfigReq, opt
 	return out, nil
 }
 
-func (c *applicationClient) SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*SetConfigRes, error) {
-	out := new(SetConfigRes)
+func (c *applicationClient) SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*CommonRes, error) {
+	out := new(CommonRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Application/SetConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -521,7 +521,7 @@ type ApplicationServer interface {
 	Ping(context.Context, *CommonReq) (*CommonRes, error)
 	Version(context.Context, *CommonReq) (*CommonRes, error)
 	GetConfig(context.Context, *GetConfigReq) (*GetConfigRes, error)
-	SetConfig(context.Context, *SetConfigReq) (*SetConfigRes, error)
+	SetConfig(context.Context, *SetConfigReq) (*CommonRes, error)
 	mustEmbedUnimplementedApplicationServer()
 }
 
@@ -538,7 +538,7 @@ func (UnimplementedApplicationServer) Version(context.Context, *CommonReq) (*Com
 func (UnimplementedApplicationServer) GetConfig(context.Context, *GetConfigReq) (*GetConfigRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
 }
-func (UnimplementedApplicationServer) SetConfig(context.Context, *SetConfigReq) (*SetConfigRes, error) {
+func (UnimplementedApplicationServer) SetConfig(context.Context, *SetConfigReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetConfig not implemented")
 }
 func (UnimplementedApplicationServer) mustEmbedUnimplementedApplicationServer() {}

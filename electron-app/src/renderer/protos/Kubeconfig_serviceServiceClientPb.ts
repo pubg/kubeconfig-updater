@@ -663,28 +663,28 @@ export class ApplicationClient {
     '/kubeconfig.Application/SetConfig',
     grpcWeb.MethodType.UNARY,
     protos_kubeconfig_service_pb.SetConfigReq,
-    protos_kubeconfig_service_pb.SetConfigRes,
+    protos_common_pb.CommonRes,
     (request: protos_kubeconfig_service_pb.SetConfigReq) => {
       return request.serializeBinary();
     },
-    protos_kubeconfig_service_pb.SetConfigRes.deserializeBinary
+    protos_common_pb.CommonRes.deserializeBinary
   );
 
   setConfig(
     request: protos_kubeconfig_service_pb.SetConfigReq,
-    metadata: grpcWeb.Metadata | null): Promise<protos_kubeconfig_service_pb.SetConfigRes>;
+    metadata: grpcWeb.Metadata | null): Promise<protos_common_pb.CommonRes>;
 
   setConfig(
     request: protos_kubeconfig_service_pb.SetConfigReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: protos_kubeconfig_service_pb.SetConfigRes) => void): grpcWeb.ClientReadableStream<protos_kubeconfig_service_pb.SetConfigRes>;
+               response: protos_common_pb.CommonRes) => void): grpcWeb.ClientReadableStream<protos_common_pb.CommonRes>;
 
   setConfig(
     request: protos_kubeconfig_service_pb.SetConfigReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: protos_kubeconfig_service_pb.SetConfigRes) => void) {
+               response: protos_common_pb.CommonRes) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +

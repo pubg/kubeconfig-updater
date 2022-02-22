@@ -49,21 +49,17 @@ func (s *applicationService) GetConfig(_ context.Context, req *protos.GetConfigR
 	}, nil
 }
 
-func (s *applicationService) SetConfig(_ context.Context, req *protos.SetConfigReq) (*protos.SetConfigRes, error) {
+func (s *applicationService) SetConfig(_ context.Context, req *protos.SetConfigReq) (*protos.CommonRes, error) {
 	err := s.RawConfigService.SetConfig(req.Name, req.Data)
 
 	if err != nil {
-		return &protos.SetConfigRes{
-			CommonRes: &protos.CommonRes{
-				Status:  protos.ResultCode_SERVER_INVALID_ARGUMENT,
-				Message: err.Error(),
-			},
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_SERVER_INVALID_ARGUMENT,
+			Message: err.Error(),
 		}, nil
 	}
 
-	return &protos.SetConfigRes{
-		CommonRes: &protos.CommonRes{
-			Message: "Success",
-		},
+	return &protos.CommonRes{
+		Message: "Success",
 	}, nil
 }

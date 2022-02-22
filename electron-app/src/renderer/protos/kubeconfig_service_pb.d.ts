@@ -485,26 +485,6 @@ export namespace SetConfigReq {
   }
 }
 
-export class SetConfigRes extends jspb.Message {
-  getCommonres(): protos_common_pb.CommonRes | undefined;
-  setCommonres(value?: protos_common_pb.CommonRes): SetConfigRes;
-  hasCommonres(): boolean;
-  clearCommonres(): SetConfigRes;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): SetConfigRes.AsObject;
-  static toObject(includeInstance: boolean, msg: SetConfigRes): SetConfigRes.AsObject;
-  static serializeBinaryToWriter(message: SetConfigRes, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): SetConfigRes;
-  static deserializeBinaryFromReader(message: SetConfigRes, reader: jspb.BinaryReader): SetConfigRes;
-}
-
-export namespace SetConfigRes {
-  export type AsObject = {
-    commonres?: protos_common_pb.CommonRes.AsObject,
-  }
-}
-
 export enum CredentialResolverKind { 
   DEFAULT = 0,
   ENV = 1,
