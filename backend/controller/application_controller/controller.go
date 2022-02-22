@@ -31,6 +31,15 @@ func (s *applicationService) Version(context.Context, *protos.CommonReq) (*proto
 }
 
 func (s *applicationService) GetConfig(_ context.Context, req *protos.GetConfigReq) (*protos.GetConfigRes, error) {
+	if req.Name == "" {
+		return &protos.GetConfigRes{
+			CommonRes: &protos.CommonRes{
+				Status:  protos.ResultCode_INVALID_ARGUMENT,
+				Message: "empty string is not a valid name",
+			},
+		}, nil
+	}
+
 	cfg, err := s.RawConfigService.GetConfig(req.Name)
 	if err != nil {
 		return &protos.GetConfigRes{
@@ -50,6 +59,13 @@ func (s *applicationService) GetConfig(_ context.Context, req *protos.GetConfigR
 }
 
 func (s *applicationService) SetConfig(_ context.Context, req *protos.SetConfigReq) (*protos.CommonRes, error) {
+	if req.Name == "" {
+		return &protos.CommonRes{
+			Status:  protos.ResultCode_INVALID_ARGUMENT,
+			Message: "empty string is not a valid name",
+		}, nil
+	}
+
 	err := s.RawConfigService.SetConfig(req.Name, req.Data)
 
 	if err != nil {
