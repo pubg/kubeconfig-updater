@@ -39,6 +39,12 @@ func DeleteContext(contextName string, cascade bool) (bool, error) {
 				}
 			}
 			delete(cfg.Contexts, contextName)
+
+			err = clientcmd.WriteToFile(*cfg, absPath)
+			if err != nil {
+				return false, err
+			}
+			return true, nil
 		}
 	}
 	return false, nil
