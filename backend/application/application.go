@@ -187,8 +187,6 @@ func (s *ServerApplication) initServiceLayer() error {
 	s.RegisterService = cluster_register_service.NewClusterRegisterService(s.MetaService, s.Config.Extensions)
 
 	s.RawConfigService = raw_config_service.NewService()
-	//_ = s.RawConfigService.AddProvider(s.CredResolverConfigStorage)
-	_ = s.RawConfigService.AddProvider(s.AggreagtedClusterMetadataCacheStorage)
 	_ = s.RawConfigService.AddProvider(s.RawConfigProvider)
 	return nil
 }

@@ -38,13 +38,11 @@ func (s *applicationService) GetConfig(_ context.Context, req *protos.GetConfigR
 				Status:  protos.ResultCode_SERVER_INTERNAL,
 				Message: err.Error(),
 			},
-			Data: "",
 		}, nil
 	}
 
 	return &protos.GetConfigRes{
 		CommonRes: &protos.CommonRes{
-			Status:  protos.ResultCode_SUCCESS,
 			Message: "Success",
 		},
 		Data: *cfg,
@@ -65,7 +63,6 @@ func (s *applicationService) SetConfig(_ context.Context, req *protos.SetConfigR
 
 	return &protos.SetConfigRes{
 		CommonRes: &protos.CommonRes{
-			Status:  protos.ResultCode_SUCCESS,
 			Message: "Success",
 		},
 	}, nil
