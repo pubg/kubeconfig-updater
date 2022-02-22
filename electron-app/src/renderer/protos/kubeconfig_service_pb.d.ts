@@ -409,6 +409,30 @@ export namespace DeleteClusterReq {
   }
 }
 
+export class GetConfigReq extends jspb.Message {
+  getCommonres(): protos_common_pb.CommonRes | undefined;
+  setCommonres(value?: protos_common_pb.CommonRes): GetConfigReq;
+  hasCommonres(): boolean;
+  clearCommonres(): GetConfigReq;
+
+  getName(): string;
+  setName(value: string): GetConfigReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetConfigReq.AsObject;
+  static toObject(includeInstance: boolean, msg: GetConfigReq): GetConfigReq.AsObject;
+  static serializeBinaryToWriter(message: GetConfigReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetConfigReq;
+  static deserializeBinaryFromReader(message: GetConfigReq, reader: jspb.BinaryReader): GetConfigReq;
+}
+
+export namespace GetConfigReq {
+  export type AsObject = {
+    commonres?: protos_common_pb.CommonRes.AsObject,
+    name: string,
+  }
+}
+
 export class GetConfigRes extends jspb.Message {
   getCommonres(): protos_common_pb.CommonRes | undefined;
   setCommonres(value?: protos_common_pb.CommonRes): GetConfigRes;
@@ -439,6 +463,9 @@ export class SetConfigReq extends jspb.Message {
   hasCommonreq(): boolean;
   clearCommonreq(): SetConfigReq;
 
+  getName(): string;
+  setName(value: string): SetConfigReq;
+
   getData(): string;
   setData(value: string): SetConfigReq;
 
@@ -453,6 +480,7 @@ export class SetConfigReq extends jspb.Message {
 export namespace SetConfigReq {
   export type AsObject = {
     commonreq?: protos_common_pb.CommonReq.AsObject,
+    name: string,
     data: string,
   }
 }

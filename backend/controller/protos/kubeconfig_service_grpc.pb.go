@@ -466,7 +466,7 @@ var Kubeconfig_ServiceDesc = grpc.ServiceDesc{
 type ApplicationClient interface {
 	Ping(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
 	Version(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*CommonRes, error)
-	GetConfig(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetConfigRes, error)
+	GetConfig(ctx context.Context, in *GetConfigReq, opts ...grpc.CallOption) (*GetConfigRes, error)
 	SetConfig(ctx context.Context, in *SetConfigReq, opts ...grpc.CallOption) (*SetConfigRes, error)
 }
 
@@ -496,7 +496,7 @@ func (c *applicationClient) Version(ctx context.Context, in *CommonReq, opts ...
 	return out, nil
 }
 
-func (c *applicationClient) GetConfig(ctx context.Context, in *CommonReq, opts ...grpc.CallOption) (*GetConfigRes, error) {
+func (c *applicationClient) GetConfig(ctx context.Context, in *GetConfigReq, opts ...grpc.CallOption) (*GetConfigRes, error) {
 	out := new(GetConfigRes)
 	err := c.cc.Invoke(ctx, "/kubeconfig.Application/GetConfig", in, out, opts...)
 	if err != nil {
@@ -520,7 +520,7 @@ func (c *applicationClient) SetConfig(ctx context.Context, in *SetConfigReq, opt
 type ApplicationServer interface {
 	Ping(context.Context, *CommonReq) (*CommonRes, error)
 	Version(context.Context, *CommonReq) (*CommonRes, error)
-	GetConfig(context.Context, *CommonReq) (*GetConfigRes, error)
+	GetConfig(context.Context, *GetConfigReq) (*GetConfigRes, error)
 	SetConfig(context.Context, *SetConfigReq) (*SetConfigRes, error)
 	mustEmbedUnimplementedApplicationServer()
 }
@@ -535,7 +535,7 @@ func (UnimplementedApplicationServer) Ping(context.Context, *CommonReq) (*Common
 func (UnimplementedApplicationServer) Version(context.Context, *CommonReq) (*CommonRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (UnimplementedApplicationServer) GetConfig(context.Context, *CommonReq) (*GetConfigRes, error) {
+func (UnimplementedApplicationServer) GetConfig(context.Context, *GetConfigReq) (*GetConfigRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
 }
 func (UnimplementedApplicationServer) SetConfig(context.Context, *SetConfigReq) (*SetConfigRes, error) {
@@ -591,7 +591,7 @@ func _Application_Version_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Application_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommonReq)
+	in := new(GetConfigReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -603,7 +603,7 @@ func _Application_GetConfig_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/kubeconfig.Application/GetConfig",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationServer).GetConfig(ctx, req.(*CommonReq))
+		return srv.(ApplicationServer).GetConfig(ctx, req.(*GetConfigReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }

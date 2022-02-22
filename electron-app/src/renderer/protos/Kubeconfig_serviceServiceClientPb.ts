@@ -619,26 +619,26 @@ export class ApplicationClient {
   methodInfoGetConfig = new grpcWeb.MethodDescriptor(
     '/kubeconfig.Application/GetConfig',
     grpcWeb.MethodType.UNARY,
-    protos_common_pb.CommonReq,
+    protos_kubeconfig_service_pb.GetConfigReq,
     protos_kubeconfig_service_pb.GetConfigRes,
-    (request: protos_common_pb.CommonReq) => {
+    (request: protos_kubeconfig_service_pb.GetConfigReq) => {
       return request.serializeBinary();
     },
     protos_kubeconfig_service_pb.GetConfigRes.deserializeBinary
   );
 
   getConfig(
-    request: protos_common_pb.CommonReq,
+    request: protos_kubeconfig_service_pb.GetConfigReq,
     metadata: grpcWeb.Metadata | null): Promise<protos_kubeconfig_service_pb.GetConfigRes>;
 
   getConfig(
-    request: protos_common_pb.CommonReq,
+    request: protos_kubeconfig_service_pb.GetConfigReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: protos_kubeconfig_service_pb.GetConfigRes) => void): grpcWeb.ClientReadableStream<protos_kubeconfig_service_pb.GetConfigRes>;
 
   getConfig(
-    request: protos_common_pb.CommonReq,
+    request: protos_kubeconfig_service_pb.GetConfigReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
                response: protos_kubeconfig_service_pb.GetConfigRes) => void) {
