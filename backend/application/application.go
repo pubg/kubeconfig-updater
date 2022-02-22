@@ -33,6 +33,7 @@ import (
 )
 
 type ServerApplication struct {
+	RawConfigProvider                     *configs.RawConfigProvider
 	CredResolverConfigStorage             *cred_resolver_config_persist.CredResolverConfigStorage
 	AggreagtedClusterMetadataCacheStorage *cluster_metadata_persist.AggregatedClusterMetadataStorage
 
@@ -132,6 +133,8 @@ func (s *ServerApplication) initApplicationConfig(absPath string) error {
 		return err
 	}
 	s.Config = cfg
+	s.RawConfigProvider = &configs.RawConfigProvider{AbsPath: absPath}
+
 	return err
 }
 
@@ -186,7 +189,7 @@ func (s *ServerApplication) initServiceLayer() error {
 	s.RawConfigService = raw_config_service.NewService()
 	//_ = s.RawConfigService.AddProvider(s.CredResolverConfigStorage)
 	//_ = s.RawConfigService.AddProvider(s.AggreagtedClusterMetadataCacheStorage)
-	//_ = s.RawConfigService.AddProvider(s.Config)
+	_ = s.RawConfigService.AddProvider(s.RawConfigProvider)
 	return nil
 }
 
