@@ -70,6 +70,6 @@ export default merge(baseConfig, {
           path: webpackPaths.dllPath,
         },
       },
-    }),
+    })
   ],
 });

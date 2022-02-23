@@ -59,6 +59,14 @@ export default merge(baseConfig, {
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'tsx',
+          target: 'es2021'
+        }
+      },
+      {
         test: /\.s?css$/,
         use: [
           'style-loader',
@@ -138,7 +146,7 @@ export default merge(baseConfig, {
       env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
       nodeModules: webpackPaths.appNodeModulesPath,
-    }),
+    })
   ],
 
   node: {
