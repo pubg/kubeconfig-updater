@@ -9,12 +9,14 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import { dependencies } from '../../package.json';
 import checkNodeEnv from '../scripts/check-node-env';
+import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 checkNodeEnv('development');
 
 const dist = webpackPaths.dllPath;
+const smp = new SpeedMeasurePlugin()
 
-export default merge(baseConfig, {
+export default smp.wrap(merge(baseConfig, {
   context: webpackPaths.rootPath,
 
   devtool: 'eval',
@@ -72,4 +74,4 @@ export default merge(baseConfig, {
       },
     })
   ],
-});
+}))

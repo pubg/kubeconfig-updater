@@ -13,6 +13,7 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
+import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 checkNodeEnv('production');
 deleteSourceMaps();
@@ -24,7 +25,9 @@ const devtoolsConfig =
       }
     : {};
 
-export default merge(baseConfig, {
+const smp = new SpeedMeasurePlugin()
+
+export default smp.wrap(merge(baseConfig, {
   ...devtoolsConfig,
 
   mode: 'production',
@@ -132,4 +135,4 @@ export default merge(baseConfig, {
       isDevelopment: process.env.NODE_ENV !== 'production',
     })
   ],
-});
+}))

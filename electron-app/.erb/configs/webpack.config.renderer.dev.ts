@@ -9,6 +9,7 @@ import baseConfig from './webpack.config.base'
 import webpackPaths from './webpack.paths'
 import checkNodeEnv from '../scripts/check-node-env'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
+import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
@@ -32,7 +33,9 @@ if (!requiredByDLLConfig && !(fs.existsSync(webpackPaths.dllPath) && fs.existsSy
   execSync('pnpm run postinstall')
 }
 
-export default merge(baseConfig, {
+const smp = new SpeedMeasurePlugin()
+
+export default smp.wrap(merge(baseConfig, {
   devtool: 'inline-source-map',
 
   mode: 'development',
@@ -182,4 +185,4 @@ export default merge(baseConfig, {
         .on('error', (spawnError) => console.error(spawnError))
     },
   },
-})
+}))
