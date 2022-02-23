@@ -83,11 +83,11 @@ export default function Page() {
             </Typography>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="body1">Application Config</Typography>
-              <Button onClick={globalThis.openLogDir}>Open</Button>
+              <Button onClick={globalThis.openBackendConfigDir}>Open</Button>
             </Box>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="body1">Logs</Typography>
-              <Button onClick={globalThis.openBackendConfigDir}>Open</Button>
+              <Button onClick={globalThis.openLogDir}>Open</Button>
             </Box>
           </Box>
         </Item>
