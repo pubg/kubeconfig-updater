@@ -3,6 +3,7 @@ const electronLogger = require('electron-log').create('renderer')
 const os = require('os')
 const path = require('path')
 const cp = require('child_process')
+const Store = require('electron-store')
 
 electronLogger.transports.console.format = '[{level}]{scope} {text}'
 // move past logs to main.old.log and clear the current log file.
@@ -84,3 +85,8 @@ const openLogDir = (dirPath) => {
 
 contextBridge.exposeInMainWorld('openLogDir', openLogDir(logPath))
 contextBridge.exposeInMainWorld('openBackendConfigDir', openLogDir(backendConfigDir))
+
+const clientConfigStore = new Store()
+contextBridge.exposeInMainWorld('clientConfigStore', clientConfigStore)
+
+console.log('(preload) clientConfigStore: ', clientConfigStore)

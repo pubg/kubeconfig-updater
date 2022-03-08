@@ -45,3 +45,5 @@ if (window.managedFromElectron === undefined) {
 }
 
 render(<App />, document.getElementById('root'))
+
+console.log('clientConfigStore: ', clientConfigStore)

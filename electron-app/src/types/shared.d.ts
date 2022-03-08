@@ -1,5 +1,6 @@
 import 'electron'
 import { opendir } from 'fs'
+import Store from 'electron-store'
 
 declare global {
   namespace IPCType {
@@ -8,7 +9,14 @@ declare global {
   }
 
   type OpenDirType = 'openLogDir' | 'openBackendConfigDir'
-  type IPCType = IPCType.IPCPortRequestType | IPCType.IPCThemeType | 'ipc-test' | 'themeFunc' | 'openURL' | OpenDirType
+  type IPCType =
+    | IPCType.IPCPortRequestType
+    | IPCType.IPCThemeType
+    | 'ipc-test'
+    | 'themeFunc'
+    | 'openURL'
+    | OpenDirType
+    | 'clientConfigStore'
 
   namespace Electron {
     interface ContextBridge {
@@ -22,6 +30,7 @@ declare global {
 
   function openLogDir(): void
   function openBackendConfigDir(): void
+  const clientConfigStore: Store
 }
 
 export {}
