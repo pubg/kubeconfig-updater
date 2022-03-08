@@ -58,7 +58,14 @@ export default function Page() {
       >
         <Item>
           <Typography variant="h6">Theme</Typography>
-          <RadioGroup row aria-label="theme" defaultValue="system" name="theme-radio-groups" onChange={OnChangeTheme}>
+          <RadioGroup
+            row
+            aria-label="theme"
+            defaultValue="system"
+            name="theme-radio-groups"
+            value={themeStore.theme}
+            onChange={OnChangeTheme}
+          >
             <FormControlLabel value="system" control={<Radio />} label="System" />
             <FormControlLabel value="light" control={<Radio />} label="Light" />
             <FormControlLabel value="dark" control={<Radio />} label="Dark" />
