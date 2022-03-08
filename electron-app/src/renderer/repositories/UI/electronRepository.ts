@@ -1,7 +1,7 @@
 import * as tsyringe from 'tsyringe'
 import { Repository } from './repository'
 
-@tsyringe.injectable()
+@tsyringe.singleton()
 export class ElectronRepository implements Repository {
   get<T>(key: string): T | undefined {
     throw new Error('Method not implemented.')

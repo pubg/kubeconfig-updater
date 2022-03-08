@@ -1,7 +1,7 @@
 import * as tsyringe from 'tsyringe'
 import { Repository } from './repository'
 
-@tsyringe.injectable()
+@tsyringe.singleton()
 export class BrowserRepository implements Repository {
   get<T>(key: string): T | undefined {
     const value = localStorage.getItem(key)
