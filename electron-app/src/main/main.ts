@@ -19,6 +19,7 @@ import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { container } from 'tsyringe'
 import _ from 'lodash'
+import Store from 'electron-store'
 import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
@@ -90,6 +91,8 @@ if (app.isPackaged) {
   container.register(BackendGrpcWebPort, { useValue: 10981 })
 }
 
+const clientConfigStore = new Store()
+
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer')
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS
@@ -140,7 +143,9 @@ const createWindow = async () => {
       mainWindow.minimize()
     } else {
       mainWindow.focus()
-      mainWindow.maximize()
+      if (clientConfigStore.get('maximizeOnStart', true)) {
+        mainWindow.maximize()
+      }
       mainWindow.show()
     }
   })

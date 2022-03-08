@@ -18,6 +18,7 @@ import { useResolve } from '../../hooks/container'
 import ThemeStore from '../../store/themeStore'
 import { ThemeType } from '../../repositories/themeRepository'
 import BackendConfig from './backendConfig'
+import ClientConfig from './clientConfig'
 
 const Item = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,
@@ -74,6 +75,11 @@ export default function Page() {
             </AccordionDetails>
           </Accordion>
           <Box mt="8px" />
+        </Item>
+
+        <Item>
+          <Typography variant="h6">Theme</Typography>
+          <ClientConfig />
         </Item>
 
         <Item>
