@@ -92,5 +92,3 @@ contextBridge.exposeInMainWorld('clientConfigStore', {
   set: clientConfigStore.set.bind(clientConfigStore),
   onDidChange: clientConfigStore.onDidChange.bind(clientConfigStore),
 })
-
-console.log('clientConfigStore path: ', clientConfigStore.path)

@@ -4,17 +4,18 @@ import { AzureThemeDark, AzureThemeLight } from '@fluentui/azure-themes'
 import { Theme as MuiTheme } from '@mui/material/styles/createTheme'
 import { createTheme } from '@mui/material/styles'
 import { PaletteMode } from '@mui/material'
-import { inject, singleton } from 'tsyringe'
-import { ThemePreferredType, ThemeRepository, ThemeType } from '../repositories/themeRepository'
+import * as tsyringe from 'tsyringe'
+import { ThemeType, ThemePreferredType } from '../types/theme/type'
+import * as Theme from '../repositories/theme'
 
-@singleton()
+@tsyringe.singleton()
 export default class ThemeStore {
   /** @readonly */
   @observable
-  private _theme: ThemeType = 'light'
+  private _theme?: ThemeType = 'light'
 
   get theme(): ThemeType {
-    return this._theme
+    return this._theme ?? 'light'
   }
 
   @computed
@@ -35,7 +36,7 @@ export default class ThemeStore {
   }
 
   // TODO: change string inject to Token (or Symbol?)
-  constructor(@inject('ThemeRepository') readonly storage: ThemeRepository) {
+  constructor(@tsyringe.inject(Theme.Registry.token) private readonly storage: Theme.Repository) {
     makeObservable(this)
     this._theme = this.storage.getTheme()
   }
@@ -44,9 +45,5 @@ export default class ThemeStore {
   setPreferredTheme(targetTheme: ThemePreferredType) {
     this.storage.setPreferredTheme(targetTheme)
     this._theme = this.storage.getTheme()
-  }
-
-  getPreferredTheme(): ThemePreferredType {
-    return this.storage.getPreferredTheme()
   }
 }

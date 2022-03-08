@@ -7,7 +7,6 @@ import { container } from 'tsyringe'
 import App from './App'
 import { ApplicationClient, KubeconfigClient } from './protos/Kubeconfig_serviceServiceClientPb'
 import browserLogger from './logger/browserLogger'
-import { BrowserThemeImpl, ElectronThemeImpl } from './repositories/themeRepository'
 
 browserLogger.debug('browser debug mode enabled')
 
@@ -38,12 +37,4 @@ container.register(KubeconfigClient, { useValue: kubeConfigClient })
 const applicationClient = new ApplicationClient(getHostName())
 container.register(ApplicationClient, { useValue: applicationClient })
 
-if (window.managedFromElectron === undefined) {
-  container.register('ThemeRepository', { useValue: new BrowserThemeImpl('system') })
-} else {
-  container.register('ThemeRepository', { useValue: new ElectronThemeImpl() })
-}
-
 render(<App />, document.getElementById('root'))
-
-console.log('clientConfigStore: ', clientConfigStore)
