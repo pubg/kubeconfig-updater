@@ -2,7 +2,8 @@ package aws_service
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/retry"
@@ -25,18 +26,7 @@ func GetProfiles() ([]string, error) {
 	}
 
 	for _, profile := range cfgProfiles {
-		var actualProfileName string
-
-		if profile == "default" {
-			actualProfileName = profile
-		} else {
-			_, err = fmt.Sscanf(profile, "profile %s", &actualProfileName)
-			if err != nil {
-				return nil, fmt.Errorf("ReadAwsConfigError: err='%s'", err.Error())
-			}
-		}
-
-		profilesMap[actualProfileName] = struct{}{}
+		profilesMap[profile] = struct{}{}
 	}
 
 	credProfiles, err := GetProfilesFromCredentials()
@@ -62,25 +52,30 @@ func GetProfilesFromConfig() ([]string, error) {
 		return nil, err
 	}
 
-	configPath := filepath.Join(awsDir, "config")
-
-	bytes, err := os.ReadFile(configPath)
+	bytes, err := os.ReadFile(filepath.Join(awsDir, "config"))
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
-
-	var profileNames []string
 
 	cfg, err := ini.Load(bytes)
 	if err != nil {
 		return nil, err
 	}
 
+	var profileNames []string
 	for _, section := range cfg.Sections() {
-		if section.Name() != "DEFAULT" {
-			// we don't need "DEFAULT", so omit this.
-			profileNames = append(profileNames, section.Name())
+		if section.Name() == ini.DefaultSection {
+			continue
 		}
+
+		profileName := section.Name()
+		if strings.HasPrefix(profileName, "profile ") {
+			profileName = strings.Replace(profileName, "profile ", "", 1)
+		}
+		profileNames = append(profileNames, profileName)
 	}
 
 	return profileNames, nil
@@ -92,23 +87,25 @@ func GetProfilesFromCredentials() ([]string, error) {
 		return nil, err
 	}
 
-	configPath := filepath.Join(awsDir, "credentials")
-
-	bytes, err := os.ReadFile(configPath)
+	bytes, err := os.ReadFile(filepath.Join(awsDir, "credentials"))
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
 
-	var profileNames []string
 	cfg, err := ini.Load(bytes)
 	if err != nil {
 		return nil, err
 	}
 
+	var profileNames []string
 	for _, section := range cfg.Sections() {
-		if section.Name() != "DEFAULT" {
-			profileNames = append(profileNames, section.Name())
+		if section.Name() == ini.DefaultSection {
+			continue
 		}
+		profileNames = append(profileNames, section.Name())
 	}
 
 	return profileNames, nil
