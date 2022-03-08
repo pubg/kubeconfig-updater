@@ -1,5 +1,4 @@
 import 'electron'
-import { opendir } from 'fs'
 import Store from 'electron-store'
 
 declare global {
