@@ -5,7 +5,7 @@
   "author": {
     "name": "PUBG"
   },
-  "version": "0.3.1",
+  "version": "0.3.2",
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
