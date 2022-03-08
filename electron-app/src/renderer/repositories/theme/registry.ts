@@ -15,5 +15,5 @@ import { ElectronRepository } from './electronRepository'
   },
 ])
 export class Registry {
-  static readonly token = Symbol(Registry.name)
+  static readonly token = Symbol('ThemeRepository')
 }
