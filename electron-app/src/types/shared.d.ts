@@ -30,7 +30,7 @@ declare global {
 
   function openLogDir(): void
   function openBackendConfigDir(): void
-  const clientConfigStore: Store
+  const clientConfigStore: Pick<Store, 'get' | 'set' | 'onDidChange'>
 }
 
 export {}

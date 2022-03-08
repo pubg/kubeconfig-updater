@@ -87,6 +87,10 @@ contextBridge.exposeInMainWorld('openLogDir', openLogDir(logPath))
 contextBridge.exposeInMainWorld('openBackendConfigDir', openLogDir(backendConfigDir))
 
 const clientConfigStore = new Store()
-contextBridge.exposeInMainWorld('clientConfigStore', clientConfigStore)
+contextBridge.exposeInMainWorld('clientConfigStore', {
+  get: clientConfigStore.get.bind(clientConfigStore),
+  set: clientConfigStore.set.bind(clientConfigStore),
+  onDidChange: clientConfigStore.onDidChange.bind(clientConfigStore),
+})
 
-console.log('(preload) clientConfigStore: ', clientConfigStore)
+console.log('clientConfigStore path: ', clientConfigStore.path)
