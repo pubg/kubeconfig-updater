@@ -1,16 +1,16 @@
 import * as tsyringe from 'tsyringe'
-import { BrowserThemeImpl } from './browserThemeImpl'
-import { ElectronThemeImpl } from './electronThemeImpl'
+import { BrowserRepository } from './browserRepository'
+import { ElectronRepository } from './electronRepository'
 
 @tsyringe.registry([
   {
     token: Registry.token,
     useFactory: (c) => {
       if (window.managedFromElectron) {
-        return c.resolve(ElectronThemeImpl)
+        return c.resolve(ElectronRepository)
       }
 
-      return c.resolve(BrowserThemeImpl)
+      return c.resolve(BrowserRepository)
     },
   },
 ])
