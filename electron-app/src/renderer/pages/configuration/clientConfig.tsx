@@ -1,28 +1,19 @@
 import { Stack, Switch, Typography } from '@mui/material'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useResolve } from '../../hooks/container'
+import { UIConfigStore } from '../../store/uiConfigStore'
 
 export default observer(function ClientConfig() {
-  const store = clientConfigStore
-  const [fullScreenState, setFullScreenState] = useState(store.get('maximizeOnStart', true) as boolean)
-
-  console.log(store)
-
-  useEffect(() => {
-    const destructor = store.onDidChange('maximizeOnStart', (value) => {
-      setFullScreenState(value as boolean)
-    })
-
-    return () => {
-      destructor()
-    }
-  }, [store])
+  const configUIStore = useResolve(UIConfigStore)
+  const [fullScreenState, setFullScreenState] = useState(configUIStore.fullScreenOnStartup)
 
   const onFullScreenToggle = useCallback(
     (value: boolean) => {
-      store.set('maximizeOnStart', value)
+      configUIStore.fullScreenOnStartup = value
+      setFullScreenState(configUIStore.fullScreenOnStartup)
     },
-    [store]
+    [configUIStore]
   )
 
   return (
