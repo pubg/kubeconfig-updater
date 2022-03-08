@@ -5,7 +5,7 @@ import { Theme as MuiTheme } from '@mui/material/styles/createTheme'
 import { createTheme } from '@mui/material/styles'
 import { PaletteMode } from '@mui/material'
 import { inject, singleton } from 'tsyringe'
-import { Repository as ThemeRepository } from '../repositories/UI'
+import { Repository as ThemeRepository } from '../repositories/UIConfig'
 import { ThemeType, ThemePreferredType } from '../types/theme/type'
 
 @singleton()

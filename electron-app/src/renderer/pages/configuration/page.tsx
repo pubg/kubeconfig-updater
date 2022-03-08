@@ -16,7 +16,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useResolve } from '../../hooks/container'
 import ThemeStore from '../../store/themeStore'
-import { ThemeType } from '../../repositories/UI/themeRepository'
+import { ThemeType } from '../../repositories/UIConfig/themeRepository'
 import BackendConfig from './backendConfig'
 import ClientConfig from './clientConfig'
 
