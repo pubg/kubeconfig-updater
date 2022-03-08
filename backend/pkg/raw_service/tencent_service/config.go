@@ -2,6 +2,7 @@ package tencent_service
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -16,7 +17,6 @@ import (
 )
 
 func GetProfiles() ([]string, error) {
-	// TODO: intl 는 .tccli, china 버전은 .tencentcloud 참조함
 	profileNames := make([]string, 0)
 
 	dirPath, err := getCredentialsDirectoryPath()
@@ -25,7 +25,9 @@ func GetProfiles() ([]string, error) {
 	}
 
 	dir, err := os.Stat(dirPath)
-	if err != nil {
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	} else if !dir.IsDir() {
 		return nil, err
