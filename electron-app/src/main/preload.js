@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer, shell } = require('electron')
+const { contextBridge, ipcRenderer, shell, nativeTheme } = require('electron')
 const electronLogger = require('electron-log').create('renderer')
 const os = require('os')
 const path = require('path')
@@ -71,3 +71,5 @@ contextBridge.exposeInMainWorld('clientConfigStore', {
   set: clientConfigStore.set.bind(clientConfigStore),
   onDidChange: clientConfigStore.onDidChange.bind(clientConfigStore),
 })
+
+contextBridge.exposeInMainWorld('nativeTheme', nativeTheme)

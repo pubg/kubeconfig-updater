@@ -7,7 +7,9 @@ declare global {
   }
 
   type OpenDirType = 'openLogDir' | 'openBackendConfigDir'
-  type IPCType = IPCType.IPCPortRequestType | 'ipc-test' | 'openURL' | OpenDirType | 'clientConfigStore'
+
+  // theme = electron.nativeTheme
+  type IPCType = IPCType.IPCPortRequestType | 'ipc-test' | 'openURL' | OpenDirType | 'clientConfigStore' | 'nativeTheme'
 
   namespace Electron {
     interface ContextBridge {
@@ -22,6 +24,7 @@ declare global {
   function openLogDir(): void
   function openBackendConfigDir(): void
   const clientConfigStore: Pick<Store, 'get' | 'set' | 'onDidChange'>
+  const nativeTheme: Electron.NativeTheme
 }
 
 export {}

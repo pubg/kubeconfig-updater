@@ -14,8 +14,14 @@ export default class ThemeStore {
   @observable
   private _theme?: ThemeType = 'light'
 
+  @computed
   get theme(): ThemeType {
     return this._theme ?? 'light'
+  }
+
+  // don't set this @computed
+  get preferredTheme(): ThemePreferredType {
+    return this.storage.getPreferredTheme() ?? 'system'
   }
 
   @computed
