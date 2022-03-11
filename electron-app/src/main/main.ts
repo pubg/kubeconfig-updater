@@ -24,7 +24,6 @@ import { resolveHtmlPath } from './util'
 import BackendManager from './backend/backend'
 import { BackendExecCmd, BackendExecCwd, BackendGrpcPort, BackendGrpcWebPort } from './backend/symbols'
 import mainLogger from './logger/mainLogger'
-import FrontendStore from './frontendStore'
 import MenuBuilder from './menu'
 
 export default class AppUpdater {
@@ -198,6 +197,11 @@ const createWindow = async () => {
     )
   }
 
+  nativeTheme.on('updated', () => {
+    mainLogger.info(`nativeTheme updated. shouldUseDarkColor: ${nativeTheme.shouldUseDarkColors}`)
+    mainWindow?.webContents.send('nativeTheme.updated')
+  })
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -257,30 +261,6 @@ app.on('before-quit', async (event) => {
   }
 })
 
-// Theme Start
-const store = container.resolve(FrontendStore)
-type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
-nativeTheme.themeSource = <ThemeSourceType>store.getPreferredTheme()
-mainLogger.info(`Load Preferred Theme: ${store.getPreferredTheme()}`)
-
-ipcMain.on('theme:getPreferredTheme', (event) => {
-  event.returnValue = store.getPreferredTheme()
+ipcMain.on('theme.shouldUseDarkColors', (event) => {
+  event.returnValue = nativeTheme.shouldUseDarkColors
 })
-
-ipcMain.on('theme:getTheme', (event) => {
-  event.returnValue = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
-})
-
-// theme:setPreferredTheme => bool
-// Set Success or Not
-ipcMain.on('theme:setPreferredTheme', (event, ...args) => {
-  if (args.length !== 1 || typeof args[0] !== 'string') {
-    event.returnValue = false
-    return
-  }
-  const targetTheme = args[0] as string
-  nativeTheme.themeSource = <ThemeSourceType>targetTheme
-  store.setPreferredTheme(targetTheme)
-  event.returnValue = true
-})
-// Theme End

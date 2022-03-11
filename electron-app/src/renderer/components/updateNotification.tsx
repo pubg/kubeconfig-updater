@@ -2,7 +2,7 @@ import { SnackbarKey, useSnackbar } from 'notistack'
 import semver from 'semver'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { Box, Button, emphasize, Theme, useTheme } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import browserLogger from '../logger/browserLogger'
 import { version } from '../../../package.json'
 

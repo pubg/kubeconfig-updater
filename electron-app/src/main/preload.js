@@ -1,9 +1,10 @@
-const { contextBridge, ipcRenderer, shell } = require('electron')
+const { contextBridge, ipcRenderer, shell, nativeTheme } = require('electron')
 const electronLogger = require('electron-log').create('renderer')
 const os = require('os')
 const path = require('path')
 const cp = require('child_process')
 const Store = require('electron-store')
+const EventEmitter = require('events')
 
 electronLogger.transports.console.format = '[{level}]{scope} {text}'
 // move past logs to main.old.log and clear the current log file.
@@ -21,27 +22,6 @@ contextBridge.exposeInMainWorld('electronLogger', electronLogger.functions)
 const grpcWebPort = ipcRenderer.sendSync('getGrpcWebPort')
 contextBridge.exposeInMainWorld('grpcWebPort', grpcWebPort)
 electronLogger.info(`[Preload] getGrpcWebPort: ${grpcWebPort}`)
-
-const theme = ipcRenderer.sendSync('theme:getTheme')
-electronLogger.info(`[Preload] getTheme: ${theme}`)
-contextBridge.exposeInMainWorld('theme', theme)
-
-contextBridge.exposeInMainWorld('themeGetTheme', () => {
-  const theme2 = ipcRenderer.sendSync('theme:getTheme')
-  electronLogger.info(`[themeFunc] getTheme: ${theme2}`)
-  return theme2
-})
-
-contextBridge.exposeInMainWorld('themeGetPreferredTheme', () => {
-  const preferredTheme = ipcRenderer.sendSync('theme:getPreferredTheme')
-  electronLogger.info(`[themeFunc] getPreferredTheme: ${preferredTheme}`)
-  return preferredTheme
-})
-
-contextBridge.exposeInMainWorld('themeSetPreferredTheme', (preferredTheme) => {
-  ipcRenderer.sendSync('theme:setPreferredTheme', preferredTheme)
-  electronLogger.info(`[themeFunc] setPreferredTheme: ${preferredTheme}`)
-})
 
 contextBridge.exposeInMainWorld('managedFromElectron', true)
 
@@ -91,4 +71,17 @@ contextBridge.exposeInMainWorld('clientConfigStore', {
   get: clientConfigStore.get.bind(clientConfigStore),
   set: clientConfigStore.set.bind(clientConfigStore),
   onDidChange: clientConfigStore.onDidChange.bind(clientConfigStore),
+})
+
+contextBridge.exposeInMainWorld('nativeTheme', nativeTheme)
+
+contextBridge.exposeInMainWorld('shouldUseDarkColors', () => {
+  return ipcRenderer.sendSync('theme.shouldUseDarkColors')
+})
+
+const nativeThemeEvent = new EventEmitter()
+ipcRenderer.on('nativeTheme.updated', () => nativeThemeEvent.emit('updated'))
+
+contextBridge.exposeInMainWorld('nativeThemeEvent', {
+  on: nativeThemeEvent.on.bind(nativeThemeEvent),
 })

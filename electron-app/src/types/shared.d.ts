@@ -1,35 +1,13 @@
 import 'electron'
 import Store from 'electron-store'
+import EventEmitter from 'events'
 
 declare global {
-  namespace IPCType {
-    type IPCPortRequestType = 'getGrpcWebPort'
-    type IPCThemeType = 'theme' | 'theme:getTheme'
-  }
-
-  type OpenDirType = 'openLogDir' | 'openBackendConfigDir'
-  type IPCType =
-    | IPCType.IPCPortRequestType
-    | IPCType.IPCThemeType
-    | 'ipc-test'
-    | 'themeFunc'
-    | 'openURL'
-    | OpenDirType
-    | 'clientConfigStore'
-
-  namespace Electron {
-    interface ContextBridge {
-      exposeInMainWorld(apiKey: IPCType, api: any): void
-    }
-
-    interface IpcMain {
-      on(channel: IPCType, listener: (event: IpcMainEvent, ...args: any[]) => void): this
-    }
-  }
-
   function openLogDir(): void
   function openBackendConfigDir(): void
+  function shouldUseDarkColors(): boolean
   const clientConfigStore: Pick<Store, 'get' | 'set' | 'onDidChange'>
+  const nativeThemeEvent: Pick<EventEmitter, 'on'> | undefined
 }
 
 export {}
