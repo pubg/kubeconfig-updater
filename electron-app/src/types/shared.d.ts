@@ -8,13 +8,18 @@ declare global {
 
   type OpenDirType = 'openLogDir' | 'openBackendConfigDir'
 
-  // theme = electron.nativeTheme
-  type IPCType = IPCType.IPCPortRequestType | 'ipc-test' | 'openURL' | OpenDirType | 'clientConfigStore' | 'nativeTheme'
+  type IPCType =
+    | IPCType.IPCPortRequestType
+    | 'ipc-test'
+    | 'openURL'
+    | OpenDirType
+    | 'clientConfigStore'
+    | 'theme.shouldUseDarkColors'
 
   namespace Electron {
-    interface ContextBridge {
-      exposeInMainWorld(apiKey: IPCType, api: any): void
-    }
+    // interface ContextBridge {
+    // exposeInMainWorld(apiKey: string, api: any): void
+    // }
 
     interface IpcMain {
       on(channel: IPCType, listener: (event: IpcMainEvent, ...args: any[]) => void): this
@@ -23,8 +28,8 @@ declare global {
 
   function openLogDir(): void
   function openBackendConfigDir(): void
+  function shouldUseDarkColors(): boolean
   const clientConfigStore: Pick<Store, 'get' | 'set' | 'onDidChange'>
-  const nativeTheme: Electron.NativeTheme
 }
 
 export {}

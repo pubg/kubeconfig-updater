@@ -14,7 +14,7 @@ import 'reflect-metadata'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import path from 'path'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { container } from 'tsyringe'
@@ -254,4 +254,8 @@ app.on('before-quit', async (event) => {
     await manager.end()
     app.quit()
   }
+})
+
+ipcMain.on('theme.shouldUseDarkColors', (event) => {
+  event.returnValue = nativeTheme.shouldUseDarkColors
 })

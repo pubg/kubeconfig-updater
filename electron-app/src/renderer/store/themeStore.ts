@@ -14,14 +14,17 @@ export default class ThemeStore {
   @observable
   private _theme?: ThemeType = 'light'
 
+  @observable
+  private _preferredTheme?: ThemePreferredType = 'system'
+
   @computed
   get theme(): ThemeType {
     return this._theme ?? 'light'
   }
 
-  // don't set this @computed
+  @computed
   get preferredTheme(): ThemePreferredType {
-    return this.storage.getPreferredTheme() ?? 'system'
+    return this._preferredTheme ?? 'system'
   }
 
   @computed
@@ -51,5 +54,6 @@ export default class ThemeStore {
   setPreferredTheme(targetTheme: ThemePreferredType) {
     this.storage.setPreferredTheme(targetTheme)
     this._theme = this.storage.getTheme()
+    this._preferredTheme = this.storage.getPreferredTheme()
   }
 }

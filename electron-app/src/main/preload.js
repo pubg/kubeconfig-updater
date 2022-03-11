@@ -73,3 +73,7 @@ contextBridge.exposeInMainWorld('clientConfigStore', {
 })
 
 contextBridge.exposeInMainWorld('nativeTheme', nativeTheme)
+
+contextBridge.exposeInMainWorld('shouldUseDarkColors', () => {
+  return ipcRenderer.sendSync('theme.shouldUseDarkColors')
+})

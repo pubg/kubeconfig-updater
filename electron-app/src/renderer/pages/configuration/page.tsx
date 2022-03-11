@@ -14,6 +14,7 @@ import {
   Typography,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { observer } from 'mobx-react-lite'
 import { useResolve } from '../../hooks/container'
 import ThemeStore from '../../store/themeStore'
 import BackendConfig from './backendConfig'
@@ -30,11 +31,16 @@ const Item = styled(Box)(({ theme }) => ({
   },
 }))
 
-export default function Page() {
+export default observer(function Page() {
   const themeStore = useResolve(ThemeStore)
-  const OnChangeTheme = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    themeStore.setPreferredTheme(value as ThemeType)
-  }
+  const OnChangeTheme = React.useCallback(
+    (value: string) => {
+      themeStore.setPreferredTheme(value as ThemeType)
+      console.log('value: ', value)
+      console.log('theme: ', themeStore.theme)
+    },
+    [themeStore]
+  )
 
   return (
     <Container
@@ -63,8 +69,8 @@ export default function Page() {
             aria-label="theme"
             defaultValue="system"
             name="theme-radio-groups"
-            value={themeStore.theme}
-            onChange={OnChangeTheme}
+            value={themeStore.preferredTheme}
+            onChange={(_, value) => OnChangeTheme(value)}
           >
             <FormControlLabel value="system" control={<Radio />} label="System" />
             <FormControlLabel value="light" control={<Radio />} label="Light" />
@@ -107,4 +113,4 @@ export default function Page() {
       </Stack>
     </Container>
   )
-}
+})

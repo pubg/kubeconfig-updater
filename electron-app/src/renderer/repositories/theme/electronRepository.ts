@@ -13,7 +13,8 @@ export class ElectronRepository extends Repository {
     const theme = this.getPreferredTheme()
 
     if (theme === 'system') {
-      if (nativeTheme.shouldUseDarkColors) {
+      console.log('shouldUseDarkColors: ', shouldUseDarkColors())
+      if (shouldUseDarkColors()) {
         return 'dark'
       }
 
