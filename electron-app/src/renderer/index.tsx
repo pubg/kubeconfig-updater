@@ -13,10 +13,6 @@ browserLogger.debug('browser debug mode enabled')
 declare global {
   interface Window {
     grpcWebPort?: number
-    theme?: string
-    themeGetTheme?: () => string
-    themeGetPreferredTheme?: () => string
-    themeSetPreferredTheme?: (preferredTheme: string) => void
     managedFromElectron?: boolean
   }
 }

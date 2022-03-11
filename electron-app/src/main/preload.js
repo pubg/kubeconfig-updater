@@ -22,27 +22,6 @@ const grpcWebPort = ipcRenderer.sendSync('getGrpcWebPort')
 contextBridge.exposeInMainWorld('grpcWebPort', grpcWebPort)
 electronLogger.info(`[Preload] getGrpcWebPort: ${grpcWebPort}`)
 
-const theme = ipcRenderer.sendSync('theme:getTheme')
-electronLogger.info(`[Preload] getTheme: ${theme}`)
-contextBridge.exposeInMainWorld('theme', theme)
-
-contextBridge.exposeInMainWorld('themeGetTheme', () => {
-  const theme2 = ipcRenderer.sendSync('theme:getTheme')
-  electronLogger.info(`[themeFunc] getTheme: ${theme2}`)
-  return theme2
-})
-
-contextBridge.exposeInMainWorld('themeGetPreferredTheme', () => {
-  const preferredTheme = ipcRenderer.sendSync('theme:getPreferredTheme')
-  electronLogger.info(`[themeFunc] getPreferredTheme: ${preferredTheme}`)
-  return preferredTheme
-})
-
-contextBridge.exposeInMainWorld('themeSetPreferredTheme', (preferredTheme) => {
-  ipcRenderer.sendSync('theme:setPreferredTheme', preferredTheme)
-  electronLogger.info(`[themeFunc] setPreferredTheme: ${preferredTheme}`)
-})
-
 contextBridge.exposeInMainWorld('managedFromElectron', true)
 
 contextBridge.exposeInMainWorld('openURL', (url) => {

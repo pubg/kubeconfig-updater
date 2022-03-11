@@ -10,10 +10,12 @@ export default class FrontendStore {
   }
 
   getPreferredTheme(): string {
-    return <string>this.store.get('theme', 'system')
+    const theme: any = this.store.get('theme')
+
+    return theme?.type ?? 'system'
   }
 
   setPreferredTheme(theme: string) {
-    this.store.set('theme', theme)
+    this.store.set('theme')
   }
 }

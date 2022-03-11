@@ -256,31 +256,3 @@ app.on('before-quit', async (event) => {
     app.quit()
   }
 })
-
-// Theme Start
-const store = container.resolve(FrontendStore)
-type ThemeSourceType = typeof Electron.nativeTheme['themeSource']
-nativeTheme.themeSource = <ThemeSourceType>store.getPreferredTheme()
-mainLogger.info(`Load Preferred Theme: ${store.getPreferredTheme()}`)
-
-ipcMain.on('theme:getPreferredTheme', (event) => {
-  event.returnValue = store.getPreferredTheme()
-})
-
-ipcMain.on('theme:getTheme', (event) => {
-  event.returnValue = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
-})
-
-// theme:setPreferredTheme => bool
-// Set Success or Not
-ipcMain.on('theme:setPreferredTheme', (event, ...args) => {
-  if (args.length !== 1 || typeof args[0] !== 'string') {
-    event.returnValue = false
-    return
-  }
-  const targetTheme = args[0] as string
-  nativeTheme.themeSource = <ThemeSourceType>targetTheme
-  store.setPreferredTheme(targetTheme)
-  event.returnValue = true
-})
-// Theme End
