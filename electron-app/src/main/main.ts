@@ -197,6 +197,11 @@ const createWindow = async () => {
     )
   }
 
+  nativeTheme.on('updated', () => {
+    mainLogger.info(`nativeTheme updated. shouldUseDarkColor: ${nativeTheme.shouldUseDarkColors}`)
+    mainWindow?.webContents.send('nativeTheme.updated')
+  })
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();

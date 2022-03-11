@@ -48,11 +48,21 @@ export default class ThemeStore {
   constructor(@tsyringe.inject(Theme.Registry.token) private readonly storage: Theme.Repository) {
     makeObservable(this)
     this._theme = this.storage.getTheme()
+
+    if ('nativeThemeEvent' in globalThis) {
+      nativeThemeEvent!.on('updated', () => this.updatePreferredTheme())
+    }
   }
 
   @action
   setPreferredTheme(targetTheme: ThemePreferredType) {
     this.storage.setPreferredTheme(targetTheme)
+    this.updatePreferredTheme()
+  }
+
+  @action
+  updatePreferredTheme() {
+    console.log('updating theme')
     this._theme = this.storage.getTheme()
     this._preferredTheme = this.storage.getPreferredTheme()
   }

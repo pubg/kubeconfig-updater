@@ -4,6 +4,7 @@ const os = require('os')
 const path = require('path')
 const cp = require('child_process')
 const Store = require('electron-store')
+const EventEmitter = require('events')
 
 electronLogger.transports.console.format = '[{level}]{scope} {text}'
 // move past logs to main.old.log and clear the current log file.
@@ -76,4 +77,11 @@ contextBridge.exposeInMainWorld('nativeTheme', nativeTheme)
 
 contextBridge.exposeInMainWorld('shouldUseDarkColors', () => {
   return ipcRenderer.sendSync('theme.shouldUseDarkColors')
+})
+
+const nativeThemeEvent = new EventEmitter()
+ipcRenderer.on('nativeTheme.updated', () => nativeThemeEvent.emit('updated'))
+
+contextBridge.exposeInMainWorld('nativeThemeEvent', {
+  on: nativeThemeEvent.on.bind(nativeThemeEvent),
 })
