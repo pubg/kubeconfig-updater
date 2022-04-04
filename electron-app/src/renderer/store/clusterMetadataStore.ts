@@ -1,4 +1,4 @@
-import { flow, makeObservable, observable } from 'mobx'
+import { flow, makeObservable, observable, reaction } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
@@ -6,9 +6,15 @@ import browserLogger from '../logger/browserLogger'
 import ClusterRepository from '../repositories/clusterRepository'
 import EventStore from '../event/eventStore'
 import { ResultCode } from '../protos/common_pb'
+import CredResolverStore from './credResolverStore'
+import { Disposable } from '../types/disposable'
 
 @singleton()
-export default class ClusterMetadataStore {
+export default class ClusterMetadataStore implements Disposable {
+  private readonly disposables: Disposable[] = []
+
+  private disposed = false
+
   private readonly logger = browserLogger
 
   @observable
@@ -53,8 +59,17 @@ export default class ClusterMetadataStore {
 
   readonly errorEvent = new EventStore<Error>()
 
-  constructor() {
+  constructor(credResolverStore: CredResolverStore) {
     makeObservable(this)
+
+    // if credResolverStore changes, fetch clusterMetadata
+    this.disposables.push({
+      dispose: () =>
+        reaction(
+          () => credResolverStore.credResolvers,
+          () => this.fetchMetadata(true)
+        ),
+    })
   }
 
   fetchMetadata = flow(function* (this: ClusterMetadataStore, resync?: boolean) {
@@ -113,5 +128,17 @@ export default class ClusterMetadataStore {
     }
 
     return res.getClustersList()
+  }
+
+  dispose(): void {
+    if (this.disposed) {
+      return
+    }
+
+    for (const disposable of this.disposables) {
+      disposable.dispose()
+    }
+
+    this.disposed = true
   }
 }
