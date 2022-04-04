@@ -1,4 +1,4 @@
-import { flow, makeObservable, observable } from 'mobx'
+import { computed, flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
@@ -18,7 +18,12 @@ export default class ClusterMetadataStore implements Disposable {
   private readonly logger = browserLogger
 
   @observable
-  state: 'ready' | 'fetch' | 'in-sync' = 'ready'
+  private _state: 'ready' | 'fetch' | 'in-sync' = 'ready'
+
+  @computed
+  get state() {
+    return this._state
+  }
 
   @observable
   private _items: AggregatedClusterMetadata[] = []
@@ -74,7 +79,7 @@ export default class ClusterMetadataStore implements Disposable {
 
     if (resync || this.shouldResync) {
       this.logger.debug('request backend cluster metadata sync')
-      this.state = 'in-sync'
+      this._state = 'in-sync'
 
       try {
         yield ClusterMetadataStore.sync()
@@ -85,7 +90,7 @@ export default class ClusterMetadataStore implements Disposable {
     }
 
     this.logger.debug('request backend cluster metadata fetch')
-    this.state = 'fetch'
+    this._state = 'fetch'
 
     try {
       this._items = yield ClusterMetadataStore.fetch()
@@ -95,7 +100,7 @@ export default class ClusterMetadataStore implements Disposable {
     }
 
     this.logger.debug('fetch cluster metadata done.')
-    this.state = 'ready'
+    this._state = 'ready'
   })
 
   private static async sync() {
