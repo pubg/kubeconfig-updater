@@ -68,16 +68,22 @@ export default class ClusterMetadataStore implements Disposable {
     makeObservable(this)
 
     credResolverStore.event.on('credResolverUpdated', (sender, e) => this.onCredResolverUpdated(sender, e))
+
+    this.fetchMetadata()
   }
 
   private onCredResolverUpdated(_: any, e: any) {
     this.fetchMetadata(true)
   }
 
-  fetchMetadata = flow(function* (this: ClusterMetadataStore, resync?: boolean) {
+  /**
+   * fetchMetadata get cluster metadata from backend.
+   * @param doSync determines whether or not to sync before fetching data from backend.
+   */
+  fetchMetadata = flow(function* (this: ClusterMetadataStore, doSync = true) {
     this._items = []
 
-    if (resync || this.shouldResync) {
+    if (doSync || this.shouldResync) {
       this.logger.debug('request backend cluster metadata sync')
       this._state = 'in-sync'
 
