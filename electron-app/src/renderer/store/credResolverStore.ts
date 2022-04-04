@@ -120,8 +120,6 @@ export default class CredResolverStore {
       yield this.fetchCredResolver(true, true)
     }
 
-    yield this.fetchCredResolver(true)
-
     this.setPayloadResolved(value.accountid, res)
   })
 
