@@ -64,6 +64,7 @@ specifiers:
   eslint-plugin-promise: ^5.1.1
   eslint-plugin-react: ^7.26.1
   eslint-plugin-react-hooks: ^4.2.0
+  events: ^3.3.0
   file-loader: ^6.2.0
   fix-path: 3.0.0
   google-protobuf: ^3.19.1
@@ -105,6 +106,7 @@ specifiers:
   ts-loader: ^9.2.6
   ts-node: ^10.4.0
   tsyringe: ^4.6.0
+  typed-emitter: ^2.1.0
   typedoc: ^0.22.10
   typescript: ^4.4.4
   url-loader: ^4.1.1
@@ -129,6 +131,7 @@ dependencies:
   electron-log: 4.4.1
   electron-store: 8.0.1
   electron-updater: 4.6.1
+  events: 3.3.0
   fix-path: 3.0.0
   google-protobuf: 3.19.1
   grpc-web: 1.3.0
@@ -150,6 +153,7 @@ dependencies:
   sprintf-js: 1.1.2
   tree-kill: 1.2.2
   tsyringe: 4.6.0
+  typed-emitter: 2.1.0
   uuid: 8.3.2
 
 devDependencies:
@@ -5789,7 +5793,6 @@ packages:
   /events/3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
-    dev: true
 
   /evp_bytestokey/1.0.3:
     resolution: {integrity: sha512-/f2Go4TognH/KvCISP7OUsHn85hT9nUkxxA9BEWxFn+Oj9o8ZNLm/40hdlgSLyuOimsrTKLUMEorQexp/aPQeA==}
@@ -10235,7 +10238,6 @@ packages:
     resolution: {integrity: sha512-7SQDi7xeTMCJpqViXh8gL/lebcwlp3d831F05+9B44A4B0WfsEwUQHR64gsH1kvJ+Ep/J9K2+n1hVl1CsGN23w==}
     dependencies:
       tslib: 2.1.0
-    dev: true
 
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -11299,7 +11301,6 @@ packages:
 
   /tslib/2.1.0:
     resolution: {integrity: sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==}
-    dev: true
 
   /tslib/2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
@@ -11378,6 +11379,12 @@ packages:
       media-typer: 0.3.0
       mime-types: 2.1.34
     dev: true
+
+  /typed-emitter/2.1.0:
+    resolution: {integrity: sha512-g/KzbYKbH5C2vPkaXGu8DJlHrGKHLsM25Zg9WuC9pMGfuvT+X25tZQWo5fK1BjBm8+UrVE9LDCvaY0CQk+fXDA==}
+    optionalDependencies:
+      rxjs: 7.4.0
+    dev: false
 
   /typedarray-to-buffer/3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
