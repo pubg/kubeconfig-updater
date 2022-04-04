@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { computed, flow, makeObservable, observable } from 'mobx'
+import { computed, flow, makeObservable } from 'mobx'
 import { singleton } from 'tsyringe'
 import LINQ from 'linq'
 import CredResolverStore from '../../store/credResolverStore'
@@ -11,12 +11,11 @@ type Option = ProfileSelectionOption
 
 @singleton()
 export default class UIStore {
-  @observable
-  private _loading = true
-
   @computed
   get state(): 'ready' | 'fetching' {
-    return this.profileStore.state !== 'ready' || this._loading ? 'fetching' : 'ready'
+    const isLoading = this.profileStore.state !== 'ready' || this.credResolverStore.isLoading !== 'ready'
+
+    return isLoading ? 'fetching' : 'ready'
   }
 
   @computed
@@ -59,9 +58,7 @@ export default class UIStore {
   // reload local entity state to match backend's state
   @flow
   *fetchCredResolvers(forceSync = false) {
-    this._loading = true
     yield this.credResolverStore.fetchCredResolver(forceSync)
-    this._loading = false
   }
 
   @flow

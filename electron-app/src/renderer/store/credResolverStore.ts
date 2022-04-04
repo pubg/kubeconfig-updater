@@ -43,28 +43,50 @@ export default class CredResolverStore {
 
   private readonly expiredMinute = 5
 
+  @observable
+  private _state: 'ready' | 'fetch' = 'ready'
+
+  @computed
+  get isLoading() {
+    return this._state
+  }
+
   constructor(private readonly credResolverRepository: CredResolverRepository) {
     makeObservable(this)
   }
 
   /**
    * update resolvers to match backend state.
+   * @param ignoreCache if enabled, always fetch data from backend whether cache is expired or not.
+   * @param skipSync if enabled, skip calling backend to sync cred resolvers (for fast reload.)
    */
-  fetchCredResolver = flow(function* (this: CredResolverStore, forceSync = false) {
-    if (forceSync || this.isCacheExpired()) {
-      this.logger.debug('sync cred resolvers...')
-      yield this.credResolverRepository.SyncAvailableCredResolvers()
+  fetchCredResolver = flow(function* (this: CredResolverStore, ignoreCache = false, skipSync = false) {
+    if (ignoreCache || this.isCacheExpired()) {
+      try {
+        this._state = 'fetch'
 
-      this.logger.debug('fetching cred resolvers...')
-      const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
+        if (skipSync) {
+          this.logger.debug('sync cred resolver is skipped.')
+        } else {
+          this.logger.debug('sync cred resolvers...')
+          yield this.credResolverRepository.SyncAvailableCredResolvers()
+        }
 
-      if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
-        this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
-        return
+        this.logger.debug('fetching cred resolvers...')
+        const res: GetCredResolversRes = yield this.credResolverRepository.getCredResolvers()
+
+        if (res.getCommonres()?.getStatus() !== ResultCode.SUCCESS) {
+          this.logger.error('failed fetching cred resolvers. error: ', res.getCommonres()?.getMessage())
+          return
+        }
+
+        this.syncCredResolvers(res.getConfigsList())
+        this.lastUpdated = dayjs()
+      } catch (e) {
+        this.logger.error(`Unexpected error: ${e}`)
+      } finally {
+        this._state = 'ready'
       }
-
-      this.syncCredResolvers(res.getConfigsList())
-      this.lastUpdated = dayjs()
     } else {
       this.clearPayloads()
     }
@@ -84,15 +106,19 @@ export default class CredResolverStore {
   setCredResolver = flow(async function* (this: CredResolverStore, value: ObservedCredResolverConfig) {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
+    const isAddingConfig = !this._credResolverMap.has(value.accountid)
 
     this.setPayloadResolving(value.accountid)
 
     const res: CommonRes = yield this.credResolverRepository.setCredResolver(value)
     if (res.getStatus() !== ResultCode.SUCCESS) {
       this.logger.error('failed to set cred resolver. err: ', res.getMessage())
+      return
     }
 
-    yield this.fetchCredResolver(true)
+    if (isAddingConfig) {
+      yield this.fetchCredResolver(true, true)
+    }
 
     this.setPayloadResolved(value.accountid, res)
   })
