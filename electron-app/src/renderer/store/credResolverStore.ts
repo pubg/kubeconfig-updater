@@ -1,8 +1,9 @@
 /* eslint-disable class-methods-use-this */
 import dayjs from 'dayjs'
-import _ from 'lodash'
-import { action, computed, flow, makeObservable, observable, runInAction, toJS } from 'mobx'
+import { EventEmitter } from 'events'
+import { action, computed, flow, makeObservable, observable, toJS } from 'mobx'
 import { singleton } from 'tsyringe'
+import TypedEmitter from 'typed-emitter'
 import browserLogger from '../logger/browserLogger'
 import ObservedCredResolverConfig from '../pages/credResolver/credResolverConfig'
 import { CommonRes, ResultCode } from '../protos/common_pb'
@@ -16,6 +17,10 @@ export interface Payload {
     resultCode: ResultCode
     message: string
   }
+}
+
+type EventTypes = {
+  credResolverUpdated(sender: CredResolverStore, e: ObservedCredResolverConfig): void
 }
 
 /**
@@ -47,9 +52,12 @@ export default class CredResolverStore {
   private _state: 'ready' | 'fetch' = 'ready'
 
   @computed
-  get isLoading() {
+  get state() {
     return this._state
   }
+
+  // TODO: support multiple listeners for a single key.
+  readonly event = new EventEmitter() as TypedEmitter<EventTypes>
 
   constructor(private readonly credResolverRepository: CredResolverRepository) {
     makeObservable(this)
@@ -120,24 +128,35 @@ export default class CredResolverStore {
       yield this.fetchCredResolver(true, true)
     }
 
-    this.setPayloadResolved(value.accountid, res)
+    const credResolver = this.setPayloadResolved(value.accountid, res)
+    this.event.emit('credResolverUpdated', this, credResolver)
   })
 
+  /**
+   * setPayloadResolving mark payload to resolving state.
+   * @returns observed CredResolverConfig that's marked as resolving.
+   */
   @action
-  private setPayloadResolving(accountId: string) {
+  private setPayloadResolving(accountId: string): ObservedCredResolverConfig | null {
     const credResolver = this._credResolverMap.get(accountId)
     if (!credResolver) {
-      return
+      return null
     }
 
     credResolver.payload = {
       resolved: false,
       data: undefined,
     }
+
+    return credResolver.value
   }
 
+  /**
+   * setPayloadResolved mark credResolverConfig's payload as resolved with given arguments.
+   * @returns observed CredResolverConfig that's marked as resolved.
+   */
   @action
-  private setPayloadResolved(accountId: string, res: CommonRes) {
+  private setPayloadResolved(accountId: string, res: CommonRes): ObservedCredResolverConfig {
     const credResolver = this._credResolverMap.get(accountId)
     if (!credResolver) {
       throw new Error(`credResolver is not exist on map, accountId: ${accountId}`)
@@ -150,6 +169,8 @@ export default class CredResolverStore {
         resultCode: res.getStatus(),
       },
     }
+
+    return credResolver.value
   }
 
   deleteCredResolver = flow(function* (this: CredResolverStore, accountId: string) {

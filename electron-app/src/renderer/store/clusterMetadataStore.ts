@@ -1,4 +1,4 @@
-import { flow, makeObservable, observable, reaction } from 'mobx'
+import { flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
@@ -62,14 +62,11 @@ export default class ClusterMetadataStore implements Disposable {
   constructor(credResolverStore: CredResolverStore) {
     makeObservable(this)
 
-    // if credResolverStore changes, fetch clusterMetadata
-    this.disposables.push({
-      dispose: () =>
-        reaction(
-          () => credResolverStore.credResolvers,
-          () => this.fetchMetadata(true)
-        ),
-    })
+    credResolverStore.event.on('credResolverUpdated', (sender, e) => this.onCredResolverUpdated(sender, e))
+  }
+
+  private onCredResolverUpdated(_: any, e: any) {
+    this.fetchMetadata(true)
   }
 
   fetchMetadata = flow(function* (this: ClusterMetadataStore, resync?: boolean) {

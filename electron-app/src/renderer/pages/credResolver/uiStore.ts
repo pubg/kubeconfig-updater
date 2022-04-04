@@ -13,7 +13,7 @@ type Option = ProfileSelectionOption
 export default class UIStore {
   @computed
   get state(): 'ready' | 'fetching' {
-    const isLoading = this.profileStore.state !== 'ready' || this.credResolverStore.isLoading !== 'ready'
+    const isLoading = this.profileStore.state !== 'ready' || this.credResolverStore.state !== 'ready'
 
     return isLoading ? 'fetching' : 'ready'
   }
