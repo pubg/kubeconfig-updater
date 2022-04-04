@@ -142,7 +142,8 @@ const createWindow = async () => {
       mainWindow.minimize()
     } else {
       mainWindow.focus()
-      if (clientConfigStore.get('maximizeOnStart', true)) {
+
+      if (clientConfigStore.get('fullScreenOnStartup', true)) {
         mainWindow.maximize()
       }
       mainWindow.show()
