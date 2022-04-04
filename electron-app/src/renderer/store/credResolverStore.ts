@@ -81,7 +81,7 @@ export default class CredResolverStore {
     return this.lastUpdated.add(this.expiredMinute, 'minute').isBefore(dayjs())
   }
 
-  setCredResolver = flow(function* (this: CredResolverStore, value: ObservedCredResolverConfig) {
+  setCredResolver = flow(async function* (this: CredResolverStore, value: ObservedCredResolverConfig) {
     this.logger.debug(`request set cred resolver, accountId: ${value.accountid}, infraVendor: ${value.infravendor}`)
     this.logger.debug('value: ', toJS(value))
 
@@ -91,6 +91,8 @@ export default class CredResolverStore {
     if (res.getStatus() !== ResultCode.SUCCESS) {
       this.logger.error('failed to set cred resolver. err: ', res.getMessage())
     }
+
+    yield this.fetchCredResolver(true)
 
     this.setPayloadResolved(value.accountid, res)
   })
