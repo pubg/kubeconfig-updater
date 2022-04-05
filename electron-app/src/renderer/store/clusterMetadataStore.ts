@@ -66,7 +66,7 @@ export default class ClusterMetadataStore implements Disposable {
 
   readonly errorEvent = new EventStore<Error>()
 
-  private readonly fetchMetadataDebounceTimeout = 5000 // ms
+  readonly fetchMetadataDebounceTimeout = 5000 // ms
 
   private readonly lock = new AsyncLock()
 
@@ -79,16 +79,20 @@ export default class ClusterMetadataStore implements Disposable {
   }
 
   private onCredResolverUpdated(_0: any, e: any) {
-    this.fetchMetadata()
+    this.fetchMetadataDebounced()
   }
 
   /**
    * fetchMetadata get cluster metadata from backend.
    * @param doSync determines whether or not to sync before fetching data from backend.
    */
-  fetchMetadata = _.debounce(async (doSync = true) => {
+  fetchMetadataDebounced = _.debounce(async (doSync = true) => {
+    await this.fetchMetadata(doSync)
+  }, this.fetchMetadataDebounceTimeout)
+
+  async fetchMetadata(doSync = true) {
     await this.lock.acquire(
-      this.fetchMetadata.name,
+      this.fetchMetadataDebounced.name,
       flow(
         function* (this: ClusterMetadataStore) {
           this._items = []
@@ -120,7 +124,7 @@ export default class ClusterMetadataStore implements Disposable {
         }.bind(this)
       )
     )
-  }, this.fetchMetadataDebounceTimeout)
+  }
 
   private static async sync() {
     const repo = container.resolve(ClusterRepository)
