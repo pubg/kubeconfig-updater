@@ -19,7 +19,7 @@ export default observer(function ClientConfig() {
   return (
     <Stack>
       <Stack flexDirection="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="body1">FullScreen on start</Typography>
+        <Typography variant="body1">FullScreen On Start</Typography>
         <Switch checked={fullScreenState} onChange={(_, checked) => onFullScreenToggle(checked)} />
       </Stack>
     </Stack>
