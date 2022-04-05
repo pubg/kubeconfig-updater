@@ -2,6 +2,7 @@ import { computed, flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
 import AsyncLock from 'async-lock'
+import _ from 'lodash'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import browserLogger from '../logger/browserLogger'
 import ClusterRepository from '../repositories/clusterRepository'
@@ -65,6 +66,8 @@ export default class ClusterMetadataStore implements Disposable {
 
   readonly errorEvent = new EventStore<Error>()
 
+  private readonly fetchMetadataDebounceTimeout = 5000 // ms
+
   private readonly lock = new AsyncLock()
 
   constructor(credResolverStore: CredResolverStore) {
@@ -75,7 +78,7 @@ export default class ClusterMetadataStore implements Disposable {
     this.fetchMetadata()
   }
 
-  private onCredResolverUpdated(_: any, e: any) {
+  private onCredResolverUpdated(_0: any, e: any) {
     this.fetchMetadata()
   }
 
@@ -83,7 +86,7 @@ export default class ClusterMetadataStore implements Disposable {
    * fetchMetadata get cluster metadata from backend.
    * @param doSync determines whether or not to sync before fetching data from backend.
    */
-  async fetchMetadata(doSync = true) {
+  fetchMetadata = _.debounce(async (doSync = true) => {
     await this.lock.acquire(
       this.fetchMetadata.name,
       flow(
@@ -117,7 +120,7 @@ export default class ClusterMetadataStore implements Disposable {
         }.bind(this)
       )
     )
-  }
+  }, this.fetchMetadataDebounceTimeout)
 
   private static async sync() {
     const repo = container.resolve(ClusterRepository)
