@@ -1,4 +1,4 @@
-import { Refresh, ArrowDropDownOutlined } from '@mui/icons-material'
+import { Refresh } from '@mui/icons-material'
 import {
   Stack,
   FormGroup,
@@ -7,12 +7,7 @@ import {
   Button,
   UseAutocompleteProps,
   ButtonGroup,
-  Popper,
-  Paper,
-  ClickAwayListener,
-  MenuList,
   MenuItem,
-  Grow,
   useTheme,
   Select,
   InputLabel,
@@ -20,6 +15,7 @@ import {
 } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import _ from 'lodash'
 import { ClusterInformationStatus } from '../../protos/kubeconfig_service_pb'
 import { longestCommonSequence } from '../../utils/strings/lcs'
 import browserLogger from '../../logger/browserLogger'
@@ -59,7 +55,6 @@ export default observer(function TopBar() {
 
   // define variables
   const [nameFilter, setNameFilter] = useState('')
-  const [showReloadDropdown, setShowReloadDropdown] = useState(false)
   const [viewType, setViewType] = useState<ViewType>('All')
   const reloadDropdownRef = useRef(null)
 
@@ -74,15 +69,12 @@ export default observer(function TopBar() {
     store.setGroupTag(value)
   }
 
-  // TODO: refactor this hard-coded requester binding to parent?
-  const onReloadClick = useCallback(async () => {
-    await requester.fetchMetadata()
-  }, [requester])
-
-  const onHardReloadClick = useCallback(async () => {
-    setShowReloadDropdown(false)
-    requester.fetchMetadata(true)
-  }, [requester])
+  const onHardReloadClick = _.debounce(
+    useCallback(() => {
+      requester.fetchMetadata(true)
+    }, [requester]),
+    500
+  )
 
   const theme = useTheme()
 
@@ -134,31 +126,10 @@ export default observer(function TopBar() {
       </FormGroup>
       <Stack>
         <ButtonGroup variant="outlined" ref={reloadDropdownRef}>
-          <Button variant="outlined" startIcon={<Refresh />} onClick={onReloadClick}>
+          <Button variant="outlined" startIcon={<Refresh />} onClick={onHardReloadClick}>
             Reload
           </Button>
-          <Button variant="outlined" size="small" onClick={() => setShowReloadDropdown(!showReloadDropdown)}>
-            <ArrowDropDownOutlined />
-          </Button>
         </ButtonGroup>
-        {/* TODO: make this Popper width same as parent */}
-        {/* read: https://github.com/floating-ui/floating-ui/issues/794 */}
-        <Popper open={showReloadDropdown} anchorEl={reloadDropdownRef.current} transition disablePortal>
-          {({ TransitionProps, placement }) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <Grow {...TransitionProps}>
-              <Paper elevation={8}>
-                <ClickAwayListener onClickAway={() => setShowReloadDropdown(false)}>
-                  <MenuList>
-                    <MenuItem key="force-reload" onClick={onHardReloadClick}>
-                      Hard Reload
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
       </Stack>
     </Stack>
   )

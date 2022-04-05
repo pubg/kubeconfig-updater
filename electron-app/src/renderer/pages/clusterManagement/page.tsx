@@ -1,6 +1,5 @@
 import { Box, Paper } from '@mui/material'
 import { ThemeProvider } from '@fluentui/react'
-import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import TopBar from './topBar'
 import BottomBar from './bottomBar'
@@ -8,18 +7,11 @@ import ProgressSnackbar from './progressSnackbar'
 import { ContainerContextProvider, useResolve } from '../../hooks/container'
 import ThemeStore from '../../store/themeStore'
 import ClusterInfoList from './clusterList'
-import ClusterMetadataStore from '../../store/clusterMetadataStore'
 import ErrorNotification from './errorNotification'
 import RegStatusModal from './regStatusModal'
 
 export default observer(function ClusterManagement() {
-  const clusterMetadataStore = useResolve(ClusterMetadataStore)
   const { fluentUiTheme } = useResolve(ThemeStore)
-
-  // invoke on mount
-  useEffect(() => {
-    clusterMetadataStore.fetchMetadata()
-  }, [clusterMetadataStore])
 
   return (
     <ContainerContextProvider>

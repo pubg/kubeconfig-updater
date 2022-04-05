@@ -1,18 +1,31 @@
-import { flow, makeObservable, observable } from 'mobx'
+import { computed, flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
+import AsyncLock from 'async-lock'
+import _ from 'lodash'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import browserLogger from '../logger/browserLogger'
 import ClusterRepository from '../repositories/clusterRepository'
 import EventStore from '../event/eventStore'
 import { ResultCode } from '../protos/common_pb'
+import CredResolverStore from './credResolverStore'
+import { Disposable } from '../types/disposable'
 
 @singleton()
-export default class ClusterMetadataStore {
+export default class ClusterMetadataStore implements Disposable {
+  private readonly disposables: Disposable[] = []
+
+  private disposed = false
+
   private readonly logger = browserLogger
 
   @observable
-  state: 'ready' | 'fetch' | 'in-sync' = 'ready'
+  private _state: 'ready' | 'fetch' | 'in-sync' = 'ready'
+
+  @computed
+  get state() {
+    return this._state
+  }
 
   @observable
   private _items: AggregatedClusterMetadata[] = []
@@ -53,38 +66,65 @@ export default class ClusterMetadataStore {
 
   readonly errorEvent = new EventStore<Error>()
 
-  constructor() {
+  readonly fetchMetadataDebounceTimeout = 5000 // ms
+
+  private readonly lock = new AsyncLock()
+
+  constructor(credResolverStore: CredResolverStore) {
     makeObservable(this)
+
+    credResolverStore.event.on('credResolverUpdated', (sender, e) => this.onCredResolverUpdated(sender, e))
+
+    this.fetchMetadata()
   }
 
-  fetchMetadata = flow(function* (this: ClusterMetadataStore, resync?: boolean) {
-    this._items = []
+  private onCredResolverUpdated(_0: any, e: any) {
+    this.fetchMetadataDebounced()
+  }
 
-    if (resync || this.shouldResync) {
-      this.logger.debug('request backend cluster metadata sync')
-      this.state = 'in-sync'
+  /**
+   * fetchMetadata get cluster metadata from backend.
+   * @param doSync determines whether or not to sync before fetching data from backend.
+   */
+  fetchMetadataDebounced = _.debounce(async (doSync = true) => {
+    await this.fetchMetadata(doSync)
+  }, this.fetchMetadataDebounceTimeout)
 
-      try {
-        yield ClusterMetadataStore.sync()
-      } catch (e) {
-        this.errorEvent.emit(e as Error)
-        this.logger.error(e)
-      }
-    }
+  async fetchMetadata(doSync = true) {
+    await this.lock.acquire(
+      this.fetchMetadataDebounced.name,
+      flow(
+        function* (this: ClusterMetadataStore) {
+          this._items = []
 
-    this.logger.debug('request backend cluster metadata fetch')
-    this.state = 'fetch'
+          if (doSync || this.shouldResync) {
+            this.logger.debug('request backend cluster metadata sync')
+            this._state = 'in-sync'
 
-    try {
-      this._items = yield ClusterMetadataStore.fetch()
-    } catch (e) {
-      this.errorEvent.emit(e as Error)
-      this.logger.error(e)
-    }
+            try {
+              yield ClusterMetadataStore.sync()
+            } catch (e) {
+              this.errorEvent.emit(e as Error)
+              this.logger.error(e)
+            }
+          }
 
-    this.logger.debug('fetch cluster metadata done.')
-    this.state = 'ready'
-  })
+          this.logger.debug('request backend cluster metadata fetch')
+          this._state = 'fetch'
+
+          try {
+            this._items = yield ClusterMetadataStore.fetch()
+          } catch (e) {
+            this.errorEvent.emit(e as Error)
+            this.logger.error(e)
+          }
+
+          this.logger.debug('fetch cluster metadata done.')
+          this._state = 'ready'
+        }.bind(this)
+      )
+    )
+  }
 
   private static async sync() {
     const repo = container.resolve(ClusterRepository)
@@ -113,5 +153,17 @@ export default class ClusterMetadataStore {
     }
 
     return res.getClustersList()
+  }
+
+  dispose(): void {
+    if (this.disposed) {
+      return
+    }
+
+    for (const disposable of this.disposables) {
+      disposable.dispose()
+    }
+
+    this.disposed = true
   }
 }
