@@ -1,6 +1,7 @@
 import { computed, flow, makeObservable, observable } from 'mobx'
 import { container, singleton } from 'tsyringe'
 import dayjs, { Dayjs } from 'dayjs'
+import AsyncLock from 'async-lock'
 import { AggregatedClusterMetadata } from '../protos/kubeconfig_service_pb'
 import browserLogger from '../logger/browserLogger'
 import ClusterRepository from '../repositories/clusterRepository'
@@ -64,6 +65,8 @@ export default class ClusterMetadataStore implements Disposable {
 
   readonly errorEvent = new EventStore<Error>()
 
+  private readonly lock = new AsyncLock()
+
   constructor(credResolverStore: CredResolverStore) {
     makeObservable(this)
 
@@ -73,41 +76,48 @@ export default class ClusterMetadataStore implements Disposable {
   }
 
   private onCredResolverUpdated(_: any, e: any) {
-    this.fetchMetadata(true)
+    this.fetchMetadata()
   }
 
   /**
    * fetchMetadata get cluster metadata from backend.
    * @param doSync determines whether or not to sync before fetching data from backend.
    */
-  fetchMetadata = flow(function* (this: ClusterMetadataStore, doSync = true) {
-    this._items = []
+  async fetchMetadata(doSync = true) {
+    await this.lock.acquire(
+      this.fetchMetadata.name,
+      flow(
+        function* (this: ClusterMetadataStore) {
+          this._items = []
 
-    if (doSync || this.shouldResync) {
-      this.logger.debug('request backend cluster metadata sync')
-      this._state = 'in-sync'
+          if (doSync || this.shouldResync) {
+            this.logger.debug('request backend cluster metadata sync')
+            this._state = 'in-sync'
 
-      try {
-        yield ClusterMetadataStore.sync()
-      } catch (e) {
-        this.errorEvent.emit(e as Error)
-        this.logger.error(e)
-      }
-    }
+            try {
+              yield ClusterMetadataStore.sync()
+            } catch (e) {
+              this.errorEvent.emit(e as Error)
+              this.logger.error(e)
+            }
+          }
 
-    this.logger.debug('request backend cluster metadata fetch')
-    this._state = 'fetch'
+          this.logger.debug('request backend cluster metadata fetch')
+          this._state = 'fetch'
 
-    try {
-      this._items = yield ClusterMetadataStore.fetch()
-    } catch (e) {
-      this.errorEvent.emit(e as Error)
-      this.logger.error(e)
-    }
+          try {
+            this._items = yield ClusterMetadataStore.fetch()
+          } catch (e) {
+            this.errorEvent.emit(e as Error)
+            this.logger.error(e)
+          }
 
-    this.logger.debug('fetch cluster metadata done.')
-    this._state = 'ready'
-  })
+          this.logger.debug('fetch cluster metadata done.')
+          this._state = 'ready'
+        }.bind(this)
+      )
+    )
+  }
 
   private static async sync() {
     const repo = container.resolve(ClusterRepository)
