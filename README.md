@@ -18,8 +18,6 @@ GUI Kuberentes config file manager app. It suggests your cloud profiles and avai
 | linux-arm64.AppImage | AppImage     | Linux   | Arm64        |
 | linux-arm64.tar.gz   | tar.gz       | Linux   | Arm64        |
 | mac-universal.zip    | App          | MacOS   | Universal    |
-| mac-x64.zip          | App          | MacOS   | x86-64       |
-| mac-arm64.zip        | App          | MacOS   | Arm64        |
 
 ## Run Requirements
 - (Option) AWS CLI
