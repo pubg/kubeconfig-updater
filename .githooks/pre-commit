@@ -1,6 +1,8 @@
 #!/bin/sh
 set -euxo pipefail
 
+export PATH=$PATH:$(go env GOPATH)/bin:$(go env GOROOT)/bin
+
 result=$(gofmt -s -l -w backend/ | wc -c)
 if [ $result -ne 0 ]; then
     echo "Automatically formatted unformatted files. Please stage changes and commit again."

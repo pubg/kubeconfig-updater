@@ -3,9 +3,10 @@ package azure
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cluster_metadata_service"
-	"log"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
@@ -51,19 +52,23 @@ func (r *Resolver) ListClusters() ([]*protos.ClusterMetadata, error) {
 	client := aks.NewManagedClustersClient(r.subscriptionId)
 	client.Authorizer = authorizer
 
-	result, err := client.List(context.Background())
+	ctx := context.Background()
+	result, err := client.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error occurred when trying AKS/List/ManagedCluster subscriptionId:%s error:%s", r.subscriptionId, err.Error())
 	}
-	for !result.NotDone() {
-		err = result.Next()
+
+	values := result.Values()
+	for result.NotDone() {
+		err = result.NextWithContext(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error occurred when trying AKS/List/ManagedCluster subscriptionId:%s error:%s", r.subscriptionId, err.Error())
 		}
+		values = append(values, result.Values()...)
 	}
 
 	var clusters []*protos.ClusterMetadata
-	for _, cluster := range result.Values() {
+	for _, cluster := range values {
 		meta := &protos.ClusterMetadata{
 			ClusterName:    *cluster.Name,
 			CredResolverId: r.subscriptionId,
