@@ -139,8 +139,8 @@ jobs:
           ls -al packages
           VERSION=$(jq -r -c '.version' ./electron-app/package.json)
           gh release create v$VERSION --repo=https://github.com/pubg/kubeconfig-updater --title=v$VERSION
-          gh release upload v$VERSION --repo=https://github.com/pubg/kubeconfig-updater ./packages/mac-universal.zip
-          gh release upload v$VERSION --repo=https://github.com/pubg/kubeconfig-updater ./packages/linux-*
-          gh release upload v$VERSION --repo=https://github.com/pubg/kubeconfig-updater ./packages/win-*
+          gh release upload v$VERSION --repo=https://github.com/pubg/kubeconfig-updater ./packages/*-mac-universal.zip
+          gh release upload v$VERSION --repo=https://github.com/pubg/kubeconfig-updater ./packages/*-linux-*
+          gh release upload v$VERSION --repo=https://github.com/pubg/kubeconfig-updater ./packages/*-win-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
