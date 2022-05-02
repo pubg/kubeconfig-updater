@@ -2,6 +2,8 @@ package cluster_metadata_service
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/pubg/kubeconfig-updater/backend/application/configs"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
@@ -9,7 +11,6 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/persistence/cluster_metadata_persist"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/service/cred_resolver_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
-	"strings"
 )
 
 type ClusterMetadataService struct {

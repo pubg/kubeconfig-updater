@@ -1,39 +1,34 @@
-package aws
+package azure
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
-	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
+	azureCred "github.com/pubg/kubeconfig-updater/backend/pkg/credentials/azure"
 )
 
-func TestAwsResolver_ListClusters(t *testing.T) {
-	accountId := "2222"
+func TestResolver_ListClusters(t *testing.T) {
+	accountId := os.Getenv("AZ_SUBSCRIPTION_ID")
 
 	cfg := &protos.CredResolverConfig{
 		AccountId:    accountId,
-		InfraVendor:  "AWS",
-		AccountAlias: "pubg-xtrm",
+		InfraVendor:  "Azure",
+		AccountAlias: "xtrm-newstate",
 		Kind:         protos.CredentialResolverKind_PROFILE,
 		ResolverAttributes: map[string]string{
-			"profile": "mfa",
+			"profile": accountId,
 		},
 		Status: protos.CredentialResolverStatus_CRED_REGISTERED_OK,
 	}
 
-	factory, exists := credentials.GetFactory(types.InfraVendor_AWS)
-	if !exists {
-		t.Error("CredResolverFactory NotFound")
-	}
-
-	credResolver, err := factory.NewCredResolverFunc(cfg)
+	credResolver, err := azureCred.NewAzureResolver(cfg)
 	if err != nil {
 		t.Error(err)
 	}
 
-	resolver, err := NewAwsResolver(credResolver, accountId)
+	resolver, err := NewAzureResolver(credResolver, accountId)
 	if err != nil {
 		t.Error(err)
 	}
