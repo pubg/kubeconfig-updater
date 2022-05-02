@@ -16,3 +16,5 @@ builds:
     goarch:
       - amd64
       - arm64
+    goamd64:
+      - v1
