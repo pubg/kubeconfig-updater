@@ -3,6 +3,8 @@ package aws
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/pubg/kubeconfig-updater/backend/controller/protos"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/common"
@@ -10,7 +12,6 @@ import (
 	"github.com/pubg/kubeconfig-updater/backend/pkg/credentials"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/raw_service/aws_service"
 	"github.com/pubg/kubeconfig-updater/backend/pkg/types"
-	"log"
 )
 
 func init() {
@@ -38,7 +39,10 @@ func (a *LocalCred) GetLocalProfiles() ([]*protos.Profile, error) {
 		if err != nil {
 			return nil, err
 		}
-		accountIdOrEmpty, _ := aws_service.GetConfigInfo(&cfg)
+		accountIdOrEmpty, tolerableErr := aws_service.GetConfigInfo(&cfg)
+		if tolerableErr != nil {
+			fmt.Printf("aws.LocalCred.GetLocalProfiles TolerableErr %s", err.Error())
+		}
 		return &protos.Profile{
 			ProfileName: profileName,
 			AccountId:   accountIdOrEmpty,
