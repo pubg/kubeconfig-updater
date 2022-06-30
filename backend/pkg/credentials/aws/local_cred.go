@@ -41,7 +41,7 @@ func (a *LocalCred) GetLocalProfiles() ([]*protos.Profile, error) {
 		}
 		accountIdOrEmpty, tolerableErr := aws_service.GetConfigInfo(&cfg)
 		if tolerableErr != nil {
-			fmt.Printf("aws.LocalCred.GetLocalProfiles TolerableErr %s", err.Error())
+			fmt.Printf("aws.LocalCred.GetLocalProfiles TolerableErr %s", tolerableErr.Error())
 		}
 		return &protos.Profile{
 			ProfileName: profileName,
