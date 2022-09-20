@@ -15,7 +15,7 @@ type CredResolverConfigStorage struct {
 	StoragePath string
 }
 
-//FirstLoad, Error
+// FirstLoad, Error
 func (c *CredResolverConfigStorage) LoadStorage() (bool, error) {
 	err := os.MkdirAll(filepath.Dir(c.StoragePath), os.ModePerm)
 	if err != nil {

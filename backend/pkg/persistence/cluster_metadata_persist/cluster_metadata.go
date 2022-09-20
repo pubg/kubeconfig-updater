@@ -15,7 +15,7 @@ type ClusterMetadataStorage struct {
 	StoragePath string
 }
 
-//FirstLoad, Error
+// FirstLoad, Error
 func (c *ClusterMetadataStorage) LoadStorage() (bool, error) {
 	err := os.MkdirAll(filepath.Dir(c.StoragePath), os.ModePerm)
 	if err != nil {

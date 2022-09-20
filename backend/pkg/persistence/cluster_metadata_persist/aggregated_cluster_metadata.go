@@ -22,7 +22,7 @@ func (c *AggregatedClusterMetadataStorage) InitStorage() {
 	c.keyStore = new(jsonstore.JSONStore)
 }
 
-//FirstLoad, Error
+// FirstLoad, Error
 func (c *AggregatedClusterMetadataStorage) LoadStorage() (bool, error) {
 	err := os.MkdirAll(filepath.Dir(c.StoragePath), os.ModePerm)
 	if err != nil {
