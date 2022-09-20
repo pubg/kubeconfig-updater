@@ -27,10 +27,10 @@ require (
 	github.com/rancher/rancher/pkg/client v0.0.0-20211102002137-7a574e4a17ae
 	github.com/schollz/jsonstore v1.1.0
 	github.com/spf13/cobra v1.2.1
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.228
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.500
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.313
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.228
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.500
 	github.krafton.com/xtrm/fox v1.1.1
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect

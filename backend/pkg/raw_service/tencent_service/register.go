@@ -29,6 +29,7 @@ func RegisterTkeCluster0(region, clusterId, clusterName string, credProvider com
 
 	req := tke.NewDescribeClusterKubeconfigRequest()
 	req.ClusterId = common.StringPtr(clusterId)
+	req.IsExtranet = common.BoolPtr(true)
 	res, err := client.DescribeClusterKubeconfig(req)
 	if err != nil {
 		return err
