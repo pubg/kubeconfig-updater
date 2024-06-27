@@ -125,7 +125,7 @@ pnpm run start
 ```bash
 # Build with goreleaser
 cd backend
-goreleaser build --rm-dist --snapshot
+goreleaser build --clean --snapshot
 
 # Build with go mod (for develop)
 cd backend

@@ -19,7 +19,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: build --rm-dist --snapshot --single-target
+          args: build --clean --snapshot --single-target
           workdir: backend
 
   frontend-build:

@@ -1,5 +1,5 @@
 build-backend:
-	cd ../backend && goreleaser build --rm-dist --snapshot
+	cd ../backend && goreleaser build --clean --snapshot
 
 build-frontend:
 	pnpm install
