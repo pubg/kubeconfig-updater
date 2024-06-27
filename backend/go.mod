@@ -11,11 +11,11 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.3
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/aws/aws-sdk-go-v2 v1.11.2
-	github.com/aws/aws-sdk-go-v2/config v1.6.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.25.0
-	github.com/aws/aws-sdk-go-v2/service/eks v1.15.1
-	github.com/aws/aws-sdk-go-v2/service/sts v1.6.1
+	github.com/aws/aws-sdk-go-v2 v1.30.0
+	github.com/aws/aws-sdk-go-v2/config v1.27.22
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.167.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.45.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.30.0
 	github.com/binxio/gcloudconfig v0.1.5
 	github.com/ghodss/yaml v1.0.0
 	github.com/gobwas/glob v0.2.3
@@ -31,7 +31,6 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.313
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts v1.0.319
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tke v1.0.500
-	github.krafton.com/xtrm/fox v1.1.1
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
@@ -54,14 +53,16 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.3.2 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.4.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.3.2 // indirect
-	github.com/aws/smithy-go v1.9.0 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.22 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.8 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.12 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.12 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.14 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.22.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.26.0 // indirect
+	github.com/aws/smithy-go v1.20.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
